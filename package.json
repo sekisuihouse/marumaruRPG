@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": "24.11.1",
+    "npm": "11.6.2"
+  },
   "scripts": {
     "dev": "vite",
     "dev:debug": "vite --mode debug",

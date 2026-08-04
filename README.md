@@ -10,6 +10,8 @@ cp .env.example .env.local
 npm run dev
 ```
 
+Node.js `24.11.1`（npm `11.6.2`）を使用します。`.node-version` と `package.json` の`engines`で固定しています。
+
 マルチプレイをローカルで試す場合は、別ターミナルで次を起動します。
 
 ```bash
