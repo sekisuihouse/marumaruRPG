@@ -7,7 +7,7 @@
  *   3. セーブがあればタイトルで「続きから／最初から」を選ばせる
  *   4. Canvas をマウントして World を描画
  */
-import React, { Suspense, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import React, { Suspense, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Canvas } from '@react-three/fiber'
 import { useProgress } from '@react-three/drei'
@@ -32,7 +32,6 @@ const { resetTown } = destructApi
 import { World } from './scene/World.jsx'
 import { Hud } from './ui/Hud.jsx'
 import { MultiplayerMenu } from './ui/MultiplayerMenu.jsx'
-import { multiplayerSnapshot, subscribeMultiplayer } from './net/multiplayerStore.js'
 import { KEYMAP } from './engine/input.js'
 
 function Loader() {
@@ -74,7 +73,6 @@ function App() {
   const [error, setError] = useState(null)
   const saveRef = useRef(null)
   const wrapRef = useRef(null)
-  const multiplayerState = useSyncExternalStore(subscribeMultiplayer, multiplayerSnapshot, multiplayerSnapshot)
   /**
    * ポインターロックは「ユーザー操作の直後」でないと拒否される。
    * 拡張機能の autostart 起動はクリックを伴わないので要求しない
@@ -156,10 +154,6 @@ function App() {
     setPhase('play')
     requestPointerLock()
   }
-
-  useEffect(() => {
-    if (phase === 'multiplayer' && multiplayerState.role === 'guest' && multiplayerState.gameStarted) start(false, multiplayerState.settings)
-  }, [phase, multiplayerState.gameStarted])
 
   if (phase === 'error') {
     return (
