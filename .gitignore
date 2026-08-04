@@ -12,4 +12,6 @@ marugotosai2026_KV.glb
 # 変換元・編集用の配布素材は含めない（実行用GLBは公開許諾確認済み）。
 bos 3Dmoderu/
 Ultimate Modular Men- Feb 2022/
-marugoto-tensei-extension/
+# 拡張機能の実装は追跡し、ビルド済みゲーム・アセットだけは毎回生成する。
+marugoto-tensei-extension/game/
+marugoto-tensei-extension/assets/
