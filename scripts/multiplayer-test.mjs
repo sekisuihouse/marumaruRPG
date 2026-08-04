@@ -1,6 +1,7 @@
 /** シグナリングの結合テスト。WebRTC本体はブラウザAPIが必要なのでここではルーム制御を検証する。 */
 import { spawn } from 'node:child_process'
 import { WebSocket } from 'ws'
+import { interpolate } from '../src/net/interpolation.js'
 
 const port = 18787
 const base = `ws://127.0.0.1:${port}/signal`
@@ -40,6 +41,12 @@ try {
   await waitServer()
   const health = await (await fetch(`http://127.0.0.1:${port}/health`)).json()
   check('GET /health', health.ok === true)
+  const interp = { samples: [
+    { hostTime: 900_000, receivedAt: 100, position: [0, 0, 0], rotation: 0, animationState: 'idle' },
+    { hostTime: 900_100, receivedAt: 200, position: [10, 0, 0], rotation: 1, animationState: 'run' },
+  ] }
+  interpolate(interp, 150)
+  check('タブごとの時刻差でも受信時刻で位置を補間する', Math.abs(interp.x - 5) < 0.01)
 
   const host = await connect()
   host.send({ type: 'create', name: 'test', playerName: 'host', password: 'pw', maxPlayers: 2, settings: { bosses: true } })

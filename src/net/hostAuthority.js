@@ -11,6 +11,20 @@ let lastFast = 0, lastSnapshot = 0, inputSequence = 0
 export const isGuest = () => multiplayer.role === 'guest' && multiplayer.status === 'connected'
 export const isHost = () => multiplayer.role === 'host' && multiplayer.status === 'connected'
 
+// ホスト画面でも参加者を表示する。入力位置は検証済みのものだけを使う。
+function updateHostRemoteAvatar(id, input) {
+  let remote = multiplayer.remotePlayers.get(id)
+  const isNew = !remote
+  if (!remote) {
+    remote = { id, label: multiplayer.peers.get(id)?.name || '参加者', pos: { x: input.position[0], y: input.position[1], z: input.position[2] }, yaw: input.rotation || 0, alive: true, hitFlash: 0, scale: 1, samples: [] }
+    multiplayer.remotePlayers.set(id, remote)
+  }
+  remote.label = multiplayer.peers.get(id)?.name || remote.label
+  remote.pos.x = input.position[0]; remote.pos.y = input.position[1]; remote.pos.z = input.position[2]
+  remote.yaw = input.rotation || 0; remote.anim = input.animationState || 'idle'; remote.alive = true
+  if (isNew) notifyMultiplayer()
+}
+
 export function initMultiplayerAuthority() {
   onPartBroken((part, impulse) => {
     if (!isHost()) return
@@ -25,7 +39,9 @@ export function initMultiplayerAuthority() {
       if (!isHost() || m.type !== 'input' || !m.playerId) return
       const old = remoteInputs.get(m.playerId); const position = validateMove(old?.position, m.position, (performance.now() - (old?.receivedAt || performance.now())) / 1000)
       if (!position) return
-      remoteInputs.set(m.playerId, { ...m, position, receivedAt: performance.now(), sequence: m.sequence })
+      const input = { ...m, position, receivedAt: performance.now(), sequence: m.sequence }
+      remoteInputs.set(m.playerId, input)
+      updateHostRemoteAvatar(m.playerId, input)
     },
     onReliable: (m) => {
       if (m.type === 'snapshot' && isGuest()) applySnapshot(m)

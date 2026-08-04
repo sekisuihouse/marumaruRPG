@@ -20,6 +20,7 @@ export function applySnapshot(s) {
   if (!s || s.sequence <= (sim.net.lastSnapshot || -1)) return false
   sim.net.lastSnapshot = s.sequence
   multiplayer.settings = s.settings || multiplayer.settings
+  const receivedAt = performance.now()
   for (const p of s.players || []) {
     if (p.id === multiplayer.playerId) {
       // 自己操作は維持しつつ、ホスト位置へ滑らかに寄せる。
@@ -29,7 +30,7 @@ export function applySnapshot(s) {
     let remote = multiplayer.remotePlayers.get(p.id)
     if (!remote) { remote = { id: p.id, label: p.name, pos: { x: p.position[0], y: p.position[1], z: p.position[2] }, yaw: p.rotation, alive: !p.dead, hitFlash: 0, scale: 1, samples: [] }; multiplayer.remotePlayers.set(p.id, remote) }
     remote.label = p.name; remote.alive = !p.dead; remote.level = p.level; remote.hp = p.hp; remote.maxHp = p.maxHp; remote.dead = p.dead
-    pushSample(remote, { sequence: s.sequence, hostTime: s.hostTime, position: p.position, rotation: p.rotation, animationState: p.animationState })
+    pushSample(remote, { sequence: s.sequence, hostTime: s.hostTime, receivedAt, position: p.position, rotation: p.rotation, animationState: p.animationState })
   }
   for (const state of s.enemies || []) {
     const e = sim.enemies.find((x) => x.id === state.id); if (!e) continue

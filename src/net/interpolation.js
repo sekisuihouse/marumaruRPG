@@ -5,7 +5,10 @@ export function pushSample(entity, sample) {
 }
 export function interpolate(entity, renderTime) {
   const a = entity.samples || []; if (!a.length) return entity
-  const b = a.find((s) => s.hostTime >= renderTime) || a[a.length - 1]; const before = a[Math.max(0, a.indexOf(b) - 1)] || b
-  const span = Math.max(1, b.hostTime - before.hostTime); const t = Math.max(0, Math.min(1, (renderTime - before.hostTime) / span))
+  // performance.now() はタブごとに起点が異なる。ネット越しのhostTimeではなく、
+  // この端末での受信時刻で補間しないと、別タブでは数分間初期位置に固定され得る。
+  const stamp = (s) => s.receivedAt ?? s.hostTime
+  const b = a.find((s) => stamp(s) >= renderTime) || a[a.length - 1]; const before = a[Math.max(0, a.indexOf(b) - 1)] || b
+  const span = Math.max(1, stamp(b) - stamp(before)); const t = Math.max(0, Math.min(1, (renderTime - stamp(before)) / span))
   entity.x = before.position[0] + (b.position[0] - before.position[0]) * t; entity.y = before.position[1] + (b.position[1] - before.position[1]) * t; entity.z = before.position[2] + (b.position[2] - before.position[2]) * t; entity.yaw = before.rotation + (b.rotation - before.rotation) * t; entity.anim = b.animationState; return entity
 }
