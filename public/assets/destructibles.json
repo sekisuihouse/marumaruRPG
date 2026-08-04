@@ -1,0 +1,1400 @@
+{
+ "source": "public/assets/town.glb",
+ "generatedAt": "2026-08-03T16:14:57.231Z",
+ "stats": {
+  "sourceMeshes": 527,
+  "triangles": 195607,
+  "buckets": 21,
+  "parts": 3143,
+  "partTypes": {
+   "prop": 243,
+   "wall": 1490,
+   "floor": 146,
+   "roof": 729,
+   "pillar": 266,
+   "sign": 102,
+   "window": 167
+  },
+  "breakableObjects": 65,
+  "totalHp": 169645
+ },
+ "classification": [
+  {
+   "name": "トラック",
+   "category": "prop",
+   "breakable": true
+  },
+  {
+   "name": "駐車場地面",
+   "category": "ground",
+   "breakable": false
+  },
+  {
+   "name": "ガソスタ地面",
+   "category": "ground",
+   "breakable": false
+  },
+  {
+   "name": "トラック002",
+   "category": "prop",
+   "breakable": true
+  },
+  {
+   "name": "車001",
+   "category": "prop",
+   "breakable": true
+  },
+  {
+   "name": "地面",
+   "category": "ground",
+   "breakable": false
+  },
+  {
+   "name": "ふち",
+   "category": "ground",
+   "breakable": false
+  },
+  {
+   "name": "川",
+   "category": "water",
+   "breakable": false
+  },
+  {
+   "name": "川岩",
+   "category": "ground",
+   "breakable": false
+  },
+  {
+   "name": "杉",
+   "category": "nature",
+   "breakable": false
+  },
+  {
+   "name": "イチョウ",
+   "category": "nature",
+   "breakable": false
+  },
+  {
+   "name": "すだち002",
+   "category": "nature",
+   "breakable": false
+  },
+  {
+   "name": "イチョウ001",
+   "category": "nature",
+   "breakable": false
+  },
+  {
+   "name": "イチョウ002",
+   "category": "nature",
+   "breakable": false
+  },
+  {
+   "name": "イチョウ003",
+   "category": "nature",
+   "breakable": false
+  },
+  {
+   "name": "イチョウ004",
+   "category": "nature",
+   "breakable": false
+  },
+  {
+   "name": "イチョウ005",
+   "category": "nature",
+   "breakable": false
+  },
+  {
+   "name": "すだち001",
+   "category": "nature",
+   "breakable": false
+  },
+  {
+   "name": "イチョウ009",
+   "category": "nature",
+   "breakable": false
+  },
+  {
+   "name": "社",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "鳥居",
+   "category": "structure",
+   "breakable": true
+  },
+  {
+   "name": "NURBSパス001",
+   "category": "ground",
+   "breakable": false
+  },
+  {
+   "name": "NURBSパス002",
+   "category": "ground",
+   "breakable": false
+  },
+  {
+   "name": "一方通行",
+   "category": "structure",
+   "breakable": true
+  },
+  {
+   "name": "一方通行001",
+   "category": "structure",
+   "breakable": true
+  },
+  {
+   "name": "一方通行002",
+   "category": "structure",
+   "breakable": true
+  },
+  {
+   "name": "一方通行004",
+   "category": "structure",
+   "breakable": true
+  },
+  {
+   "name": "一方通行003",
+   "category": "structure",
+   "breakable": true
+  },
+  {
+   "name": "一方通行005",
+   "category": "structure",
+   "breakable": true
+  },
+  {
+   "name": "ガードレール002",
+   "category": "structure",
+   "breakable": true
+  },
+  {
+   "name": "ガードレール",
+   "category": "structure",
+   "breakable": true
+  },
+  {
+   "name": "カフェ",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "温泉",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "コンビニ",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "キャンプ",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家002",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家004",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家2001",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家005",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家2002",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家007",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家2004",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "パン屋",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家010",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家011",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家012",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家001",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家003",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家2003",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家006",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家009",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家2005",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家014",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家016",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家017",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家018",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家2006",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家2007",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家013",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家2008",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家015",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家2009",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "古民家019",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "ガソスタ",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "Bus",
+   "category": "prop",
+   "breakable": true
+  },
+  {
+   "name": "Bus001",
+   "category": "prop",
+   "breakable": true
+  },
+  {
+   "name": "Loop",
+   "category": "ground",
+   "breakable": false
+  },
+  {
+   "name": "ブランコ",
+   "category": "structure",
+   "breakable": true
+  },
+  {
+   "name": "滑り台",
+   "category": "structure",
+   "breakable": true
+  },
+  {
+   "name": "土",
+   "category": "ground",
+   "breakable": false
+  },
+  {
+   "name": "すだち箱",
+   "category": "prop",
+   "breakable": true
+  },
+  {
+   "name": "集会所",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "自転車004",
+   "category": "prop",
+   "breakable": true
+  },
+  {
+   "name": "自転車005",
+   "category": "prop",
+   "breakable": true
+  },
+  {
+   "name": "棚田",
+   "category": "ground",
+   "breakable": false
+  },
+  {
+   "name": "古民家008",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "畑",
+   "category": "ground",
+   "breakable": false
+  },
+  {
+   "name": "ROOMS",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "Office",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "HOME",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "ステージ",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "学生体験",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "お話(男)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "作業(Man)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "作業(Woman)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "聞き手(Man)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "聞き手(Woman)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "聞き手(Woman)001",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "聞き手(Man)001",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "ぼうつき",
+   "category": "structure",
+   "breakable": true
+  },
+  {
+   "name": "マルシェ",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "店員(Woman)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "店員(Woman)001",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "店員(Woman)004",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "店員(Woman)005",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "物販",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "店員(Woman)002",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "店員(Woman)003",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "店員(Man)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "飲食",
+   "category": "building",
+   "breakable": true
+  },
+  {
+   "name": "花火(中)",
+   "category": "fx",
+   "breakable": false
+  },
+  {
+   "name": "花火(小)",
+   "category": "fx",
+   "breakable": false
+  },
+  {
+   "name": "花火(大)",
+   "category": "fx",
+   "breakable": false
+  },
+  {
+   "name": "お話(Man)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "寝転がり(Man)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "スコップで掘る(Man)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "歩く(Man)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "歩く(Woman)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "お話(Woman)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "スコップで掘る(Woman)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "寝転がり(Woman)",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "天を仰ぐ",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "阿波踊り_Woman006",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "阿波踊り_Woman005",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "阿波踊り_Woman004",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "阿波踊り_Woman002",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "阿波踊り_Woman001",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "阿波踊り_Woman",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "阿波踊り006",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "阿波踊り005",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "阿波踊り004",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "阿波踊り003",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "阿波踊り002",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "阿波踊り001",
+   "category": "people",
+   "breakable": false
+  },
+  {
+   "name": "物販_未来",
+   "category": "building",
+   "breakable": true
+  }
+ ],
+ "objects": [
+  {
+   "name": "ステージ",
+   "category": "building",
+   "chunks": 160,
+   "hp": 8985,
+   "types": [
+    "wall",
+    "pillar",
+    "window",
+    "roof",
+    "floor"
+   ]
+  },
+  {
+   "name": "HOME",
+   "category": "building",
+   "chunks": 158,
+   "hp": 14134,
+   "types": [
+    "wall",
+    "pillar",
+    "roof",
+    "floor"
+   ]
+  },
+  {
+   "name": "温泉",
+   "category": "building",
+   "chunks": 152,
+   "hp": 9216,
+   "types": [
+    "wall",
+    "roof",
+    "window",
+    "pillar"
+   ]
+  },
+  {
+   "name": "飲食",
+   "category": "building",
+   "chunks": 140,
+   "hp": 5953,
+   "types": [
+    "wall",
+    "window",
+    "roof",
+    "pillar"
+   ]
+  },
+  {
+   "name": "マルシェ",
+   "category": "building",
+   "chunks": 96,
+   "hp": 6565,
+   "types": [
+    "wall",
+    "roof",
+    "pillar",
+    "floor"
+   ]
+  },
+  {
+   "name": "ROOMS",
+   "category": "building",
+   "chunks": 95,
+   "hp": 8660,
+   "types": [
+    "wall",
+    "roof",
+    "pillar"
+   ]
+  },
+  {
+   "name": "コンビニ",
+   "category": "building",
+   "chunks": 84,
+   "hp": 3499,
+   "types": [
+    "wall",
+    "pillar",
+    "roof",
+    "floor",
+    "window"
+   ]
+  },
+  {
+   "name": "集会所",
+   "category": "building",
+   "chunks": 80,
+   "hp": 4112,
+   "types": [
+    "wall",
+    "window",
+    "floor",
+    "pillar",
+    "roof"
+   ]
+  },
+  {
+   "name": "パン屋",
+   "category": "building",
+   "chunks": 77,
+   "hp": 3754,
+   "types": [
+    "wall",
+    "window",
+    "pillar",
+    "roof"
+   ]
+  },
+  {
+   "name": "ガソスタ",
+   "category": "building",
+   "chunks": 75,
+   "hp": 5135,
+   "types": [
+    "roof",
+    "pillar",
+    "wall",
+    "floor",
+    "window"
+   ]
+  },
+  {
+   "name": "Bus001",
+   "category": "prop",
+   "chunks": 70,
+   "hp": 1357,
+   "types": [
+    "prop"
+   ]
+  },
+  {
+   "name": "物販",
+   "category": "building",
+   "chunks": 66,
+   "hp": 4840,
+   "types": [
+    "wall",
+    "roof",
+    "pillar",
+    "floor"
+   ]
+  },
+  {
+   "name": "古民家2008",
+   "category": "building",
+   "chunks": 64,
+   "hp": 4676,
+   "types": [
+    "window",
+    "floor",
+    "wall",
+    "pillar",
+    "roof"
+   ]
+  },
+  {
+   "name": "古民家2004",
+   "category": "building",
+   "chunks": 61,
+   "hp": 3934,
+   "types": [
+    "wall",
+    "floor",
+    "pillar",
+    "window",
+    "roof"
+   ]
+  },
+  {
+   "name": "古民家2009",
+   "category": "building",
+   "chunks": 61,
+   "hp": 3646,
+   "types": [
+    "window",
+    "pillar",
+    "wall",
+    "floor",
+    "roof"
+   ]
+  },
+  {
+   "name": "Bus",
+   "category": "prop",
+   "chunks": 61,
+   "hp": 1019,
+   "types": [
+    "prop"
+   ]
+  },
+  {
+   "name": "Office",
+   "category": "building",
+   "chunks": 60,
+   "hp": 3765,
+   "types": [
+    "wall",
+    "window"
+   ]
+  },
+  {
+   "name": "キャンプ",
+   "category": "building",
+   "chunks": 55,
+   "hp": 2576,
+   "types": [
+    "wall",
+    "roof",
+    "pillar"
+   ]
+  },
+  {
+   "name": "古民家015",
+   "category": "building",
+   "chunks": 55,
+   "hp": 3293,
+   "types": [
+    "pillar",
+    "window",
+    "floor",
+    "wall",
+    "roof"
+   ]
+  },
+  {
+   "name": "古民家2005",
+   "category": "building",
+   "chunks": 54,
+   "hp": 2949,
+   "types": [
+    "wall",
+    "floor",
+    "window",
+    "pillar",
+    "roof"
+   ]
+  },
+  {
+   "name": "古民家019",
+   "category": "building",
+   "chunks": 52,
+   "hp": 2747,
+   "types": [
+    "wall",
+    "pillar",
+    "window",
+    "roof",
+    "floor"
+   ]
+  },
+  {
+   "name": "物販_未来",
+   "category": "building",
+   "chunks": 47,
+   "hp": 2004,
+   "types": [
+    "wall",
+    "roof",
+    "pillar",
+    "window",
+    "floor"
+   ]
+  },
+  {
+   "name": "社",
+   "category": "building",
+   "chunks": 46,
+   "hp": 4292,
+   "types": [
+    "wall",
+    "floor",
+    "roof"
+   ]
+  },
+  {
+   "name": "古民家2006",
+   "category": "building",
+   "chunks": 46,
+   "hp": 2340,
+   "types": [
+    "wall",
+    "window",
+    "floor",
+    "roof",
+    "pillar"
+   ]
+  },
+  {
+   "name": "古民家014",
+   "category": "building",
+   "chunks": 45,
+   "hp": 1688,
+   "types": [
+    "pillar",
+    "floor",
+    "window",
+    "wall",
+    "roof"
+   ]
+  },
+  {
+   "name": "古民家2007",
+   "category": "building",
+   "chunks": 45,
+   "hp": 2457,
+   "types": [
+    "wall",
+    "window",
+    "floor",
+    "roof",
+    "pillar"
+   ]
+  },
+  {
+   "name": "カフェ",
+   "category": "building",
+   "chunks": 44,
+   "hp": 2643,
+   "types": [
+    "floor",
+    "wall",
+    "roof",
+    "window"
+   ]
+  },
+  {
+   "name": "古民家2001",
+   "category": "building",
+   "chunks": 44,
+   "hp": 2610,
+   "types": [
+    "wall",
+    "floor",
+    "window",
+    "pillar",
+    "roof"
+   ]
+  },
+  {
+   "name": "古民家013",
+   "category": "building",
+   "chunks": 44,
+   "hp": 2396,
+   "types": [
+    "floor",
+    "pillar",
+    "wall",
+    "roof"
+   ]
+  },
+  {
+   "name": "古民家002",
+   "category": "building",
+   "chunks": 43,
+   "hp": 2059,
+   "types": [
+    "pillar",
+    "floor",
+    "wall",
+    "roof"
+   ]
+  },
+  {
+   "name": "古民家2002",
+   "category": "building",
+   "chunks": 43,
+   "hp": 2046,
+   "types": [
+    "wall",
+    "window",
+    "floor",
+    "roof",
+    "pillar"
+   ]
+  },
+  {
+   "name": "古民家001",
+   "category": "building",
+   "chunks": 43,
+   "hp": 2059,
+   "types": [
+    "pillar",
+    "floor",
+    "wall",
+    "roof"
+   ]
+  },
+  {
+   "name": "古民家2003",
+   "category": "building",
+   "chunks": 43,
+   "hp": 2249,
+   "types": [
+    "wall",
+    "window",
+    "floor",
+    "pillar",
+    "roof"
+   ]
+  },
+  {
+   "name": "古民家006",
+   "category": "building",
+   "chunks": 43,
+   "hp": 1993,
+   "types": [
+    "pillar",
+    "floor",
+    "wall",
+    "roof",
+    "window"
+   ]
+  },
+  {
+   "name": "古民家009",
+   "category": "building",
+   "chunks": 43,
+   "hp": 1983,
+   "types": [
+    "wall",
+    "floor",
+    "pillar",
+    "roof"
+   ]
+  },
+  {
+   "name": "自転車005",
+   "category": "prop",
+   "chunks": 43,
+   "hp": 607,
+   "types": [
+    "prop"
+   ]
+  },
+  {
+   "name": "古民家004",
+   "category": "building",
+   "chunks": 42,
+   "hp": 2262,
+   "types": [
+    "floor",
+    "wall",
+    "pillar",
+    "roof"
+   ]
+  },
+  {
+   "name": "古民家005",
+   "category": "building",
+   "chunks": 42,
+   "hp": 1976,
+   "types": [
+    "wall",
+    "window",
+    "pillar",
+    "roof",
+    "floor"
+   ]
+  },
+  {
+   "name": "古民家017",
+   "category": "building",
+   "chunks": 42,
+   "hp": 2177,
+   "types": [
+    "wall",
+    "pillar",
+    "roof",
+    "floor"
+   ]
+  },
+  {
+   "name": "古民家008",
+   "category": "building",
+   "chunks": 42,
+   "hp": 2050,
+   "types": [
+    "pillar",
+    "floor",
+    "wall",
+    "roof"
+   ]
+  },
+  {
+   "name": "学生体験",
+   "category": "building",
+   "chunks": 42,
+   "hp": 2043,
+   "types": [
+    "wall",
+    "window",
+    "roof",
+    "floor"
+   ]
+  },
+  {
+   "name": "古民家010",
+   "category": "building",
+   "chunks": 41,
+   "hp": 1705,
+   "types": [
+    "wall",
+    "floor",
+    "pillar",
+    "roof",
+    "window"
+   ]
+  },
+  {
+   "name": "古民家011",
+   "category": "building",
+   "chunks": 41,
+   "hp": 1705,
+   "types": [
+    "wall",
+    "floor",
+    "pillar",
+    "roof",
+    "window"
+   ]
+  },
+  {
+   "name": "古民家012",
+   "category": "building",
+   "chunks": 41,
+   "hp": 1705,
+   "types": [
+    "wall",
+    "floor",
+    "pillar",
+    "roof",
+    "window"
+   ]
+  },
+  {
+   "name": "古民家003",
+   "category": "building",
+   "chunks": 41,
+   "hp": 2157,
+   "types": [
+    "window",
+    "pillar",
+    "wall",
+    "roof",
+    "floor"
+   ]
+  },
+  {
+   "name": "古民家016",
+   "category": "building",
+   "chunks": 41,
+   "hp": 1856,
+   "types": [
+    "pillar",
+    "floor",
+    "wall",
+    "roof"
+   ]
+  },
+  {
+   "name": "古民家018",
+   "category": "building",
+   "chunks": 39,
+   "hp": 1747,
+   "types": [
+    "pillar",
+    "floor",
+    "wall",
+    "roof",
+    "window"
+   ]
+  },
+  {
+   "name": "ぼうつき",
+   "category": "structure",
+   "chunks": 36,
+   "hp": 1950,
+   "types": [
+    "sign",
+    "pillar"
+   ]
+  },
+  {
+   "name": "古民家007",
+   "category": "building",
+   "chunks": 35,
+   "hp": 1581,
+   "types": [
+    "pillar",
+    "floor",
+    "wall",
+    "roof",
+    "window"
+   ]
+  },
+  {
+   "name": "ブランコ",
+   "category": "structure",
+   "chunks": 27,
+   "hp": 2268,
+   "types": [
+    "sign",
+    "pillar"
+   ]
+  },
+  {
+   "name": "自転車004",
+   "category": "prop",
+   "chunks": 25,
+   "hp": 332,
+   "types": [
+    "prop"
+   ]
+  },
+  {
+   "name": "鳥居",
+   "category": "structure",
+   "chunks": 23,
+   "hp": 895,
+   "types": [
+    "pillar",
+    "sign"
+   ]
+  },
+  {
+   "name": "滑り台",
+   "category": "structure",
+   "chunks": 21,
+   "hp": 832,
+   "types": [
+    "pillar",
+    "sign"
+   ]
+  },
+  {
+   "name": "トラック002",
+   "category": "prop",
+   "chunks": 18,
+   "hp": 320,
+   "types": [
+    "prop"
+   ]
+  },
+  {
+   "name": "車001",
+   "category": "prop",
+   "chunks": 17,
+   "hp": 336,
+   "types": [
+    "prop"
+   ]
+  },
+  {
+   "name": "一方通行002",
+   "category": "structure",
+   "chunks": 9,
+   "hp": 288,
+   "types": [
+    "pillar",
+    "sign"
+   ]
+  },
+  {
+   "name": "トラック",
+   "category": "prop",
+   "chunks": 8,
+   "hp": 237,
+   "types": [
+    "prop"
+   ]
+  },
+  {
+   "name": "一方通行004",
+   "category": "structure",
+   "chunks": 7,
+   "hp": 190,
+   "types": [
+    "sign",
+    "pillar"
+   ]
+  },
+  {
+   "name": "一方通行003",
+   "category": "structure",
+   "chunks": 7,
+   "hp": 198,
+   "types": [
+    "pillar",
+    "sign"
+   ]
+  },
+  {
+   "name": "一方通行005",
+   "category": "structure",
+   "chunks": 7,
+   "hp": 201,
+   "types": [
+    "pillar",
+    "sign"
+   ]
+  },
+  {
+   "name": "一方通行",
+   "category": "structure",
+   "chunks": 4,
+   "hp": 161,
+   "types": [
+    "pillar",
+    "sign"
+   ]
+  },
+  {
+   "name": "一方通行001",
+   "category": "structure",
+   "chunks": 4,
+   "hp": 161,
+   "types": [
+    "pillar",
+    "sign"
+   ]
+  },
+  {
+   "name": "ガードレール002",
+   "category": "structure",
+   "chunks": 1,
+   "hp": 28,
+   "types": [
+    "sign"
+   ]
+  },
+  {
+   "name": "ガードレール",
+   "category": "structure",
+   "chunks": 1,
+   "hp": 28,
+   "types": [
+    "sign"
+   ]
+  },
+  {
+   "name": "すだち箱",
+   "category": "prop",
+   "chunks": 1,
+   "hp": 15,
+   "types": [
+    "prop"
+   ]
+  }
+ ]
+}

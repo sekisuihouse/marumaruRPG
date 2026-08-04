@@ -61,15 +61,15 @@ Pages向けには `VITE_BASE_PATH=/marumaruRPG/ npm run build` を使います�
 
 ## アセットとライセンス
 
-`Ultimate Modular Men- Feb 2022` は同梱のCC0ライセンスに従います。一方、町GLBの権利と、`bos 3Dmoderu` のPMX由来ボスGLBの再配布可否は確認が必要です。特にボスモデルは配布元の再配布禁止条件に抵触しうるため、公開リポジトリから除外しています。
+`Ultimate Modular Men- Feb 2022` は同梱のCC0ライセンスに従います。町GLB、NavMesh・破壊データ、実行用ボスGLBは本プロジェクトでの公開再配布許諾を確認した上で含めています。変換元の `bos 3Dmoderu` 配下の編集用PMX・テクスチャは含めません。
 
-ローカルで完全版を動かすには、権利を確認済みの `public/assets/town.glb`、`public/assets/navmesh.json`、`public/assets/destructibles.json`、および `public/assets/bosses/glb/*.glb` を別途用意してください。これらが無い公開チェックアウトでは完全ゲーム起動・アセット依存スモークテストは実行できません。
+公開チェックアウトには完全版の実行に必要な町・ボスGLB、NavMesh・破壊データを含めます。追加素材を導入する場合は、再配布可否を確認してください。
 
 ## 検証
 
 ```bash
 npm run build
-npm test                 # ローカルの完全アセットがある場合
+npm test
 npm run test:browser     # npm run dev 起動中に実行
 npm run test:multiplayer # シグナリングの結合テスト
 ```

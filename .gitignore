@@ -9,11 +9,7 @@ screenshot-*.png
 *.zip
 marugotosai2026_KV.glb
 
-# 公開ライセンスを確認できない町データと、再配布禁止のPMX由来ボス成果物は公開しない。
+# 変換元・編集用の配布素材は含めない（実行用GLBは公開許諾確認済み）。
 bos 3Dmoderu/
 Ultimate Modular Men- Feb 2022/
 marugoto-tensei-extension/
-public/assets/town.glb
-public/assets/navmesh.json
-public/assets/destructibles.json
-public/assets/bosses/

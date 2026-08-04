@@ -1,0 +1,170 @@
+{
+ "generatedAt": "2026-08-03T23:29:37.379Z",
+ "note": "配布元(miHoYo)のPMXから変換したゲーム用データ。元データは bos 3Dmoderu/ にあり public には置かない。",
+ "bosses": [
+  {
+   "id": "student",
+   "name": "学生体験ボス・試作機の案内人",
+   "source": "gakuseitaiken/ヒルチャール.pmx",
+   "file": "public/assets/bosses/glb/student.glb",
+   "sizeKB": 508,
+   "vertices": 5542,
+   "triangles": 7094,
+   "materials": 4,
+   "skippedMaterials": 0,
+   "textures": [
+    {
+     "name": "服.png",
+     "size": "1024x1024",
+     "kb": 91,
+     "type": "image/jpeg"
+    }
+   ],
+   "sourceHeight": 16.74,
+   "displayHeight": 3.4,
+   "pose": [
+    "左腕 39°→66°",
+    "右腕 39°→66°"
+   ],
+   "posedVertices": 0
+  },
+  {
+   "id": "stage",
+   "name": "ステージボス・リズムの演出家",
+   "source": "stage/ディジタル.pmx",
+   "file": "public/assets/bosses/glb/stage.glb",
+   "sizeKB": 3021,
+   "vertices": 36031,
+   "triangles": 51190,
+   "materials": 11,
+   "skippedMaterials": 0,
+   "textures": [
+    {
+     "name": "顔.png",
+     "size": "1024x1024",
+     "kb": 27,
+     "type": "image/jpeg"
+    },
+    {
+     "name": "髪.png",
+     "size": "1024x1024",
+     "kb": 91,
+     "type": "image/jpeg"
+    },
+    {
+     "name": "服.png",
+     "size": "1024x1024",
+     "kb": 145,
+     "type": "image/jpeg"
+    },
+    {
+     "name": "表情.png",
+     "size": "1024x1024",
+     "kb": 118,
+     "type": "image/png"
+    }
+   ],
+   "sourceHeight": 20.65,
+   "displayHeight": 3.6,
+   "pose": [
+    "左腕 41°→66°",
+    "右腕 41°→66°"
+   ],
+   "posedVertices": 0
+  },
+  {
+   "id": "shrine",
+   "name": "神社ボス・境界の守護者",
+   "source": "shrain/ガイア.pmx",
+   "file": "public/assets/bosses/glb/shrine.glb",
+   "sizeKB": 2583,
+   "vertices": 30459,
+   "triangles": 45317,
+   "materials": 12,
+   "skippedMaterials": 0,
+   "textures": [
+    {
+     "name": "髪.png",
+     "size": "1024x1024",
+     "kb": 31,
+     "type": "image/jpeg"
+    },
+    {
+     "name": "服.jpg",
+     "size": "1024x1024",
+     "kb": 144,
+     "type": "image/jpeg"
+    },
+    {
+     "name": "顔.jpg",
+     "size": "1024x1024",
+     "kb": 31,
+     "type": "image/jpeg"
+    },
+    {
+     "name": "表情.png",
+     "size": "1024x1024",
+     "kb": 118,
+     "type": "image/png"
+    }
+   ],
+   "sourceHeight": 18.88,
+   "displayHeight": 4,
+   "pose": [
+    "左腕 38°→66°",
+    "右腕 38°→66°"
+   ],
+   "posedVertices": 0
+  },
+  {
+   "id": "food",
+   "name": "飲食ボス・灼熱の料理長",
+   "source": "food/パイモン.pmx",
+   "file": "public/assets/bosses/glb/food.glb",
+   "sizeKB": 1057,
+   "vertices": 10379,
+   "triangles": 13798,
+   "materials": 8,
+   "skippedMaterials": 0,
+   "textures": [
+    {
+     "name": "顔.jpg",
+     "size": "1024x1024",
+     "kb": 31,
+     "type": "image/jpeg"
+    },
+    {
+     "name": "髪.jpg",
+     "size": "1024x1024",
+     "kb": 33,
+     "type": "image/jpeg"
+    },
+    {
+     "name": "服.jpg",
+     "size": "1024x1024",
+     "kb": 98,
+     "type": "image/jpeg"
+    },
+    {
+     "name": "マント2.jpg",
+     "size": "1024x1024",
+     "kb": 13,
+     "type": "image/jpeg"
+    },
+    {
+     "name": "表情.png",
+     "size": "1024x1024",
+     "kb": 118,
+     "type": "image/png"
+    }
+   ],
+   "sourceHeight": 10.31,
+   "displayHeight": 3,
+   "pose": [
+    "左腕 37°→66°",
+    "右腕 37°→66°"
+   ],
+   "posedVertices": 0
+  }
+ ]
+}
