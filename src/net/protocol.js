@@ -8,6 +8,11 @@ export const DEFAULT_ROOM_SETTINGS = {
 }
 export const clamp = (n, min, max) => Math.max(min, Math.min(max, Number(n) || 0))
 export const iceServers = () => {
-  try { const v = JSON.parse(import.meta.env.VITE_ICE_SERVERS_JSON || '[]'); return Array.isArray(v) ? v : [] } catch { return [] }
+  // TURNは必ず環境変数から注入する。公開STUNだけはNAT越えの最低限として既定で使う。
+  const fallback = [{ urls: 'stun:stun.l.google.com:19302' }]
+  try {
+    const v = JSON.parse(import.meta.env.VITE_ICE_SERVERS_JSON || '[]')
+    return Array.isArray(v) && v.length ? v : fallback
+  } catch { return fallback }
 }
 export const signalUrl = () => import.meta.env.VITE_SIGNAL_URL || `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.hostname}:8787/signal`
