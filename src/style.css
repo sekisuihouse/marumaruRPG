@@ -1,0 +1,223 @@
+/* まるごと祭：未来の町 — HUD スタイル
+   元の丸ゴシック＋濃緑シャドウの雰囲気を踏襲しつつ、
+   ミニマップ・クエスト・会話・操作説明を追加した。 */
+
+*{box-sizing:border-box}
+html,body,#root,main{margin:0;width:100%;height:100%;overflow:hidden;
+  font-family:ui-rounded,"Hiragino Maru Gothic ProN","Hiragino Kaku Gothic ProN",system-ui,sans-serif}
+body{background:#0d1c33;color:#fff}
+canvas{touch-action:none;display:block}
+kbd{display:inline-block;min-width:1.5em;padding:1px 5px;margin:0 2px;border:1px solid #ffffff88;border-bottom-width:2px;
+  border-radius:5px;background:#ffffff1f;font:inherit;font-size:.85em;font-weight:700;text-align:center}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ───────── 全体レイヤ ───────── */
+.hud{position:fixed;inset:0;pointer-events:none;color:#fff;text-shadow:0 2px 4px #17362c;font-size:13px}
+.hud.large-text{font-size:16px}
+.hud.high-contrast{text-shadow:0 2px 0 #000,0 0 6px #000}
+.hud.high-contrast .stats,.hud.high-contrast .quest-tracker,.hud.high-contrast .messages .msg{background:#000000d9;border-color:#fff}
+.hud button{pointer-events:auto;font-family:inherit}
+.hud button:focus-visible,.hud input:focus-visible{outline:3px solid #ffe14c;outline-offset:2px}
+
+.brand{position:absolute;top:20px;left:22px;font-size:26px;font-weight:900;letter-spacing:2px;line-height:.8}
+.brand small{font-size:9px;letter-spacing:3px;opacity:.9}.network-status{position:fixed;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));z-index:8;padding:6px 9px;border:1px solid #7ee8ff99;border-radius:8px;background:#05131dc2;color:#bdefff;font:700 12px/1 system-ui,sans-serif}
+
+/* ───────── ステータス ───────── */
+.stats{position:absolute;top:70px;left:22px;width:330px;background:#14322be0;border:2px solid #ffffff8c;
+  border-radius:15px;padding:12px 15px;font-size:16px}
+.stats>b{display:block;font-size:17px;letter-spacing:.03em}
+.bar{height:16px;margin:7px 0;background:#26383f;border:2px solid #fff;border-radius:20px;overflow:hidden}
+.bar i{display:block;height:100%;transition:width .16s linear}
+.bar.hp i{background:linear-gradient(90deg,#f04f55,#ffb444)}
+.bar.mp i{background:linear-gradient(90deg,#4c7fff,#7ee8ff)}
+.bar.sp i{background:linear-gradient(90deg,#4caf50,#c8f36b)}
+.stats small{display:block;margin-top:6px;line-height:1.55;font-size:14px;font-weight:800}
+
+/* ───────── ミニマップ ───────── */
+.minimap{position:absolute;left:22px;bottom:96px}
+.minimap canvas{filter:drop-shadow(0 4px 10px #0006)}
+.minimap.large{left:50%;top:50%;bottom:auto;transform:translate(-50%,-50%)}
+.minimap-hint{display:block;text-align:center;font-size:10px;opacity:.85;margin-top:2px}
+
+/* ───────── スキルバー ───────── */
+.skills{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:7px;pointer-events:auto}
+.skills button{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:66px;
+  border:2px solid #fff;border-radius:20px;padding:7px 11px;background:#214e62d9;color:#fff;font-weight:800;
+  font-size:12px;cursor:pointer;box-shadow:0 3px 0 #102b36;transition:transform .08s}
+.skills button em{font-size:9px;font-style:normal;opacity:.85;font-weight:700}
+.skills button:hover:not(:disabled){background:#e8a94e;color:#1e2840;transform:translateY(-1px)}
+.skills button:disabled{opacity:.42;cursor:not-allowed}
+.skills button.cooling{background:#3a4a52d9;opacity:.7}
+.skills button.on{background:#e8a94e;color:#1e2840}
+
+/* ───────── メッセージ ───────── */
+.messages{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);width:min(560px,88vw);
+  display:flex;flex-direction:column-reverse;gap:3px;align-items:center}
+.messages .msg{margin:0;padding:3px 12px;border-radius:9px;background:#12302c9e;font-size:12px;font-weight:700;
+  text-align:center;animation:fadein .18s ease-out}
+.msg.quest{background:#7a5a12cc}
+.msg.level{background:#1c6b3ecc}
+.msg.warn{background:#7a2a12cc}
+.msg.death{background:#5a1020e0}
+.msg.kill{background:#123a5acc}
+.msg.loot{background:#3a2a6acc}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
+
+.level-up-notice{position:absolute;left:50%;top:18%;transform:translateX(-50%);min-width:min(650px,92vw);padding:20px 34px;
+  text-align:center;background:linear-gradient(135deg,#224f3df2,#2e8064f2);border:3px solid #fff;border-radius:24px;
+  box-shadow:0 12px 46px #00150dcc;animation:levelpop .32s ease-out;color:#fff}
+.level-up-notice strong{display:block;color:#ffe14c;font-size:clamp(36px,6vw,76px);line-height:.92;letter-spacing:.08em}
+.level-up-notice>b{display:block;margin-top:6px;font-size:clamp(28px,4vw,48px)}
+.level-up-notice p{margin:12px 0 0;font-size:clamp(16px,2.2vw,25px);font-weight:900}.level-up-notice p span{display:block;margin-top:5px;color:#d8ff86}
+.tutorial-complete-notice{position:absolute;left:50%;top:22%;transform:translateX(-50%);width:min(650px,92vw);padding:22px 30px;
+  border:3px solid #fff;border-radius:24px;background:linear-gradient(135deg,#224f3df2,#2e8064f2);box-shadow:0 12px 46px #00150dcc;
+  text-align:center;font-size:clamp(25px,4vw,48px);font-weight:900;line-height:1.18;animation:levelpop .32s ease-out}.tutorial-complete-notice strong{color:#ffe14c;font-size:clamp(34px,5.2vw,66px)}
+@keyframes levelpop{from{opacity:0;transform:translate(-50%,-16px) scale(.82)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+
+/* ───────── クエストトラッカー ───────── */
+.quest-tracker{position:absolute;right:22px;bottom:96px;width:250px;display:flex;flex-direction:column;gap:2px;
+  background:#1f4a44c9;border:1px solid #e9ffd5;border-radius:12px;padding:9px 13px;font-size:12px;line-height:1.5}
+.quest-tracker b{color:#ffe14c}
+.quest-tracker small{opacity:.8;font-size:10px}
+
+/* 初回チュートリアルだけは、操作を見逃さないようレベルアップ通知と同規模で表示する。 */
+.quest-tracker.tutorial-notice{left:50%;right:auto;top:18%;bottom:auto;transform:translateX(-50%);width:min(650px,92vw);
+  padding:20px 34px;text-align:center;border:3px solid #fff;border-radius:24px;background:linear-gradient(135deg,#224f3df2,#2e8064f2);
+  box-shadow:0 12px 46px #00150dcc;font-size:clamp(27px,4vw,48px);line-height:1.18;animation:levelpop .32s ease-out}
+.quest-tracker.tutorial-notice b{display:block;font-size:clamp(17px,2vw,25px);letter-spacing:.08em}
+.quest-tracker.tutorial-notice span{display:block;margin-top:9px;font-size:clamp(25px,3.7vw,46px);font-weight:900}
+.quest-tracker.tutorial-notice small{display:none}
+
+.interact-hint{position:absolute;left:50%;bottom:130px;transform:translateX(-50%);margin:0;padding:5px 14px;
+  background:#12302ce0;border:1px solid #8ef0c0;border-radius:20px;font-weight:800;font-size:13px}
+
+/* ───────── 会話 ───────── */
+.dialogue{position:absolute;inset:auto 0 0 0;display:flex;justify-content:center;padding-bottom:96px;pointer-events:auto}
+.dialogue-box{width:min(680px,92vw);background:#0f2a33f2;border:2px solid #8ef0c0;border-radius:16px;padding:14px 18px;
+  box-shadow:0 10px 30px #0007}
+.dialogue-box b{font-size:15px;color:#8ef0c0}
+.dialogue-box b small{font-weight:600;font-size:11px;opacity:.8;color:#fff}
+.dialogue-box p{margin:7px 0 10px;font-size:14px;line-height:1.7}
+.dialogue-box ul{list-style:none;margin:0 0 6px;padding:0;display:flex;flex-direction:column;gap:5px}
+.dialogue-box button{width:100%;text-align:left;padding:8px 12px;border:2px solid #ffffff5c;border-radius:10px;
+  background:#1b4a5ccc;color:#fff;font-size:13px;font-weight:700;cursor:pointer}
+.dialogue-box button:hover{background:#e8a94e;color:#16232b;border-color:#fff}
+.dialogue-box>small{opacity:.75;font-size:11px}
+
+/* ───────── パネル(クエストログ / 操作説明) ───────── */
+.panel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#04121bb8;pointer-events:auto}
+.panel-box{width:min(720px,94vw);max-height:86vh;overflow:auto;background:#0f2a33f5;border:2px solid #ffffff59;
+  border-radius:16px;padding:16px 20px}
+.panel-box header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.panel-box header b{font-size:17px}
+.panel-box header button{width:32px;height:32px;border-radius:50%;border:2px solid #fff;background:#1b4a5c;color:#fff;
+  font-size:15px;cursor:pointer}
+.panel-box h4{margin:16px 0 6px;font-size:13px;color:#ffe14c}
+.panel-box small{opacity:.85}
+
+.keymap{width:100%;border-collapse:collapse;font-size:13px}
+.keymap th{text-align:left;padding:4px 8px 4px 0;white-space:nowrap;font-weight:700;width:1%}
+.keymap td{padding:4px 0;line-height:1.5}
+.keymap tr:nth-child(odd){background:#ffffff0d}
+.keymap .alt{font-size:10px;opacity:.7;margin-left:4px}
+
+.toggles{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:13px}
+.toggles label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.toggles input{width:16px;height:16px;accent-color:#e8a94e;pointer-events:auto}
+.toggles button{padding:6px 12px;border:2px solid #fff;border-radius:9px;background:#1b4a5c;color:#fff;font-weight:700;cursor:pointer}
+
+.quest-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.quest-list>li{border-left:3px solid #ffffff3d;padding-left:10px}
+.quest-list>li.active{border-color:#ffe14c}
+.quest-list>li.done{border-color:#8ef0c0;opacity:.72}
+.quest-list em{font-size:11px;padding:1px 7px;border-radius:8px;background:#ffffff24;font-style:normal}
+.quest-list ol{list-style:none;margin:3px 0 0;padding:0;font-size:12px;line-height:1.6}
+.quest-list ol li.done{opacity:.6;text-decoration:line-through}
+.quest-list ol li.now{color:#ffe14c;font-weight:700}
+
+.items,.bestiary{list-style:none;margin:0;padding:0;font-size:12px;line-height:1.6}
+.items li{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.items button{padding:3px 10px;border:1px solid #fff;border-radius:8px;background:#1b4a5c;color:#fff;cursor:pointer;font-size:12px}
+.items button:disabled{opacity:.45;cursor:default}
+.bestiary li{margin-bottom:7px;padding-bottom:6px;border-bottom:1px solid #ffffff1a}
+
+/* ───────── 死亡 / タイトル / 読み込み ───────── */
+.death{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  background:#3a05128f;font-size:26px;font-weight:900;letter-spacing:2px}
+.death span{font-size:13px;font-weight:700;letter-spacing:0}
+
+.title{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 30%,#1d5766f2,#08131ff7)}
+.title-box{width:min(560px,92vw);text-align:center;padding:26px 28px;background:#0f2a33e8;border:2px solid #8ef0c0;
+  border-radius:20px;box-shadow:0 16px 44px #0008}
+.title-box h1{margin:0;font-size:34px;font-weight:900;letter-spacing:3px;line-height:.95}
+.title-box h1 small{display:block;font-size:11px;letter-spacing:5px;opacity:.85;margin-top:4px}
+.title-box p{font-size:13px;line-height:1.7;opacity:.92}
+.title-actions{display:flex;gap:12px;justify-content:center;margin:16px 0}
+.title-actions button{padding:11px 26px;border:2px solid #fff;border-radius:24px;background:#e8a94e;color:#16232b;
+  font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 4px 0 #0004}
+.title-actions button:last-child{background:#214e62;color:#fff}
+.multi-box{max-width:min(620px,94vw)}.multi-box label{display:flex;flex-direction:column;gap:4px;margin:9px 0;text-align:left;font-weight:800}.multi-box input,.multi-box select{min-height:40px;border-radius:8px;border:1px solid #fff;padding:7px;font:inherit}.multi-box button{margin:5px}.multi-box .primary{background:#e8a94e;color:#182630}.multi-box .code{font-size:17px}.room-settings{display:grid;grid-template-columns:1fr 1fr;gap:6px;text-align:left;background:#0c2632aa;padding:10px;border-radius:10px}.room-settings label{font-size:12px}.room-settings input,.room-settings select{min-height:30px}.error{color:#ffd0c8;font-weight:800}.back{float:left}
+.title-actions button:focus-visible{outline:3px solid #ffe14c;outline-offset:3px}
+.title-keys{list-style:none;margin:12px 0 8px;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;
+  font-size:11px;text-align:left;opacity:.9}
+.title-keys span{display:inline-block;min-width:62px;font-weight:800;color:#ffe14c}
+
+.boot{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  background:#08131fee;font-size:15px;font-weight:800;z-index:20}
+.boot-bar{width:min(320px,70vw);height:10px;background:#26383f;border:2px solid #fff;border-radius:20px;overflow:hidden}
+.boot-bar i{display:block;height:100%;background:linear-gradient(90deg,#4caf50,#c8f36b);transition:width .2s}
+
+.help-fab{position:absolute;right:22px;bottom:22px;padding:8px 14px;border:2px solid #fff;border-radius:20px;
+  background:#214e62d9;color:#fff;font-weight:800;font-size:12px;cursor:pointer;pointer-events:auto}
+.reset-fab{position:absolute;right:22px;bottom:64px;padding:8px 14px;border:2px solid #fff;border-radius:20px;
+  background:#8b3b2bd9;color:#fff;font-weight:900;font-size:12px;cursor:pointer;pointer-events:auto;box-shadow:0 3px 0 #42170f}
+.reset-fab:hover{background:#d85a3d;transform:translateY(-1px)}
+
+.fatal{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center}
+.fatal pre{background:#0f2a33;padding:12px 16px;border-radius:10px;font-size:12px;text-align:left;white-space:pre-wrap}
+
+/* ───────── スマホ ───────── */
+@media(max-width:760px){
+  .brand{font-size:18px;left:12px;top:14px}
+  .stats{width:calc(100% - 24px);left:12px;top:54px;font-size:12px;padding:8px 10px}
+  .stats>b{font-size:13px}.stats small{font-size:11px}.bar{height:11px;margin:4px 0}
+  .minimap{left:12px;bottom:112px}
+  .minimap canvas{width:118px;height:118px}
+  .quest-tracker{display:none}
+  .quest-tracker.tutorial-notice{display:block;top:24%;padding:16px 18px}
+  .skills{width:96%;flex-wrap:wrap;justify-content:center;bottom:8px;gap:5px}
+  .skills button{min-width:56px;padding:6px 8px;font-size:11px}
+  .messages{bottom:118px;width:94vw}
+  .level-up-notice{top:24%;padding:16px 18px}
+  .help-fab{bottom:auto;top:60px;right:12px}
+  .reset-fab{right:12px;bottom:12px}
+  .dialogue{padding-bottom:120px}
+}
+@media(prefers-reduced-motion:reduce){
+  .messages .msg{animation:none}
+  .bar i{transition:none}
+}
+
+/* ── 破壊アクション用の追加UI ───────────────────────── */
+.skills button.hold{border-style:dashed}
+.skills button.hold.on{background:#59d3ff;color:#0d2230;border-color:#fff}
+.skills button.hold.warn{background:#c0392b;color:#fff;border-color:#ffd7cf}
+.heat{position:absolute;bottom:104px;left:50%;transform:translateX(-50%);width:260px;
+  background:#14322be0;border:2px solid #ffffff8c;border-radius:10px;padding:6px 10px;text-align:center}
+.heat small{display:block;margin-top:3px;font-size:12px;font-weight:800}
+.bar.heat-bar i{background:linear-gradient(90deg,#ffb35c,#ff5f2c)}
+.bar.heat-over i{background:linear-gradient(90deg,#ff5f2c,#ff2c2c)}
+.shockwave{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 50% 52%,#ffffff00 38%,#fff3d0 62%,#ffffff00 76%);
+  mix-blend-mode:screen;transition:opacity .08s linear}
+.toggles.sliders{flex-direction:column;align-items:stretch;gap:8px}
+.toggles.sliders label{justify-content:space-between;gap:12px}
+.toggles.sliders input[type=range]{flex:1;max-width:190px;accent-color:#e8a94e;pointer-events:auto;width:auto;height:auto}
+.toggles.sliders select{padding:4px 8px;border-radius:8px;border:2px solid #fff;background:#1b4a5c;color:#fff;font-weight:700;pointer-events:auto}
+.balance-note{margin:4px 0 0;opacity:.9}
+.boss-hud{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:min(510px,58vw);padding:7px 12px;background:#180d23d9;border:2px solid #ffd166;border-radius:10px;text-align:center;color:#fff;text-shadow:0 2px 2px #000;font-size:13px;z-index:4}.boss-hud .bar{margin:5px 0 0}.bar.boss-hp i{background:linear-gradient(90deg,#ff4d64,#f5b642,#fff06a)}
+@media (max-width:760px){
+  .heat{width:200px;bottom:auto;top:8px;left:50%}
+  .skills button.hold{min-width:64px}
+}

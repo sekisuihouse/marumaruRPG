@@ -1,0 +1,35 @@
+{
+  "name": "marugoto-open-world",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:debug": "vite --mode debug",
+    "signal": "node server/signaling.mjs",
+    "dev:all": "node scripts/dev-all.mjs",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build:assets": "node scripts/build-characters.mjs && node scripts/build-navmesh.mjs && node scripts/build-destructibles.mjs && node scripts/build-bosses.mjs",
+    "build:destructibles": "node scripts/build-destructibles.mjs",
+    "build:extension": "vite build && node scripts/build-extension.mjs",
+    "verify:assets": "node scripts/verify-characters.mjs",
+    "test": "node scripts/smoke-test.mjs",
+    "test:browser": "node scripts/browser-check.mjs",
+    "test:multiplayer": "node scripts/multiplayer-test.mjs",
+    "build:bosses": "node scripts/build-bosses.mjs"
+  },
+  "dependencies": {
+    "@react-three/drei": "latest",
+    "@react-three/fiber": "latest",
+    "@vitejs/plugin-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "three": "latest",
+    "vite": "latest",
+    "ws": "^8.21.2"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.3"
+  }
+}

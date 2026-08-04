@@ -1,0 +1,13 @@
+export const PROTOCOL_VERSION = 1
+export const CHANNEL = { reliable: 'reliable', unreliable: 'unreliable' }
+export const NET_RATE = { movingHz: 15, idleHz: 5, snapshotHz: 12, maxPlayers: 16, bossHpPerPlayer: 0.45 }
+export const DEFAULT_ROOM_SETTINGS = {
+  roomName: '未来の町', initialLevel: 1, bosses: true, enemies: true, pvp: false, maxPlayers: 4,
+  respawnSeconds: 5, allowJoinInProgress: true, timeLimitSeconds: 0, winCondition: 'free',
+  initialDestruction: 'none', enemyStrength: 1, bossStrength: 1,
+}
+export const clamp = (n, min, max) => Math.max(min, Math.min(max, Number(n) || 0))
+export const iceServers = () => {
+  try { const v = JSON.parse(import.meta.env.VITE_ICE_SERVERS_JSON || '[]'); return Array.isArray(v) ? v : [] } catch { return [] }
+}
+export const signalUrl = () => import.meta.env.VITE_SIGNAL_URL || `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.hostname}:8787/signal`

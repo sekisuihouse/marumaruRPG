@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.DS_Store
+screenshot.png
+.env
+.env.*
+!.env.example
+screenshot-*.png
+*.zip
+marugotosai2026_KV.glb
+
+# 公開ライセンスを確認できない町データと、再配布禁止のPMX由来ボス成果物は公開しない。
+bos 3Dmoderu/
+Ultimate Modular Men- Feb 2022/
+marugoto-tensei-extension/
+public/assets/town.glb
+public/assets/navmesh.json
+public/assets/destructibles.json
+public/assets/bosses/
