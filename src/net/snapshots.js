@@ -3,24 +3,35 @@ import { serializeBroken, applyBroken } from '../engine/destruct.js'
 import { serializeBosses, applyBossSave } from '../engine/bosses.js'
 import { multiplayer, notifyMultiplayer } from './multiplayerStore.js'
 import { pushSample } from './interpolation.js'
+import { netDebug } from './debug.js'
 
 const vec = (v) => [v.x, v.y, v.z]
 let lastTownKey = ''
-export function makeSnapshot(remote = []) {
+export function resetSnapshotState() {
+  sim.net.lastSnapshot = -1
+  sim.net.correction = null
+  lastTownKey = ''
+}
+// 通常の位置同期は小さく保ち、途中参加や定期的な整合性確認だけで
+// 建物・ボス進行を含める。破壊イベント自体はReliableで即時配信される。
+export function makeSnapshot(remote = [], { includeWorld = false } = {}) {
   const p = sim.player
-  return {
+  const snapshot = {
     type: 'snapshot', sequence: ++sim.net.sequence, hostTime: Math.round(performance.now()),
     players: [{ id: multiplayer.playerId, name: multiplayer.room?.members?.find((m) => m.id === multiplayer.playerId)?.name || 'ホスト', position: vec(p.pos), rotation: p.yaw, velocity: vec(p.vel), level: p.level, hp: p.hp, maxHp: p.maxHp, dead: p.dead, animationState: p.anim, score: p.kills } , ...remote],
     enemies: sim.enemies.filter((e) => e.alive).map((e) => ({ id: e.id, position: vec(e.pos), rotation: e.yaw, velocity: vec(e.vel), hp: e.hp, maxHp: e.maxHp, state: e.state, anim: e.anim, dead: e.state === 'dead' })),
     bosses: sim.bosses.filter((b) => b.spawned).map((b) => ({ id: b.id, typeId: b.typeId, position: vec(b.pos), rotation: b.yaw, hp: b.hp, maxHp: b.maxHp, state: b.state, phase: b.phase, alive: b.alive, attack: b.attack?.def?.id || null })),
-    town: serializeBroken(), bossProgress: serializeBosses(), settings: multiplayer.settings,
+    settings: multiplayer.settings,
   }
+  if (includeWorld) { snapshot.town = serializeBroken(); snapshot.bossProgress = serializeBosses() }
+  return snapshot
 }
 export function applySnapshot(s) {
   if (!s || s.sequence <= (sim.net.lastSnapshot || -1)) return false
   sim.net.lastSnapshot = s.sequence
   multiplayer.settings = s.settings || multiplayer.settings
   const receivedAt = performance.now()
+  netDebug('GUEST SNAPSHOT RECEIVE', { sequence: s.sequence, players: (s.players || []).map((p) => ({ id: p.id, position: p.position })) })
   for (const p of s.players || []) {
     if (p.id === multiplayer.playerId) {
       // 自己操作は維持しつつ、ホスト位置へ滑らかに寄せる。
@@ -28,7 +39,7 @@ export function applySnapshot(s) {
       continue
     }
     let remote = multiplayer.remotePlayers.get(p.id)
-    if (!remote) { remote = { id: p.id, label: p.name, pos: { x: p.position[0], y: p.position[1], z: p.position[2] }, yaw: p.rotation, alive: !p.dead, hitFlash: 0, scale: 1, samples: [] }; multiplayer.remotePlayers.set(p.id, remote) }
+    if (!remote) { remote = { id: p.id, label: p.name, pos: { x: p.position[0], y: p.position[1], z: p.position[2] }, yaw: p.rotation, alive: !p.dead, hitFlash: 0, scale: 1, samples: [] }; multiplayer.remotePlayers.set(p.id, remote); netDebug('GUEST PLAYER LOOKUP', { playerId: p.id, found: false }) }
     remote.label = p.name; remote.alive = !p.dead; remote.level = p.level; remote.hp = p.hp; remote.maxHp = p.maxHp; remote.dead = p.dead
     pushSample(remote, { sequence: s.sequence, hostTime: s.hostTime, receivedAt, position: p.position, rotation: p.rotation, animationState: p.animationState })
   }

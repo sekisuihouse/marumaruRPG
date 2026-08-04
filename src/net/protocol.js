@@ -1,6 +1,6 @@
 export const PROTOCOL_VERSION = 1
 export const CHANNEL = { reliable: 'reliable', unreliable: 'unreliable' }
-export const NET_RATE = { movingHz: 15, idleHz: 5, snapshotHz: 12, maxPlayers: 16, bossHpPerPlayer: 0.45 }
+export const NET_RATE = { movingHz: 20, idleHz: 8, snapshotHz: 20, inputTimeoutMs: 350, maxPlayers: 16, bossHpPerPlayer: 0.45 }
 export const DEFAULT_ROOM_SETTINGS = {
   roomName: '未来の町', initialLevel: 1, bosses: true, enemies: true, pvp: false, maxPlayers: 4,
   respawnSeconds: 5, allowJoinInProgress: true, timeLimitSeconds: 0, winCondition: 'free',

@@ -26,6 +26,7 @@ import { initWeb } from './engine/webswing.js'
 import { initFireStream } from './engine/firestream.js'
 import { initBosses, armBossSystem } from './engine/bosses.js'
 import { initMultiplayerAuthority } from './net/hostAuthority.js'
+import { multiplayer } from './net/multiplayerStore.js'
 import * as destructApi from './engine/destruct.js'
 import * as bossesApi from './engine/bosses.js'
 const { resetTown } = destructApi
@@ -209,6 +210,8 @@ if (typeof window !== 'undefined') {
     toggleDebug: () => { sim.debugDraw = !sim.debugDraw; return sim.debugDraw },
   }
   if (import.meta.env.DEV) {
+    // 複数タブ検証と通信不調の切り分け用。公開ビルドには含めない。
+    window.__marugoto.multiplayer = multiplayer
     window.__marugoto.bosses = {
       list: () => sim.bosses.map((b) => ({ id: b.def.id, spawned: b.spawned, defeated: b.defeated, hp: b.hp, ratio: sim.bossProgress.buildingRatios?.[b.def.id] })),
       spawn: (id) => bossesApi.debugSpawnBoss(id),

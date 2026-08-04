@@ -2,6 +2,7 @@
 import { spawn } from 'node:child_process'
 import { WebSocket } from 'ws'
 import { interpolate } from '../src/net/interpolation.js'
+import { validateInput } from '../src/net/validation.js'
 
 const port = 18787
 const base = `ws://127.0.0.1:${port}/signal`
@@ -47,6 +48,8 @@ try {
   ] }
   interpolate(interp, 150)
   check('タブごとの時刻差でも受信時刻で位置を補間する', Math.abs(interp.x - 5) < 0.01)
+  check('入力メッセージは正規化して受理する', validateInput({ sequence: 1, move: [0.6, -0.8], rotation: 1.2, running: true })?.x === 0.6)
+  check('不正な移動入力を拒否する', validateInput({ sequence: 2, move: [8, 0], rotation: 0 }) === null)
 
   const host = await connect()
   host.send({ type: 'create', name: 'test', playerName: 'host', password: 'pw', maxPlayers: 2, settings: { bosses: true } })

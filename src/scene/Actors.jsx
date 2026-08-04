@@ -11,6 +11,7 @@ import { Nameplate } from '../gfx/Nameplate.jsx'
 import { sim } from '../engine/sim.js'
 import { multiplayer, subscribeMultiplayer, multiplayerSnapshot } from '../net/multiplayerStore.js'
 import { interpolate } from '../net/interpolation.js'
+import { netDebug } from '../net/debug.js'
 
 /** 足元の丸影(接地感を出す軽量な代替) */
 function Blob({ source, radius = 0.5, opacity = 0.32 }) {
@@ -71,6 +72,7 @@ function RemotePlayer({ id }) {
     if (!p) return null
     interpolate(p, performance.now() - multiplayer.interpolationDelay)
     p.pos.x = p.x ?? p.pos.x; p.pos.y = p.y ?? p.pos.y; p.pos.z = p.z ?? p.pos.z
+    netDebug('GUEST RENDER APPLY', { playerId: p.id, position: [p.pos.x, p.pos.y, p.pos.z], animation: p.anim })
     return p
   }, [id])
   return <><Blob source={source} radius={0.55} /><CharacterModel model="Adventurer" source={source} /><Nameplate source={source} color="#7ee8ff" width={1.7} /></>

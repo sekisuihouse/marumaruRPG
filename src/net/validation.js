@@ -5,6 +5,14 @@ export const validateMove = (previous, next, elapsed, maxSpeed = 10) => {
   if (dx * dx + dz * dz > max * max) return null
   return [Number(next[0]) || 0, Number(next[1]) || 0, Number(next[2]) || 0]
 }
+export const validateInput = (input) => {
+  if (!input || !Number.isInteger(input.sequence) || !Array.isArray(input.move) || input.move.length !== 2) return null
+  const x = Number(input.move[0]), z = Number(input.move[1]), yaw = Number(input.rotation)
+  if (!Number.isFinite(x) || !Number.isFinite(z) || !Number.isFinite(yaw)) return null
+  const length = Math.hypot(x, z)
+  if (length > 1.05) return null
+  return { x, z, yaw, running: !!input.running, jump: !!input.jump, attack: input.attack || null }
+}
 export const validateAttack = (attack, player, now) => {
   if (!attack || !player || player.dead || !player.skills?.includes(attack.attackId)) return false
   const last = player.lastAttackAt?.[attack.attackId] || -Infinity
