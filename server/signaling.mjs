@@ -70,7 +70,7 @@ wss.on('connection', (ws) => {
       let roomCode; do { roomCode = code() } while (rooms.has(roomCode))
       const playerId = id(), token = id()
       const settings = roomSettings(msg.settings, maxPlayers)
-      const room = { code: roomCode, name: safeText(msg.name, 48) || settings.roomName, maxPlayers, passwordHash: msg.password ? hash(String(msg.password)) : null, hostId: playerId, members: new Map(), settings, updatedAt: Date.now() }
+      const room = { code: roomCode, name: safeText(msg.name, 48) || settings.roomName, maxPlayers, passwordHash: msg.password ? hash(String(msg.password)) : null, hostId: playerId, members: new Map(), settings, started: false, updatedAt: Date.now() }
       const member = { id: playerId, name: safeText(msg.playerName, 24) || 'ホスト', token, ws, connected: true, disconnectedAt: 0 }
       room.members.set(playerId, member); rooms.set(roomCode, room)
       Object.assign(client, { playerId, reconnectToken: token, roomCode })
@@ -81,10 +81,13 @@ wss.on('connection', (ws) => {
       if (!room) return send(ws, { type: 'error', code: 'roomNotFound' })
       if (room.passwordHash && room.passwordHash !== hash(String(msg.password || ''))) return send(ws, { type: 'error', code: 'badPassword' })
       if (room.members.size >= room.maxPlayers) return send(ws, { type: 'error', code: 'roomFull' })
+      if (room.started && !room.settings.allowJoinInProgress) return send(ws, { type: 'error', code: 'gameInProgress' })
       const playerId = id(), token = id(), member = { id: playerId, name: safeText(msg.playerName, 24) || '参加者', token, ws, connected: true, disconnectedAt: 0 }
       room.members.set(playerId, member); room.updatedAt = Date.now(); Object.assign(client, { playerId, reconnectToken: token, roomCode: room.code })
       send(ws, { type: 'joined', room: roomView(room), playerId, reconnectToken: token })
       const host = room.members.get(room.hostId); if (host) send(host.ws, { type: 'peerJoined', peer: peerView(member) })
+      emitRoom(room, { type: 'presence', members: [...room.members.values()].map(peerView) })
+      if (room.started) send(ws, { type: 'gameStart', settings: room.settings })
       return
     }
     if (msg.type === 'reconnect') {
@@ -93,6 +96,8 @@ wss.on('connection', (ws) => {
       member.ws = ws; member.connected = true; member.disconnectedAt = 0; room.updatedAt = Date.now(); Object.assign(client, { playerId: member.id, reconnectToken: member.token, roomCode: room.code })
       send(ws, { type: 'reconnected', room: roomView(room), playerId: member.id, reconnectToken: member.token })
       if (member.id !== room.hostId) send(room.members.get(room.hostId)?.ws, { type: 'peerJoined', peer: peerView(member), reconnected: true })
+      emitRoom(room, { type: 'presence', members: [...room.members.values()].map(peerView) })
+      if (room.started && member.id !== room.hostId) send(ws, { type: 'gameStart', settings: room.settings })
       return
     }
     const room = rooms.get(client.roomCode); const member = findMember(room, client)
@@ -109,6 +114,10 @@ wss.on('connection', (ws) => {
     if (msg.type === 'settings' && member.id === room.hostId && msg.settings && typeof msg.settings === 'object') {
       room.settings = roomSettings(msg.settings, room.maxPlayers); emitRoom(room, { type: 'settings', settings: room.settings }); return
     }
+    // 開始通知はロビー制御であり、ゲーム状態は保持しない。DataChannel準備前でも確実に届く。
+    if (msg.type === 'start' && member.id === room.hostId) {
+      room.started = true; emitRoom(room, { type: 'gameStart', settings: room.settings }, ws); return
+    }
     if (msg.type === 'ready') { member.ready = !!msg.ready; emitRoom(room, { type: 'presence', members: [...room.members.values()].map(peerView) }); return }
     if (msg.type === 'leave') return leave(client, 'left')
     send(ws, { type: 'error', code: 'unknownMessage' })
@@ -124,6 +133,6 @@ wss.on('connection', (ws) => {
 })
 function leave(client, reason) { const room = rooms.get(client.roomCode); const member = findMember(room, client); if (!room || !member) return; if (member.id === room.hostId) closeRoom(room, reason); else { room.members.delete(member.id); emitRoom(room, { type: 'peerLeft', playerId: member.id }); send(member.ws, { type: 'left' }) } client.roomCode = null }
 function peerView(m) { return { id: m.id, name: m.name, ready: !!m.ready, connected: !!m.connected } }
-function roomView(room) { return { code: room.code, name: room.name, maxPlayers: room.maxPlayers, hostId: room.hostId, settings: room.settings, members: [...room.members.values()].map(peerView) } }
+function roomView(room) { return { code: room.code, name: room.name, maxPlayers: room.maxPlayers, hostId: room.hostId, settings: room.settings, started: !!room.started, members: [...room.members.values()].map(peerView) } }
 setInterval(cleanRooms, 60_000).unref()
 server.listen(PORT, '0.0.0.0', () => console.log(`signal listening on 0.0.0.0:${PORT}`))

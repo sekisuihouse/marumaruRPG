@@ -52,6 +52,10 @@ try {
   const guest = await connect(); guest.send({ type: 'join', code: created.room.code, playerName: 'guest', password: 'pw' })
   const joined = await guest.wait('joined'); const peer = await host.wait('peerJoined')
   check('ルーム参加と入室通知', joined.room.members.length === 2 && peer.peer.name === 'guest')
+  check('参加者一覧がホストへ即時同期される', (await host.wait('presence')).members.length === 2)
+
+  host.send({ type: 'start' })
+  check('DataChannel前でも開始通知が参加者へ届く', (await guest.wait('gameStart')).settings.bosses === true)
 
   const full = await connect(); full.send({ type: 'join', code: created.room.code, playerName: 'full', password: 'pw' })
   check('満員拒否', (await full.wait('error')).code === 'roomFull')

@@ -59,6 +59,7 @@ export function connectSignal() {
     else if (m.type === 'relay') relay(m).catch((e) => setMultiplayer({ error: e.message }))
     else if (m.type === 'settings') setMultiplayer({ settings: m.settings, room: multiplayer.room ? { ...multiplayer.room, settings: m.settings } : null })
     else if (m.type === 'presence' && multiplayer.room) { multiplayer.room.members = m.members; notifyMultiplayer() }
+    else if (m.type === 'gameStart') { meter(false, data); reliableHandler(m) }
     else if (m.type === 'roomClosed') { disconnect(); setMultiplayer({ error: 'ホストが切断したためルームを終了しました。' }) }
     else if (m.type === 'error') setMultiplayer({ error: m.code })
   }
@@ -70,7 +71,7 @@ export function createRoom({ name, playerName, password, settings }) { connectSi
 export function joinRoom({ code, playerName, password, reconnectToken = '' }) { connectSignal(); const wait = setInterval(() => { if (signal?.readyState === WebSocket.OPEN) { clearInterval(wait); sendSignal(reconnectToken ? { type: 'reconnect', code, reconnectToken } : { type: 'join', code, playerName, password }) } }, 40) }
 export function updateRoomSettings(settings) { if (multiplayer.role === 'host') { multiplayer.settings = settings; sendSignal({ type: 'settings', settings }); notifyMultiplayer() } }
 export function setReady(ready) { sendSignal({ type: 'ready', ready }) }
-export function startNetworkGame(settings) { if (multiplayer.role === 'host') { multiplayer.gameStarted = true; send(CHANNEL.reliable, { type: 'gameStart', settings }); notifyMultiplayer() } }
+export function startNetworkGame(settings) { if (multiplayer.role === 'host') { multiplayer.gameStarted = true; sendSignal({ type: 'start' }); send(CHANNEL.reliable, { type: 'gameStart', settings }); notifyMultiplayer() } }
 export function send(channel, message, peerId = null) {
   const data = encode(message); const targets = peerId ? [peers.get(peerId)] : [...peers.values()]
   for (const p of targets) { const c = p?.channels[channel]; if (c?.readyState === 'open') { c.send(data); meter(true, data) } }
