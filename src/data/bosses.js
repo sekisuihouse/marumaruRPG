@@ -6,6 +6,7 @@
  *   modelPath     … 変換後のGLB。ランタイムが読むのはこれだけ。
  *   displayHeight … ゲーム内での身長(m)。GLBは高さ1.0に正規化済みなので、この値がそのまま倍率になる。
  */
+import { assetUrl } from './world.js'
 export const BOSS_SCALING = {
   hpMultiplier: (n) => 1 + n * 0.25,
   damageMultiplier: (n) => 1 + n * 0.15,
@@ -23,7 +24,7 @@ const attack = (id, kind, power, range, extra = {}) => ({
 export const BOSS_TYPES = {
   student: {
     id: 'student', implementationId: 'studentExperienceBoss', name: '学生体験ボス・試作機の案内人', areaId: 'student', objectName: '学生体験',
-    modelPath: '/assets/bosses/glb/student.glb',
+    modelPath: assetUrl('assets/bosses/glb/student.glb'),
     source: { dir: 'gakuseitaiken' }, displayHeight: 3.4, scale: 0.18, baseHp: 980,
     baseDamage: 34, moveSpeed: 6.8, hitRadius: 0.95, phaseThreshold: 0.5, spawnDestroyRatio: 0.65,
     color: '#72e4ff', weakness: 'thunder', staggerRules: { overheatHits: 3, vulnerable: 6 },
@@ -37,7 +38,7 @@ export const BOSS_TYPES = {
   },
   stage: {
     id: 'stage', implementationId: 'stageBoss', name: 'ステージボス・リズムの演出家', areaId: 'stage', objectName: 'ステージ',
-    modelPath: '/assets/bosses/glb/stage.glb',
+    modelPath: assetUrl('assets/bosses/glb/stage.glb'),
     source: { dir: 'stage' }, displayHeight: 3.6, scale: 0.16, baseHp: 1120,
     baseDamage: 39, moveSpeed: 4.8, hitRadius: 1.0, phaseThreshold: 0.5, spawnDestroyRatio: 0.65,
     color: '#f36fff', weakness: 'thunder', staggerRules: { interruptWindow: true, vulnerable: 5 },
@@ -51,7 +52,7 @@ export const BOSS_TYPES = {
   },
   shrine: {
     id: 'shrine', implementationId: 'shrineBoss', name: '神社ボス・境界の守護者', areaId: 'shrine', objectName: '社',
-    modelPath: '/assets/bosses/glb/shrine.glb',
+    modelPath: assetUrl('assets/bosses/glb/shrine.glb'),
     source: { dir: 'shrain' }, displayHeight: 4.0, scale: 0.15, baseHp: 1350,
     baseDamage: 48, moveSpeed: 3.6, hitRadius: 1.12, phaseThreshold: 0.5, spawnDestroyRatio: 0.65,
     color: '#ffd36a', weakness: 'dark', staggerRules: { coreHits: 3, vulnerable: 7 },
@@ -65,7 +66,7 @@ export const BOSS_TYPES = {
   },
   food: {
     id: 'food', implementationId: 'foodBoss', name: '飲食ボス・灼熱の料理長', areaId: 'food', objectName: '飲食',
-    modelPath: '/assets/bosses/glb/food.glb',
+    modelPath: assetUrl('assets/bosses/glb/food.glb'),
     source: { dir: 'food' }, displayHeight: 3.0, scale: 0.2, baseHp: 1060,
     baseDamage: 42, moveSpeed: 4.7, hitRadius: 1.0, phaseThreshold: 0.5, spawnDestroyRatio: 0.65,
     color: '#ff7b3f', weakness: 'water', staggerRules: { interruptWindow: true, vulnerable: 5 },

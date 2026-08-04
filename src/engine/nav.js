@@ -10,7 +10,7 @@
  *   - hasLineOfSight()  敵AIの視線判定(遮蔽物越しの感知を防ぐ)
  *   - randomPointNear() 敵のスポーン・巡回先の抽選
  */
-import { NAV } from '../data/world.js'
+import { NAV, assetUrl } from '../data/world.js'
 
 export const F = { WALK: 1, WATER: 2, BLOCK: 4 }
 
@@ -23,7 +23,7 @@ const decode = (b64, Type) => {
   return new Type(bytes.buffer, 0, bin.length / (Type.BYTES_PER_ELEMENT || 1))
 }
 
-export async function loadNav(url = '/assets/navmesh.json') {
+export async function loadNav(url = assetUrl('assets/navmesh.json')) {
   if (nav) return nav
   const res = await fetch(url)
   if (!res.ok) throw new Error(`navmesh.json を読み込めません (${res.status})。npm run build:assets を実行してください`)

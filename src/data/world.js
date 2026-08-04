@@ -1,9 +1,14 @@
 // 世界の共通定数。ビルドスクリプト(scripts/*.mjs)とランタイム(src/*)の
 // 両方から import されるため、three や CSS への依存を持たせない。
 
+// Vite public配下の素材は、GitHub Pagesでは /<repo>/assets/... になる。
+// Nodeで実行するビルド/スモークスクリプトにも読まれるので、Vite環境外では '/'.
+const PUBLIC_BASE = typeof import.meta.env !== 'undefined' ? import.meta.env.BASE_URL : '/'
+export const assetUrl = (path) => `${PUBLIC_BASE}${String(path).replace(/^\//, '')}`
+
 /** 町GLBの配置。navmesh のベイクとランタイム描画で必ず同じ値を使う。 */
 export const TOWN = {
-  url: '/assets/town.glb',
+  url: assetUrl('assets/town.glb'),
   /** town.glb 内の人物プロップ(歩く(Man)等)が約0.38単位なので、身長1.7mを基準に6倍。 */
   scale: 6,
   position: [0, 0, 0],
@@ -29,7 +34,7 @@ export const NAV = {
 
 /** キャラクターGLBの出力先。 */
 export const CHAR = {
-  dir: '/assets/characters/glb',
+  dir: assetUrl('assets/characters/glb'),
   /** GLB内でルートに掛けたスケール(FBX単位→m)。参照用。 */
   unitScale: 0.01,
 }
