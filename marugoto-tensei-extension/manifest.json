@@ -1,12 +1,18 @@
 {
   "manifest_version": 3,
   "name": "まるごと祭・転生ゲート",
-  "version": "1.1.0",
-  "description": "まるごと祭2026の3D円盤から『未来の町』ゲームを始め、ホーム上で火球を放てる拡張機能です。",
+  "version": "1.2.0",
+  "description": "まるごと祭2026の3D円盤から『未来の町』ゲームを始め、ホームのThree.jsモデルへ火球を放てる拡張機能です。",
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   },
   "content_scripts": [
+    {
+      "matches": ["https://2026.marugotosai.jp/*"],
+      "js": ["page-bridge.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
     {
       "matches": ["https://2026.marugotosai.jp/*"],
       "js": ["content.js"],
