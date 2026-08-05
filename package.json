@@ -16,12 +16,17 @@
     "preview": "vite preview",
     "build:assets": "node scripts/build-characters.mjs && node scripts/build-navmesh.mjs && node scripts/build-destructibles.mjs && node scripts/build-bosses.mjs",
     "build:destructibles": "node scripts/build-destructibles.mjs",
+    "build:town-library": "node scripts/extract-town-assets.mjs",
     "build:extension": "vite build && node scripts/build-extension.mjs",
     "verify:assets": "node scripts/verify-characters.mjs",
     "test": "node scripts/smoke-test.mjs",
     "test:browser": "node scripts/browser-check.mjs",
+    "shots:boss": "node scripts/boss-motion-shots.mjs",
     "test:multiplayer": "node scripts/multiplayer-test.mjs",
-    "build:bosses": "node scripts/build-bosses.mjs"
+    "build:bosses": "node scripts/build-bosses.mjs",
+    "test:p2p": "node scripts/p2p-browser-test.mjs",
+    "test:p2p:tabs": "node scripts/p2p-browser-test.mjs http://localhost:5173/ --tabs",
+    "test:p2p:race": "node scripts/p2p-browser-test.mjs http://localhost:5173/ --tabs --slow-sdp"
   },
   "dependencies": {
     "@react-three/drei": "latest",

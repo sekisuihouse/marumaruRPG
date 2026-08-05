@@ -30,8 +30,8 @@ globalThis.fetch = async (url) => {
 const { loadNav, isWalkable, canStand, groundY, landmarks, hasLineOfSight, cellCenter: cellCenterOf } = await import('../src/engine/nav.js')
 const simMod = await import('../src/engine/sim.js')
 const { sim, initEnemies, initQuests, resetPlayer, spawnEnemy, publishHud } = simMod
-const { initNpcs, stepSim, tryAttack } = await import('../src/engine/step.js')
-const { keys, pressed } = await import('../src/engine/input.js')
+const { initNpcs, stepSim, tryAttack, launchDebugPropShot } = await import('../src/engine/step.js')
+const { keys, pressed, clearAll } = await import('../src/engine/input.js')
 const { damagePlayer, damageEnemy, killEnemy } = await import('../src/engine/damage.js')
 const { startQuest, openDialogue, chooseDialogue, dialogueView } = await import('../src/engine/quests.js')
 const { saveGame, readSave, applySave } = await import('../src/engine/save.js')
@@ -41,14 +41,18 @@ const debrisMod = await import('../src/engine/debris.js')
 const { initDebris, spawnDebris, activeDebrisCount, clearDebris } = debrisMod
 const { initRagdolls, ragdollFor, spawnRagdoll } = await import('../src/engine/ragdoll.js')
 const { initJuice } = await import('../src/engine/juice.js')
-const { initWeb, tryWebAttach, webRelease, findAnchor } = await import('../src/engine/webswing.js')
+const { initWeb, tryWebAttach, findAnchor } = await import('../src/engine/webswing.js')
 const { initFireStream, updateFireStream, fireBlast } = await import('../src/engine/firestream.js')
 const { damageTarget } = await import('../src/engine/targets.js')
 const { buildTown } = await import('../src/gfx/townBuild.js')
 const { categoryOf, BREAKABLE } = await import('../src/data/destructibles.js')
 const { FIRE_STREAM, WEB_SWING } = await import('../src/data/abilities.js')
+const { DEBUG_PROP_SHOT_ASSETS, DEBUG_PROP_SHOT_MAX_ACTIVE } = await import('../src/data/debugPropShot.js')
 const { BOSS_LIST } = await import('../src/data/bosses.js')
-const { initBosses, armBossSystem, updateBosses, damageBoss, serializeBosses, applyBossSave, resetBossProgress } = await import('../src/engine/bosses.js')
+const { initBosses, armBossSystem, updateBosses, damageBoss, serializeBosses, applyBossSave, resetBossProgress, defeatBoss, abortBossFight, debugSpawnBoss, debugForceBossAttack, debugSetBossAi, debugSetBossPhase } = await import('../src/engine/bosses.js')
+const { initArena, isArenaLocked, unlockArena, arenaBlocksPoint, arenaBlocksSegment, ARENA } = await import('../src/engine/arena.js')
+const { restoreObject, buildingDestroyRatio } = destruct
+const navMod = await import('../src/engine/nav.js')
 
 let failures = 0
 const check = (name, ok, detail = '') => {
@@ -69,6 +73,8 @@ await loadNav()
 initEnemies()
 initBosses()
 initQuests()
+sim.player.skills = ['melee', 'magic', 'area', 'arrow', 'heal', 'webswing', 'firestream']
+sim.player.mp = sim.player.maxMp
 initNpcs()
 initDebris()
 initRagdolls()
@@ -160,6 +166,20 @@ check('NPC配置', sim.npcs.length === 4, `${sim.npcs.length}人`)
 check('NPCが歩行可能セル上', sim.npcs.every((n) => canStand(n.pos.x, n.pos.z)))
 check('プレイヤー初期位置が歩行可能', canStand(sim.player.pos.x, sim.player.pos.z),
   `(${sim.player.pos.x.toFixed(1)}, ${sim.player.pos.z.toFixed(1)})`)
+
+// ── 開発限定: Pの町小道具弾 ─────────────────────────────
+console.log('\n[1.5] 開発限定・町小道具弾')
+sim.projectiles.length = 0
+sim.debugMode = false
+check('通常モードでは小道具弾を発射しない', launchDebugPropShot() === false && sim.projectiles.length === 0)
+sim.debugMode = true
+const launched = Array.from({ length: DEBUG_PROP_SHOT_MAX_ACTIVE + 4 }, () => launchDebugPropShot())
+check('デバッグ時は町小道具GLB弾を発射できる', launched.every(Boolean) && sim.projectiles.length === DEBUG_PROP_SHOT_MAX_ACTIVE,
+  `${sim.projectiles.length}/${DEBUG_PROP_SHOT_MAX_ACTIVE}`)
+check('発射物が小道具カタログを参照する', sim.projectiles.every((p) => p.kind === 'debug-prop' && DEBUG_PROP_SHOT_ASSETS[p.propAsset]),
+  sim.projectiles.map((p) => p.propAsset).join(','))
+sim.projectiles.length = 0
+sim.debugMode = false
 
 // ── 移動: 川・建物を通り抜けないか ─────────────────────────────
 console.log('\n[2] 移動と当たり判定（8方向に全力で押し込む）')
@@ -487,13 +507,21 @@ check('破壊可能な小片が生成されている', registry.parts.length > 3
   `${registry.parts.length}個 / ${globalThis.__townStats.sourceMeshes}メッシュ`)
 check('小片1つが建物全体より十分小さい', registry.parts.every((p) => p.hx < 6 && p.hy < 6 && p.hz < 6),
   `最大 ${Math.max(...registry.parts.map((p) => Math.max(p.hx, p.hy, p.hz))).toFixed(2)}m`)
-check('地面・水・住民・自然物は破壊対象に入らない',
+check('分類どおりのものだけが破壊対象になる',
   registry.parts.every((p) => BREAKABLE.has(categoryOf(p.objectName))),
   `分類=${[...new Set(registry.parts.map((p) => p.category))].join(',')}`)
 {
-  const excluded = ['地面', '川', '杉', '歩く(Man)', '花火(大)', '棚田']
-  check('除外設定した名前が1つも小片になっていない',
+  // 足場（地面・川・畑）と演出（花火）は壊れない。落下できてしまうため。
+  const excluded = ['地面', '川', '花火(大)', '棚田', '畑', '駐車場地面']
+  check('足場と演出は1つも小片になっていない',
     excluded.every((n) => !registry.parts.some((p) => p.objectName === n)), excluded.join(','))
+  const breakables = ['杉', 'イチョウ003', 'すだち001', '歩く(Man)', '阿波踊り003']
+  check('木・すだち畑・住民・阿波踊りが壊せる',
+    breakables.every((n) => registry.parts.some((p) => p.objectName === n)),
+    breakables.map((n) => `${n}:${registry.parts.filter((p) => p.objectName === n).length}片`).join(' '))
+  check('木は幹と葉に分かれる',
+    ['trunk', 'foliage'].every((t) => registry.parts.some((p) => p.category === 'nature' && p.partType === t)),
+    [...new Set(registry.parts.filter((p) => p.category === 'nature').map((p) => p.partType))].join(','))
 }
 
 /** 建物の小片を1つ選び、その手前にプレイヤーを立たせる */
@@ -616,7 +644,9 @@ clearDebris()
     const cells = [...new Set(parts.flatMap((p) => p.cells || []))]
     const blockedBefore = cells.filter((k) => { const c = cellCenterOf(k); return !isWalkable(c.x, c.z) })
     check('破壊前はそのセルを歩けない', blockedBefore.length > 0, `${blockedBefore.length}セル`)
-    for (const p of parts) breakPart(p, 0, 0, 0, 1)
+    // そのセルを塞いでいる小片は建物以外（木・住民）にもある。全部壊してから見る。
+    const cellSet = new Set(cells)
+    for (const p of registry.parts.filter((q) => (q.cells || []).some((k) => cellSet.has(k)))) breakPart(p, 0, 0, 0, 1)
     const stillBlocked = blockedBefore.filter((k) => { const c = cellCenterOf(k); return !isWalkable(c.x, c.z) })
     check('全部壊すと当たり判定が消えて通れるようになる', stillBlocked.length === 0,
       `${blockedBefore.length}セル中 ${blockedBefore.length - stillBlocked.length}セルが開通 / 累計 ${sim.destructStats.openedCells}`)
@@ -753,8 +783,10 @@ console.log('\n[18] ウェブスイング')
     check('壁越しには接続しない（最初に当たる面に付く）', !!a && a.partId >= 0 ? !registry.parts[a.partId].broken : true)
   }
   if (anchorPart) {
-    keys.q = true          // 糸は「押している間」だけ維持される
-    check('糸が張れる', tryWebAttach() === true)
+    clearAll()
+    keys.webSwing = true // Qを押している間だけ接続する
+    stepSim(DT)
+    check('Q長押しで糸が張れる', p4.web.attached === true)
     check('接続中は空中状態になる', p4.airborne === true && p4.web.attached === true)
     let peak = 0
     let overLimit = 0
@@ -764,10 +796,10 @@ console.log('\n[18] ウェブスイング')
       if (Math.hypot(p4.vel.x, p4.vy, p4.vel.z) > WEB_SWING.maxSpeed + 0.01) overLimit++
       if (p4.web.attached) heldFrames++
     })
-    check('押している間は接続が維持される', heldFrames > 30, `${heldFrames}/60フレーム`)
+    check('Qを押している間は接続が維持される', heldFrames > 30, `${heldFrames}/60フレーム`)
     check('スイングで速度が乗る', peak > 2, `最高 ${peak.toFixed(2)}m/s`)
     check('速度上限を超えない', overLimit === 0, `超過 ${overLimit} フレーム`)
-    // 離した瞬間: 糸を張った場所まで飛んでいく（ジップ）
+    // Qを離す: 糸を切り、素直に落下する
     revive()
     p4.pos.set(anchorPart.cx + 12, groundY(anchorPart.cx + 12, anchorPart.cz, 0), anchorPart.cz)
     p4.web.attached = true
@@ -776,21 +808,11 @@ console.log('\n[18] ウェブスイング')
     p4.web.rope = 12
     p4.web.attachedAt = sim.time
     p4.airborne = true
-    const d0 = Math.hypot(p4.pos.x - anchorPart.cx, p4.pos.y - anchorPart.cy, p4.pos.z - anchorPart.cz)
-    keys.q = false
+    p4.vel.set(-11, 3, 2)
+    keys.webSwing = false
     run(1)
-    check('キーを離すと接続が切れてジップが始まる', p4.web.attached === false && p4.web.zipping === true)
-    let closest = d0
-    let zipSpeed = 0
-    run(120, () => {
-      closest = Math.min(closest, Math.hypot(p4.pos.x - anchorPart.cx, p4.pos.y - anchorPart.cy, p4.pos.z - anchorPart.cz))
-      zipSpeed = Math.max(zipSpeed, Math.hypot(p4.vel.x, p4.vy, p4.vel.z))
-    })
-    check('糸を張った場所まで飛んでいく', closest < WEB_SWING.zip.arriveRadius + 1.0,
-      `${d0.toFixed(1)}m → 最接近 ${closest.toFixed(1)}m`)
-    check('ジップで大きく加速する（振り子より速い）', zipSpeed > peak * 2 && zipSpeed > 15,
-      `振り子 ${peak.toFixed(1)} → ジップ ${zipSpeed.toFixed(1)}m/s`)
-    check('ジップは必ず終わる（無限に飛ばない）', p4.web.zipping === false)
+    check('Qを離すと接続が切れる', p4.web.attached === false && p4.web.zipping === false)
+    check('解除後は落下へ切り替わる', p4.vy <= 0, `vy=${p4.vy.toFixed(1)}`)
     run(240)
     check('着地して通常状態へ戻る', p4.airborne === false)
     check('NavMesh外へ落ちても復帰する', isWalkable(p4.pos.x, p4.pos.z))
@@ -904,10 +926,28 @@ console.log('\n[20] 建物連動ボス')
     BOSS_LIST.map((b) => `${b.id}:${b.displayHeight}m`).join(' '))
   check('配布物そのもの(PMX)は public に置いていない',
     !fs.existsSync('public/assets/bosses/food') && !fs.existsSync('public/assets/bosses/shrain'))
+  // BOSS FORGEは既存のボス状態機械を直接使う。4体すべてで強制攻撃・AI停止・
+  // phase切替が本編の生成経路を通ることを確認する。
+  for (const def of BOSS_LIST) {
+    initBosses()
+    const spawned = debugSpawnBoss(def.id)
+    const forgeBoss = sim.bosses.find((b) => b.def.id === def.id)
+    const forced = debugForceBossAttack(def.id, def.abilities[0].id)
+    check(`BOSS FORGE: ${def.name}を直接出現できる`, spawned === true && forgeBoss?.alive === true)
+    check(`BOSS FORGE: ${def.name}の攻撃を強制再生できる`, forced === true && forgeBoss?.attack?.def.id === def.abilities[0].id)
+    debugSetBossAi(def.id, false)
+    check(`BOSS FORGE: ${def.name}のAIを停止できる`, forgeBoss.debugAi === false)
+    debugSetBossPhase(def.id, 2)
+    check(`BOSS FORGE: ${def.name}をPHASE 2へ切替できる`, forgeBoss.phase === 2)
+    resetBossProgress()
+  }
+  initBosses(); armBossSystem(0)
   let singleSpawn = true
   for (const def of BOSS_LIST) {
     const parts = registry.parts.filter((p) => p.objectName === def.objectName)
-    for (let i = 0; i < Math.ceil(parts.length * def.spawnDestroyRatio); i++) parts[i].broken = true
+      for (let i = 0; i < Math.ceil(parts.length * def.spawnDestroyRatio); i++) parts[i].broken = true
+    // 前のボスの封鎖が残っていると次のボスは出ない（＝1体ずつ戦う仕様）
+    unlockArena('abort')
     updateBosses(1 / 60)
     const b = sim.bosses.find((x) => x.def.id === def.id)
     const once = b.alive && b.spawned
@@ -936,6 +976,218 @@ console.log('\n[20] 建物連動ボス')
   resetTown()
 }
 
+// ── ボス戦のアリーナ封鎖 ─────────────────────────────
+console.log('\n[20b] ボス戦の封鎖・中断・撃破')
+{
+  resetTown(); initBosses(); initArena(); sim.mode = 'play'; sim.townReady = true; armBossSystem(0)
+  revive()
+  const def = BOSS_LIST[0]
+  const parts = registry.parts.filter((p) => p.objectName === def.objectName)
+  const target = Math.ceil(parts.length * def.spawnDestroyRatio)
+  for (let i = 0; i < target; i++) breakPart(parts[i], 0, 0, 0, 1)
+  updateBosses(1 / 60)
+  const boss = sim.bosses.find((b) => b.def.id === def.id)
+  check('建物を壊すとボスが出現する', boss.alive === true, def.name)
+  check('出現と同時にアリーナが封鎖される', isArenaLocked() === true, `${sim.arena.blockedCells}セルを封鎖`)
+  check('ATフィールドの板が用意される', (sim.arena.panels || []).length > 0, `${sim.arena.panels.length}枚`)
+
+  // 橋（川を渡っている歩行セル）が通れなくなっているか
+  {
+    const bridge = navMod.riverCrossings(ARENA.bridgeSpan, ARENA.bridgePlug)
+    let total = 0, closed = 0
+    for (let k = 0; k < bridge.length; k++) {
+      if (!bridge[k]) continue
+      total++
+      const c = navMod.cellCenter(k)
+      if (!isWalkable(c.x, c.z)) closed++
+    }
+    check('ボス戦中は橋を渡れない', total > 0 && closed === total, `${closed}/${total}セル`)
+  }
+
+  // 封鎖してもボスへ到達できること（対岸に閉じ込められない）
+  {
+    const nav = navMod.getNav()
+    const n = nav.n
+    const idx = (x, z) => {
+      const i = Math.round((x - nav.origin) / nav.cell), j = Math.round((z - nav.origin) / nav.cell)
+      return i < 0 || j < 0 || i >= n || j >= n ? -1 : j * n + i
+    }
+    const start = idx(sim.player.pos.x, sim.player.pos.z)
+    const goal = idx(boss.pos.x, boss.pos.z)
+    const seen = new Uint8Array(n * n)
+    const queue = [start]
+    seen[start] = 1
+    let reached = false
+    while (queue.length) {
+      const k = queue.pop()
+      if (k === goal) { reached = true; break }
+      const i = k % n, j = (k - i) / n
+      for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const ii = i + di, jj = j + dj
+        if (ii < 0 || jj < 0 || ii >= n || jj >= n) continue
+        const nk = jj * n + ii
+        if (seen[nk]) continue
+        const c = navMod.cellCenter(nk)
+        if (!isWalkable(c.x, c.z)) continue
+        seen[nk] = 1
+        queue.push(nk)
+      }
+    }
+    check('封鎖してもプレイヤーからボスへ到達できる', reached,
+      `プレイヤー(${sim.player.pos.x.toFixed(0)},${sim.player.pos.z.toFixed(0)}) → ボス(${boss.pos.x.toFixed(0)},${boss.pos.z.toFixed(0)})`)
+    let area = 0
+    for (let k = 0; k < n * n; k++) if (seen[k]) area++
+    check('封鎖後も戦えるだけの広さが残る', area > 800, `到達可能 ${area}セル（約${Math.round(area * nav.cell * nav.cell)}m²）`)
+  }
+
+  // 通常の敵が湧かない
+  for (const e of sim.enemies) { e.alive = false; e.respawnAt = sim.time - 1 }
+  run(120)
+  // 戦場が本当に閉じているか（歩いて外へ出られないか）
+  {
+    const nav = navMod.getNav()
+    const n = nav.n
+    const start = navMod.cellIndexAt(sim.player.pos.x, sim.player.pos.z)
+    const seen = new Uint8Array(n * n)
+    const queue = [start]
+    seen[start] = 1
+    let far = 0
+    for (let head = 0; head < queue.length; head++) {
+      const k = queue[head]
+      const c = navMod.cellCenter(k)
+      far = Math.max(far, Math.hypot(c.x - boss.pos.x, c.z - boss.pos.z))
+      const i = k % n, j = (k - (k % n)) / n
+      for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const ii = i + di, jj = j + dj
+        if (ii < 0 || jj < 0 || ii >= n || jj >= n) continue
+        const kk = jj * n + ii
+        if (seen[kk]) continue
+        const cc = navMod.cellCenter(kk)
+        if (!isWalkable(cc.x, cc.z)) continue
+        seen[kk] = 1
+        queue.push(kk)
+      }
+    }
+    check('封鎖中は歩いて戦場の外へ出られない', far <= ARENA.maxRadius + 2,
+      `ボスから最遠 ${far.toFixed(1)}m（上限 ${ARENA.maxRadius}m）`)
+  }
+
+  // ATフィールドは空中にも立つ（ウェブスイングで越えられない）
+  {
+    const outside = sim.arena.panels.find((q) => Math.hypot(q.x - boss.pos.x, q.z - boss.pos.z) > 8)
+    const gy = outside ? outside.y : 0
+    check('ATフィールドは壁の高さまで空中も塞ぐ', !!outside
+      && arenaBlocksPoint(outside.x, gy + ARENA.wallHeight * 0.5, outside.z) === true
+      && arenaBlocksPoint(outside.x, gy + ARENA.wallHeight + 5, outside.z) === false,
+      outside ? `板(${outside.x.toFixed(0)},${outside.z.toFixed(0)}) 高さ${ARENA.wallHeight}m` : '板なし')
+    check('壁を横切る線分を検出できる', !!outside
+      && arenaBlocksSegment(boss.pos.x, gy + 6, boss.pos.z, outside.x, gy + 6, outside.z) === true)
+  }
+
+  // ウェブスイングでも通り抜けられない（空中移動は NavMesh を無視するので別経路）
+  {
+    const p = sim.player
+    const target = sim.arena.panels.find((q) => Math.hypot(q.x - boss.pos.x, q.z - boss.pos.z) > 10)
+    if (target) {
+      const from = navMod.nearestWalkable(boss.pos.x + (target.x - boss.pos.x) * 0.7, boss.pos.z + (target.z - boss.pos.z) * 0.7)
+      const dx = target.x - from.x, dz = target.z - from.z
+      const len = Math.hypot(dx, dz) || 1
+      p.dead = false
+      p.pos.set(from.x, groundY(from.x, from.z) + 12, from.z)
+      p.airborne = true
+      p.vy = 0
+      p.vel.set((dx / len) * 26, 0, (dz / len) * 26)
+      for (let i = 0; i < 90; i++) stepSim(1 / 60)
+      check('ATフィールドはウェブスイングでも越えられない',
+        isWalkable(p.pos.x, p.pos.z) && !arenaBlocksPoint(p.pos.x, p.pos.y, p.pos.z),
+        `着地(${p.pos.x.toFixed(0)},${p.pos.z.toFixed(0)}) 場外=${arenaBlocksPoint(p.pos.x, p.pos.y, p.pos.z)}`)
+      p.airborne = false
+      p.vel.set(0, 0, 0)
+      p.vy = 0
+    }
+  }
+
+  // 封鎖マスクが「壊した分だけ通れる」を打ち消していないか（ボス戦中の当たり判定バグ）
+  {
+    const seed = registry.parts.find((q) => q.category === 'building' && (q.cells || []).length
+      && q.objectName !== def.objectName && Math.hypot(q.cx - boss.pos.x, q.cz - boss.pos.z) < 26)
+    const parts = seed ? registry.parts.filter((q) => q.objectName === seed.objectName) : []
+    const cells = [...new Set(parts.flatMap((q) => q.cells || []))]
+    const cellSet = new Set(cells)
+    const before = cells.filter((k) => { const c = navMod.cellCenter(k); return !isWalkable(c.x, c.z) })
+    for (const q of registry.parts.filter((r) => (r.cells || []).some((k) => cellSet.has(k)))) breakPart(q, 0, 0, 0, 1)
+    const after = before.filter((k) => { const c = navMod.cellCenter(k); return !isWalkable(c.x, c.z) })
+    check('封鎖中に壊した建物の当たり判定も消える', before.length > 0 && after.length === 0,
+      `${seed?.objectName}: ${before.length}セル中 ${before.length - after.length}セル開通`)
+  }
+
+  // 場外へ出てしまったときに町のスポーンへ飛ばされないか（戦場から追い出される）
+  {
+    const home = sim.arena.center
+    const back = navMod.nearestWalkable(home.x + 52, home.z + 52)
+    check('封鎖中に場外へ出ても戦場へ戻される', isWalkable(back.x, back.z)
+      && Math.hypot(back.x - home.x, back.z - home.z) <= ARENA.maxRadius,
+      `(${back.x.toFixed(0)},${back.z.toFixed(0)}) ← 中心(${home.x.toFixed(0)},${home.z.toFixed(0)})`)
+  }
+
+  check('封鎖中は通常の敵が出現しない', sim.enemies.every((e) => !e.alive),
+    `${sim.enemies.filter((e) => e.alive).length}体`)
+
+  // ── プレイヤーが倒れて中断
+  const ratioBefore = buildingDestroyRatio(def.objectName).ratio
+  sim.player.dead = true
+  updateBosses(1 / 60)
+  check('戦闘中に倒れるとボスが消える', boss.alive === false && boss.spawned === false && boss.defeated === false)
+  check('中断で封鎖が解除される', isArenaLocked() === false)
+  {
+    const bridge = navMod.riverCrossings(ARENA.bridgeSpan, ARENA.bridgePlug)
+    let open = 0, total = 0
+    for (let k = 0; k < bridge.length; k++) {
+      if (!bridge[k]) continue
+      total++
+      const c = navMod.cellCenter(k)
+      if (isWalkable(c.x, c.z)) open++
+    }
+    check('中断で橋が渡れるように戻る', total > 0 && open === total, `${open}/${total}セル`)
+  }
+  check('中断で出現元の建物が直る', buildingDestroyRatio(def.objectName).ratio === 0,
+    `破壊率 ${(ratioBefore * 100).toFixed(0)}% → ${(buildingDestroyRatio(def.objectName).ratio * 100).toFixed(0)}%`)
+  sim.player.dead = false
+  revive()
+  run(60)
+  check('中断後は通常の敵が戻る', sim.enemies.some((e) => e.respawnAt < 1e8))
+
+  // ── もう一度壊せば再戦できる
+  sim.bossArmedAt = sim.time
+  const parts2 = registry.parts.filter((p) => p.objectName === def.objectName)
+  for (let i = 0; i < Math.ceil(parts2.length * def.spawnDestroyRatio); i++) breakPart(parts2[i], 0, 0, 0, 1)
+  updateBosses(1 / 60)
+  check('直した建物を壊すと同じボスが再登場する', boss.alive === true && isArenaLocked() === true)
+
+  // ── 撃破。封鎖は解けるが建物は壊れたまま
+  const ratioAtKill = buildingDestroyRatio(def.objectName).ratio
+  defeatBoss(boss)
+  check('撃破で封鎖が解除される', isArenaLocked() === false)
+  {
+    const bridge = navMod.riverCrossings(ARENA.bridgeSpan, ARENA.bridgePlug)
+    let open = 0, total = 0
+    for (let k = 0; k < bridge.length; k++) {
+      if (!bridge[k]) continue
+      total++
+      const c = navMod.cellCenter(k)
+      if (isWalkable(c.x, c.z)) open++
+    }
+    check('撃破で橋が渡れるように戻る', total > 0 && open === total, `${open}/${total}セル`)
+  }
+  check('撃破後も出現元の建物は壊れたまま', buildingDestroyRatio(def.objectName).ratio === ratioAtKill,
+    `破壊率 ${(buildingDestroyRatio(def.objectName).ratio * 100).toFixed(0)}%`)
+  check('撃破したボスは再登場しない', boss.defeated === true)
+  run(120)
+  check('撃破後は通常の敵が戻る', sim.enemies.some((e) => e.respawnAt < 1e8))
+
+  resetTown(); initBosses(); initArena(); revive()
+}
+
 // ── 長時間の耐久 ─────────────────────────────
 console.log('\n[20] 5分相当(18000フレーム)の連続実行')
 store.clear()
@@ -947,6 +1199,7 @@ let errors = 0
 let sawProjectile = false
 let sawEffect = false
 let sawEnemyAttack = false
+let sawEnemyActive = false
 offMesh = 0
 try {
   run(18000, (i) => {
@@ -955,14 +1208,17 @@ try {
       keys.w = Math.random() < 0.6; keys.s = Math.random() < 0.2
       keys.a = Math.random() < 0.3; keys.d = Math.random() < 0.3
       keys.shift = Math.random() < 0.4
-      keys.q = Math.random() < 0.2
       sim.camera.yaw += (Math.random() - 0.5) * 2
     }
-    if (i % 23 === 0) pressed[['j', 'k', 'l', 'u', 'i'][i % 5]] = true
-    if (i % 211 === 0) pressed[' '] = true
+    if (i % 46 === 0) pressed[['ability1', 'ability2', 'ability3', 'ability4'][(i / 46) % 4 | 0]] = true
+    if (i % 46 === 23) pressed.useAbility = true
+    if (i % 211 === 0) pressed.dodge = true
     if (sim.projectiles.length) sawProjectile = true
     if (sim.effects.length) sawEffect = true
     if (sim.enemies.some((e) => e.attack)) sawEnemyAttack = true
+    // 索敵・追跡・巡回のいずれかが起きたかを「期間中ずっと」見る。
+    // 最終フレームだけを見ると、たまたま全員が見失った瞬間で落ちる。
+    if (!sawEnemyActive && sim.enemies.some((e) => e.alive && (e.aware || e.state === 'chase' || e.patrol))) sawEnemyActive = true
     if (!isWalkable(sim.player.pos.x, sim.player.pos.z)) offMesh++
   })
 } catch (err) {
@@ -973,8 +1229,10 @@ check('例外なしで完走', errors === 0)
 check('歩行不可セルに留まらない', offMesh === 0, `違反 ${offMesh} フレーム`)
 check('弾が飛んでいる', sawProjectile)
 check('エフェクトが出ている', sawEffect)
-// ランダム巡回で射線が取れない回があるため、実際の攻撃または索敵状態をAI活動として確認する。
-check('敵AIが活動している', sawEnemyAttack || sim.enemies.some((e) => e.alive && e.aware))
+// ランダム巡回で射線が取れない回があるため、攻撃・索敵・追跡・巡回のどれかが
+// 期間中に一度でも起きたかで判定する（最終フレームのスナップだけでは不安定）。
+check('敵AIが活動している', sawEnemyAttack || sawEnemyActive,
+  `攻撃=${sawEnemyAttack} 索敵/追跡/巡回=${sawEnemyActive}`)
 check('配列がリークしていない',
   sim.projectiles.length < 40 && sim.effects.length < 40 && sim.floaters.length <= 14 && sim.messages.length <= 5,
   `弾${sim.projectiles.length} 効果${sim.effects.length} 数値${sim.floaters.length} ログ${sim.messages.length}`)

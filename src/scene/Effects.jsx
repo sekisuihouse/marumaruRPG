@@ -4,8 +4,10 @@
  */
 import React, { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { sim } from '../engine/sim.js'
+import { DEBUG_PROP_SHOT_ASSETS, DEBUG_PROP_SHOT_MAX_ACTIVE, debugPropProjectileScale } from '../data/debugPropShot.js'
 
 const PROJECTILES = 20
 const RINGS = 10
@@ -14,6 +16,7 @@ const BURSTS = 22
 const SLASHES = 6
 const FLOATERS = 14
 const FLOATER_WIDTH = 0.85   // ダメージ数値のワールド幅の基準(m)
+const PROP_PROJECTILES = DEBUG_PROP_SHOT_MAX_ACTIVE
 
 const tmpColor = new THREE.Color()
 
@@ -26,6 +29,7 @@ export function Projectiles() {
       if (!g) continue
       const pr = sim.projectiles[i]
       if (!pr) { g.visible = false; continue }
+      if (pr.kind === 'debug-prop') { g.visible = false; continue }
       g.visible = true
       g.position.set(pr.x, pr.y, pr.z)
       g.rotation.y = Math.atan2(pr.dx, pr.dz)
@@ -59,6 +63,65 @@ export function Projectiles() {
       ))}
     </>
   )
+}
+
+/**
+ * デバッグの町小道具弾。GLB本来のメッシュ・マテリアルをクローンするため、
+ * 単色の代用品ではなく town-library に保存した見た目で飛ぶ。
+ */
+export function DebugPropProjectiles() {
+  const refs = useRef([])
+  const sources = useGLTF(DEBUG_PROP_SHOT_ASSETS.map((asset) => asset.file))
+  const sourceInfo = useMemo(() => sources.map((gltf, index) => {
+    const scene = gltf.scene
+    const box = new THREE.Box3().setFromObject(scene)
+    const center = box.getCenter(new THREE.Vector3())
+    return { scene, center, scale: debugPropProjectileScale(DEBUG_PROP_SHOT_ASSETS[index]) }
+  }), [sources])
+
+  useFrame((_, dt) => {
+    const projectiles = sim.projectiles.filter((projectile) => projectile.kind === 'debug-prop')
+    for (let i = 0; i < PROP_PROJECTILES; i++) {
+      const group = refs.current[i]
+      const projectile = projectiles[i]
+      if (!group) continue
+      if (!projectile) { group.visible = false; continue }
+      group.visible = true
+      group.position.set(projectile.x, projectile.y, projectile.z)
+      group.rotation.y = Math.atan2(projectile.dx, projectile.dz)
+      const assetGroup = group.children[2]
+      if (group.userData.projectileId !== projectile.id) {
+        group.userData.projectileId = projectile.id
+        assetGroup.clear()
+        const source = sourceInfo[projectile.propAsset]
+        if (source) {
+          const model = source.scene.clone(true)
+          model.traverse((node) => { if (node.isMesh) { node.castShadow = true; node.receiveShadow = true } })
+          model.scale.setScalar(source.scale)
+          model.position.copy(source.center).multiplyScalar(-source.scale)
+          assetGroup.add(model)
+        }
+      }
+      const age = 1 - projectile.life / (projectile.maxLife || 2.4)
+      const spin = assetGroup.children[0]
+      if (spin) spin.rotation.x += dt * (10 + (projectile.propAsset % 3) * 2)
+      const glow = group.children[0]
+      if (glow) glow.scale.setScalar(0.48 + Math.sin(age * Math.PI * 12) * 0.06)
+    }
+  })
+
+  return <>
+    {Array.from({ length: PROP_PROJECTILES }, (_, index) => (
+      <group key={index} ref={(element) => { refs.current[index] = element }} visible={false}>
+        <mesh>
+          <sphereGeometry args={[1, 12, 12]} />
+          <meshBasicMaterial color="#b9f6ff" transparent opacity={0.26} depthWrite={false} />
+        </mesh>
+        <pointLight color="#b9f6ff" intensity={2.4} distance={4.5} decay={2} />
+        <group />
+      </group>
+    ))}
+  </>
 }
 
 /** 範囲攻撃の予告円・着弾・回復の輪 */

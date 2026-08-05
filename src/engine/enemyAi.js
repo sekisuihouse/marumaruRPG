@@ -65,6 +65,8 @@ function updateEnemy(e, dt) {
   const p = sim.player
 
   if (!e.alive) {
+    // ボス戦の封鎖中は通常の敵を出さない（ボスに集中させる）
+    if (sim.arena?.active) return
     const initialSlotEnabled = sim.enemyChallengeUnlocked || e.spawnSlot % 2 === 0
     if (t >= e.respawnAt && initialSlotEnabled && canSpawnNow(def)) spawnEnemy(e)
     return

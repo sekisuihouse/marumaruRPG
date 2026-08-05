@@ -9,11 +9,14 @@ import { Sky, Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
 import { Town } from '../gfx/Town.jsx'
 import { PlayerActor, EnemyActors, NpcActors, BossActors, RemotePlayers } from './Actors.jsx'
-import { Projectiles, GroundEffects, DamageNumbers } from './Effects.jsx'
+import { Projectiles, DebugPropProjectiles, GroundEffects, DamageNumbers } from './Effects.jsx'
 import { Debris } from './Debris.jsx'
 import { WebLine } from './WebLine.jsx'
 import { DebugOverlay } from './DebugOverlay.jsx'
+import { ArenaField } from './ArenaField.jsx'
+import { BossForgeCamera } from './BossForgeCamera.jsx'
 import { ThirdPersonCamera } from './ThirdPersonCamera.jsx'
+import { BossForgeDebug, BossForgePreviewStage, BossForgeBackdrop } from './BossForgeDebug.jsx'
 import { sim, isNight } from '../engine/sim.js'
 import { stepSim } from '../engine/step.js'
 
@@ -22,10 +25,21 @@ function SimDriver() {
   // デバッグ用: DevTools から __three.gl.info.render で描画統計を見られる
   if (typeof window !== 'undefined') window.__three = { scene, gl, camera }
   useFrame((_, dt) => {
-    stepSim(dt)
+    const forge = sim.bossForge
+    const scale = forge?.timeScale ?? 1
+    if (scale > 0) stepSim(dt * scale)
+    else if (forge?.stepOnce) { stepSim(1 / 60); forge.stepOnce = false }
     if (typeof window !== 'undefined') window.__frames = (window.__frames || 0) + 1
   }, -10)
   return null
+}
+
+function ForgeGameplayLayer({ children }) {
+  const ref = useRef()
+  useFrame(() => {
+    if (ref.current) ref.current.visible = !sim.bossForge || sim.bossForge.combat
+  })
+  return <group ref={ref}>{children}</group>
 }
 
 const sunDir = new THREE.Vector3()
@@ -107,20 +121,28 @@ export function World() {
     <>
       <SimDriver />
       <DayNight />
-      <NightSparkles />
-      <Town />
-      <PlayerActor />
-      <RemotePlayers />
-      <EnemyActors />
+      <ForgeGameplayLayer>
+        <NightSparkles />
+        <Town />
+        <PlayerActor />
+        <RemotePlayers />
+        <EnemyActors />
+        <NpcActors />
+        <Projectiles />
+        {sim.debugMode && <DebugPropProjectiles />}
+        <Debris />
+        <WebLine />
+        <ArenaField />
+        <GroundEffects />
+        <DamageNumbers />
+        <DebugOverlay />
+      </ForgeGameplayLayer>
       <BossActors />
-      <NpcActors />
-      <Projectiles />
-      <Debris />
-      <WebLine />
-      <GroundEffects />
-      <DamageNumbers />
-      <DebugOverlay />
+      <BossForgePreviewStage />
+      <BossForgeBackdrop />
+      <BossForgeDebug />
       <ThirdPersonCamera />
+      <BossForgeCamera />
     </>
   )
 }

@@ -1,6 +1,6 @@
 /**
  * 三人称カメラ。プレイヤーの背後を追従し、
- * マウスドラッグ / Z・Xキー で旋回、ホイール / -・+ で距離を変える。
+ * トラックパッド / マウス移動で旋回、2本指スクロール / ホイールで距離を変える。
  * 移動入力(step.js の cameraRelative)はこのカメラの yaw を基準にするので、
  * 「カメラの向きが前」になる。
  */
@@ -19,6 +19,9 @@ export function ThirdPersonCamera() {
   const current = useRef(9)
 
   useFrame((_, dt) => {
+    // BOSS FORGE の編集プレビューは専用カメラ(BossForgeCamera)が担当する。
+    // プレイヤー座標・NavMeshの遮蔽距離・地面の下限を持ち込まない。
+    if (sim.bossForge && !sim.bossForge.combat) return
     const p = sim.player
     const c = sim.camera
 
@@ -44,10 +47,6 @@ export function ThirdPersonCamera() {
     let pz = c.target.z + dirZ * dist
     let py = c.target.y + dirY * dist
 
-    // 地面や川床にカメラが潜らないよう下限を設ける
-    const floor = Math.max(groundY(px, pz, p.pos.y), p.pos.y - 2) + 0.7
-    if (py < floor) py = floor
-
     // 被弾時の軽い揺れ(reducedMotion では無効)
     if (lastHp.current !== null && p.hp < lastHp.current && !sim.settings.reducedMotion) shake.current = 0.28
     lastHp.current = p.hp
@@ -65,6 +64,12 @@ export function ThirdPersonCamera() {
       py += (Math.random() - 0.5) * s
       pz += (Math.random() - 0.5) * s
     }
+
+    // 地面や川床にカメラが潜らないよう下限を設ける。
+    // ⚠️ 必ず揺れの後に掛ける。先に掛けると、ボス戦の破壊シェイク（最大±0.7m）が
+    // そのまま下方向へ乗って、カメラが地面へ沈む。
+    const floor = Math.max(groundY(px, pz, p.pos.y), p.pos.y - 2) + 0.7
+    if (py < floor) py = floor
 
     camera.position.set(px, py, pz)
     camera.lookAt(c.target)

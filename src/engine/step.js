@@ -6,7 +6,7 @@
  */
 import * as THREE from 'three'
 import { sim, publishHud, say, floater, addEffect, addProjectile, resetPlayer, isNight } from './sim.js'
-import { keys, pressed, mouse, moveAxis, endFrame, holding } from './input.js'
+import { actionActive, endFrame, isHeld, mouse, moveAxis, wasPressed } from './input.js'
 import { move, groundY, isWalkable, findLandmark, nearestWalkable } from './nav.js'
 import { PLAYER_ATTACKS } from '../data/enemies.js'
 import { damageEnemy, damagePlayer } from './damage.js'
@@ -25,6 +25,7 @@ import { updateFireStream, fireBlast } from './firestream.js'
 import { updateWeb, tryWebAttach, webRelease, isSwinging, aimDirection } from './webswing.js'
 import { isGuest, tickMultiplayer, requestAttack } from '../net/hostAuthority.js'
 import { multiplayer } from '../net/multiplayerStore.js'
+import { DEBUG_PROP_SHOT_ASSETS, DEBUG_PROP_SHOT_ATTACK, DEBUG_PROP_SHOT_MAX_ACTIVE } from '../data/debugPropShot.js'
 
 const COMBO_MUL = [1, 1.12, 1.4]
 const HUD_INTERVAL = 1 / 12
@@ -50,14 +51,23 @@ export function initNpcs() {
 }
 
 export function stepSim(rawDt) {
+  // 非表示タブ用の保険(src/net/keepalive.js)が「描画フレームが来ているか」を見るための刻印
+  if (typeof performance !== 'undefined') sim.lastStepAt = performance.now()
   let dt = Math.min(rawDt, 1 / 20)   // タブ復帰時の巨大な dt でワープしないよう制限
   updateJuice(dt)
   // ヒットストップ・スローモーションはここで時間を縮める（入力とカメラは等速のまま）
   dt *= timeScale()
+  // BOSS FORGE の再生制御。編集中だけ効き、通常プレイには影響しない。
+  const forge = sim.bossForge
+  if (forge && !forge.combat) {
+    if (forge.stepOnce) { dt = 1 / 60; forge.stepOnce = false }
+    else dt *= Number.isFinite(forge.timeScale) ? forge.timeScale : 1
+  }
   if (dt < 1e-6) dt = 1e-6
   sim.time += dt
 
-  if (pressed.f9) sim.debugDraw = !sim.debugDraw
+  // 開発用の可視化は公開版の入力から完全に外す。
+  if (typeof import.meta.env !== 'undefined' && import.meta.env.DEV && wasPressed('debug')) sim.debugDraw = !sim.debugDraw
 
   // 時間帯(bunbetu 13 出現条件に使う)
   const wasNight = isNight()
@@ -114,16 +124,14 @@ function publishThrottled(dt) {
 
 function updateCamera(dt) {
   const c = sim.camera
-  const speed = 2.4
-  if (keys.z) c.yaw += speed * dt
-  if (keys.x) c.yaw -= speed * dt
   if (mouse.dx) c.yaw -= mouse.dx * 0.005
   if (mouse.dy) c.pitch += mouse.dy * 0.004 * (sim.settings.invertY ? -1 : 1)
-  if (keys['-']) c.dist += 6 * dt
-  if (keys['+'] || keys['=']) c.dist -= 6 * dt
   if (mouse.wheel) c.dist += mouse.wheel * 0.9
-  c.pitch = THREE.MathUtils.clamp(c.pitch, 0.06, 1.15)
-  c.dist = THREE.MathUtils.clamp(c.dist, 3.5, 16)
+  // BOSS FORGE のプレビューは大きなボスを丸ごと見たいので、可動域を広げる
+  const preview = sim.bossForge && !sim.bossForge.combat
+  // 通常プレイも上方向へ見上げられるよう、下限を0より下へ広げる。
+  c.pitch = THREE.MathUtils.clamp(c.pitch, preview ? -0.45 : -0.35, preview ? 1.4 : 1.15)
+  c.dist = THREE.MathUtils.clamp(c.dist, preview ? 1.5 : 3.5, preview ? 80 : 16)
 }
 
 // ───────────────────────────── プレイヤー
@@ -156,29 +164,30 @@ function updatePlayer(dt) {
   p.stamina = THREE.MathUtils.clamp(p.stamina + dt * staminaRate, 0, p.maxStamina)
 
   // 盾(押している間)
-  const wantBlock = !!keys.control && p.stamina > 2 && !p.action && p.state !== 'roll'
+  const wantSprint = actionActive('sprint', sim.settings.sprintMode === 'toggle')
+  const wantBlock = actionActive('guard', sim.settings.guardMode === 'toggle') && p.stamina > 2 && !p.action && p.state !== 'roll'
   p.blocking = wantBlock
   if (p.blocking) p.tutorialActions.block = true
 
   // 攻撃入力
   handleAttackInput()
+  if (sim.debugMode && wasPressed('debugPropShot')) launchDebugPropShot()
 
-  // ── 長押しアクション（ウェブスイング / 連続火球）
-  const wantWeb = holding.webswing()
-  if (wantWeb && !isSwinging()) tryWebAttach()
-  else if (!wantWeb && isSwinging()) webRelease(true)
-  updateFireStream(dt, holding.firestream())
+  // ── ウェブはQを押している間だけ接続。離すと糸が切れ、そのまま落下する。
+  if (isHeld('webSwing') && !isSwinging()) tryWebAttach()
+  else if (!isHeld('webSwing') && isSwinging()) webRelease(false)
+  updateFireStream(dt, p.selectedAbility === 'firestream' && isHeld('useAbility'))
 
   // ── 空中（スイング中・飛び出し中）は専用の物理で動かす
   if (p.airborne) {
     const axis = cameraRelative(moveAxis())
-    updateWeb(dt, axis, { forward: holding.forward(), back: holding.back() })
+    updateWeb(dt, axis)
     if (p.action) runPlayerAttack(dt)
     return
   }
 
   // 回避ローリング
-  if (pressed[' '] && p.state !== 'roll' && p.stamina >= p.dodgeCost && !p.dead) {
+  if (wasPressed('dodge') && p.state !== 'roll' && p.stamina >= p.dodgeCost && !p.dead) {
     p.state = 'roll'
     p.stateTime = 0
     p.anim = 'roll'
@@ -192,7 +201,7 @@ function updatePlayer(dt) {
   }
 
   // 会話
-  if (pressed.g) tryInteract()
+  if (wasPressed('interact')) tryInteract()
 
   // ── 移動
   let moveX = 0, moveZ = 0
@@ -209,7 +218,7 @@ function updatePlayer(dt) {
   } else if (!locked) {
     const axis = cameraRelative(moveAxis())
     if (axis.len > 0.01) {
-      const canRun = keys.shift && p.stamina > 3 && !p.blocking
+      const canRun = wantSprint && p.stamina > 3 && !p.blocking
       p.running = canRun
       speed = (canRun ? p.runSpeed : p.walkSpeed) * (p.blocking ? 0.55 : 1) * (1 - p.slow)
       moveX = axis.x
@@ -277,9 +286,50 @@ function cameraRelative({ x, y }) {
 }
 
 function handleAttackInput() {
-  const map = { f: 'melee', r: 'magic', l: 'area', u: 'arrow', e: 'heal' }
-  for (const [key, id] of Object.entries(map)) if (pressed[key]) { tryAttack(id); return }
-  if (mouse.leftClick) tryAttack('melee')
+  const p = sim.player
+  const slots = ['magic', 'area', 'arrow', 'firestream']
+  for (let i = 0; i < slots.length; i++) {
+    if (wasPressed(`ability${i + 1}`)) {
+      p.selectedAbility = slots[i]
+      const def = PLAYER_ATTACKS[p.selectedAbility]
+      say(`${def.label} を選択`, p.skills.includes(def.id) ? 'info' : 'warn')
+      return
+    }
+  }
+  if (wasPressed('meleeAttack')) { tryAttack('melee'); return }
+  if (wasPressed('heal')) { tryAttack('heal'); return }
+  if (wasPressed('useAbility') && p.selectedAbility !== 'firestream') tryAttack(p.selectedAbility)
+}
+
+/**
+ * デバッグ限定のネタ技。分離した町GLBをランダムに選び、通常の弾と同じ
+ * 命中・建物破壊・敵ダメージ経路へ流す。連打を気持ちよくするためクールダウンなし。
+ */
+export function launchDebugPropShot() {
+  const p = sim.player
+  if (!sim.debugMode || p.dead || isGuest()) return false
+  const oldest = sim.projectiles.findIndex((projectile) => projectile.kind === 'debug-prop')
+  if (sim.projectiles.filter((projectile) => projectile.kind === 'debug-prop').length >= DEBUG_PROP_SHOT_MAX_ACTIVE && oldest >= 0) {
+    sim.projectiles.splice(oldest, 1)
+  }
+  const assetIndex = Math.floor(Math.random() * DEBUG_PROP_SHOT_ASSETS.length)
+  const asset = DEBUG_PROP_SHOT_ASSETS[assetIndex]
+  if (!asset) return false
+  const aim = aimDirection()
+  const flat = Math.hypot(aim.x, aim.z) || 1
+  const dx = aim.x / flat
+  const dz = aim.z / flat
+  const dy = THREE.MathUtils.clamp(aim.y * 0.7 + 0.08, -0.42, 0.42)
+  const attacker = { attack: p.attack, magicAttack: p.magicAttack, buff: null }
+  addProjectile({
+    kind: 'debug-prop', owner: 'player', attack: DEBUG_PROP_SHOT_ATTACK, attacker, mul: 1,
+    x: p.pos.x + dx * 0.75, y: p.pos.y + 1.25, z: p.pos.z + dz * 0.75,
+    dx, dy, dz, speed: DEBUG_PROP_SHOT_ATTACK.speed, radius: DEBUG_PROP_SHOT_ATTACK.radius,
+    color: '#d9f8ff', life: 2.4, maxLife: 2.4, armAt: sim.time + 0.12, propAsset: assetIndex,
+  })
+  sim.debugPropShotsFired++
+  addEffect({ kind: 'muzzle', x: p.pos.x + dx * 0.7, y: p.pos.y + 1.2, z: p.pos.z + dz * 0.7, radius: 0.7, color: '#a9f1ff', life: 0.18 })
+  return true
 }
 
 /** 破片がプレイヤー/敵に当たったとき（上限つき。接触だけでは即死しない） */
@@ -491,8 +541,8 @@ function updateNpcs(dt) {
 }
 
 function handleDialogueInput() {
-  if (pressed.escape) { closeDialogue(); return }
-  for (let i = 1; i <= 4; i++) if (pressed[String(i)]) { chooseDialogue(i - 1); return }
+  if (wasPressed('pause')) { closeDialogue(); return }
+  for (let i = 1; i <= 4; i++) if (wasPressed(`ability${i}`)) { chooseDialogue(i - 1); return }
 }
 
 // ───────────────────────────── 弾
@@ -508,6 +558,9 @@ function updateProjectiles(dt) {
     pr.life -= dt
 
     let done = false
+    // 発射直後だけは自分のいる建物コライダーに当てず、GLBが魔法球として
+    // 画面から飛び出すまでの短い猶予を確保する。
+    if (sim.time < (pr.armAt ?? -Infinity)) continue
     // 建物の小片に当たったか（3D）。命中位置から局所破壊する
     const part = (pr.owner === 'player' || pr.structure) ? isInsideStructure(pr.x, pr.y, pr.z) : null
     if (part) {

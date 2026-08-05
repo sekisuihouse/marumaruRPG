@@ -21,7 +21,9 @@ export function Debris() {
   const bigRefs = useRef([])
   const chips = useRef()
   const chipGeo = useMemo(() => new THREE.BoxGeometry(1, 1, 1), [])
-  const chipMat = useMemo(() => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, metalness: 0.05 }), [])
+  // vertexColors は付けない（setColorAt は instanceColor を使う。付けるとジオメトリの
+  // color 属性が無いため破片が真っ黒になる）
+  const chipMat = useMemo(() => new THREE.MeshStandardMaterial({ roughness: 0.85, metalness: 0.05 }), [])
 
   useFrame(() => {
     const list = sim.debris || []

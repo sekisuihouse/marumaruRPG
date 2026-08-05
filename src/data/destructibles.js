@@ -22,20 +22,23 @@ export const CHUNKING = {
 /**
  * トップレベル名 → 分類。上から順に最初に一致したものを採用する。
  * category:
- *   ground / water : 破壊不可（足場）
- *   nature / people / fx : 破壊不可（装飾・住民・演出）
+ *   ground / water : 破壊不可（足場）。ここに穴を開けると落下できてしまう。
+ *   fx       : 破壊不可（花火などの演出）
  *   building : 建物（壁・屋根・窓に細分）
  *   structure: 柱状の構造物（鳥居・信号・遊具）
  *   prop     : 小物（車・自転車・箱）
+ *   nature   : 木・すだち畑（幹と葉に細分）
+ *   people   : 住民・阿波踊り
  */
 export const CATEGORY_RULES = [
   // ── 足場（絶対に壊さない）
   { re: /^(地面|ふち|駐車場地面|ガソスタ地面|土|棚田|畑|Loop|NURBSパス)/, category: 'ground' },
   { re: /^(川)$/, category: 'water' },
   { re: /^川岩/, category: 'ground' },
-  // ── 自然物・住民・演出（壊さない）
-  { re: /^(杉|イチョウ|すだち)(?!箱)/, category: 'nature' },
+  // ── 演出（壊さない）
   { re: /^花火/, category: 'fx' },
+  // ── 木・すだち畑・住民・阿波踊り（壊せる）
+  { re: /^(杉|イチョウ|すだち)(?!箱)/, category: 'nature' },
   { re: /^(歩く|お話|聞き手|店員|作業|寝転がり|天を仰ぐ|スコップで掘る|阿波踊り|おてあげ人)/, category: 'people' },
   // ── 建物
   { re: /^(古民家|カフェ|温泉|コンビニ|パン屋|集会所|HOME|ROOMS|Office|ガソスタ$|社$|キャンプ|ステージ|物販|マルシェ|飲食|学生体験)/, category: 'building' },
@@ -46,10 +49,10 @@ export const CATEGORY_RULES = [
 ]
 
 /** 上のどれにも当たらなかった名前の既定。安全側（壊さない）に倒す。 */
-export const DEFAULT_CATEGORY = 'nature'
+export const DEFAULT_CATEGORY = 'ground'
 
 /** 破壊対象にする分類 */
-export const BREAKABLE = new Set(['building', 'structure', 'prop'])
+export const BREAKABLE = new Set(['building', 'structure', 'prop', 'nature', 'people'])
 
 /**
  * 部位ごとの基本値。building は高さから wall / roof / pillar / window を自動判定する。
@@ -68,6 +71,11 @@ export const PART_STATS = {
   sign: { hp: 24, mass: 1.0, breakThreshold: 2, materialType: 'metal', debrisImpulse: 1.4, chainBreakRadius: 1.2 },
   floor: { hp: 120, mass: 5.0, breakThreshold: 12, materialType: 'stone', debrisImpulse: 0.6, chainBreakRadius: 1.4 },
   prop: { hp: 30, mass: 1.4, breakThreshold: 2, materialType: 'metal', debrisImpulse: 1.5, chainBreakRadius: 1.4 },
+  // 木は幹が硬く、葉は軽く散る。幹を折れば上の葉も連鎖で落ちる。
+  trunk: { hp: 70, mass: 3.2, breakThreshold: 5, materialType: 'wood', debrisImpulse: 0.9, chainBreakRadius: 2.6 },
+  foliage: { hp: 18, mass: 0.5, breakThreshold: 1, materialType: 'leaf', debrisImpulse: 1.7, chainBreakRadius: 2.8 },
+  // 住民・阿波踊り。軽く吹き飛び、硬さで手が止まらないようにする。
+  body: { hp: 14, mass: 0.9, breakThreshold: 1, materialType: 'cloth', debrisImpulse: 1.9, chainBreakRadius: 1.2 },
 }
 
 /** 分類ごとの倍率（同じ壁でも小屋と大きな建物で硬さを変える） */
@@ -75,6 +83,8 @@ export const CATEGORY_MUL = {
   building: { hp: 1.0, mass: 1.0 },
   structure: { hp: 1.35, mass: 1.2 },
   prop: { hp: 0.7, mass: 0.8 },
+  nature: { hp: 0.85, mass: 0.9 },
+  people: { hp: 0.4, mass: 0.6 },
 }
 
 /** 材質ごとの演出 */
@@ -84,6 +94,8 @@ export const MATERIALS = {
   stone: { dust: '#cfcfcf', spark: 0.2, volume: 1.15 },
   glass: { dust: '#d8f2ff', spark: 0.5, volume: 0.7 },
   metal: { dust: '#a8b4bd', spark: 0.8, volume: 1.05 },
+  leaf: { dust: '#8fbf6a', spark: 0, volume: 0.5 },
+  cloth: { dust: '#e6d3b8', spark: 0, volume: 0.45 },
 }
 
 /** 破片・物理の上限。品質切り替えで差し替える。 */
@@ -123,10 +135,15 @@ export const isBreakable = (topName) => BREAKABLE.has(categoryOf(topName))
  */
 export function partTypeOf(category, chunk, objBox) {
   if (category === 'prop') return 'prop'
+  if (category === 'people') return 'body'
   const h = Math.max(0.001, objBox.maxY - objBox.minY)
   const rel = (chunk.cy - objBox.minY) / h
   const w = Math.max(chunk.hx, chunk.hz) * 2
   const tall = chunk.hy * 2
+  if (category === 'nature') {
+    // 下half かつ細い断片が幹。それ以外は葉として軽く散らす。
+    return rel < 0.5 && w < Math.max(1.2, h * 0.28) ? 'trunk' : 'foliage'
+  }
   if (category === 'structure') {
     return tall > w * 1.6 ? 'pillar' : 'sign'
   }

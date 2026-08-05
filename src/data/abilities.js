@@ -7,7 +7,7 @@
 export const FIRE_STREAM = {
   id: 'firestream',
   label: '☄ 連続火球',
-  key: 'C',
+  key: '4 → R長押し',
   unlockLevel: 8,
   /** 発射間隔(s) */
   interval: 0.12,
@@ -39,7 +39,7 @@ export const FIRE_STREAM = {
 export const WEB_SWING = {
   id: 'webswing',
   label: '🕸 ウェブスイング',
-  key: 'Q',
+  key: 'Q長押し',
   unlockLevel: 6,
   /** 接続可能な最大距離(m) */
   maxDistance: 62,
@@ -76,8 +76,16 @@ export const WEB_SWING = {
     /** ジップ中の重力（0で完全な直進） */
     gravity: 3.0,
   },
-  /** 糸が引く力（加速度 m/s^2） */
-  pull: 26,
+  /** 糸が引く力（加速度 m/s^2）。落下より接続点への牽引を優先する。 */
+  pull: 58,
+  /** 接続中の重力。通常落下よりかなり弱くし、糸でまっすぐ飛びやすくする。 */
+  attachedGravity: 5.5,
+  /** Qを押している間の自動巻き取り速度(m/s)。 */
+  autoReelSpeed: 24,
+  /** 接続直後に確保する前進速度と、接続点へ向けた速度補正。 */
+  attachMinSpeed: 15,
+  attachAccel: 82,
+  attachSteer: 7.5,
   /** 前後入力での巻き取り／繰り出し速度(m/s) */
   reelIn: 9,
   reelOut: 7,
@@ -85,11 +93,11 @@ export const WEB_SWING = {
   /** 横入力のスイング補助 */
   lateral: 12,
   /** 速度上限(m/s)。壁への高速衝突で操作不能にならないよう抑える。 */
-  maxSpeed: 30,
+  maxSpeed: 34,
   /** 糸を張った瞬間の跳ね上がり（地上から撃っても引きずられない） */
-  launchLift: 6.5,
+  launchLift: 9,
   /** 発射直後に着地判定を無視する時間(s) */
-  launchGrace: 0.45,
+  launchGrace: 0.8,
   /** 解除時に上乗せする跳び出し */
   releaseBoost: 1.18,
   releaseLift: 3.4,
@@ -100,7 +108,7 @@ export const WEB_SWING = {
   cooldown: 0.25,
   /** 短距離では振り子ではなく軽い引き寄せにする距離 */
   shortRange: 7,
-  shortPull: 14,
+  shortPull: 46,
   /** 地面・壁への衝突時に残す速度の割合 */
   crashKeep: 0.35,
 }

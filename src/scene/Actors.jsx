@@ -92,7 +92,8 @@ function BossActor({ index }) {
   return <>
     <Blob source={source} radius={b.def.hitRadius * 1.45} opacity={0.42} />
     <BossModel source={source} />
-    <Nameplate source={source} color={b.def.color} width={2.8} offsetY={3.2} />
+    {/* 編集プレビューでは名札がモデルへ重なるので出さない */}
+    <Nameplate source={() => (sim.bossForge && !sim.bossForge.combat ? null : source())} color={b.def.color} width={2.8} offsetY={3.2} />
   </>
 }
 

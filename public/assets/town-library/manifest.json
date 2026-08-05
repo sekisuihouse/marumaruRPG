@@ -1,0 +1,5474 @@
+{
+  "source": "public/assets/town.glb",
+  "generatedAt": "2026-08-04T18:23:44.936Z",
+  "worldUnitScale": 6,
+  "usage": "各GLBは原点・接地面へ整列済み。敵の手へ装着する場合は weaponUse.attachBone を基準にする。",
+  "categories": {
+    "building": 45,
+    "structure": 12,
+    "prop": 8,
+    "people": 35,
+    "nature": 10,
+    "ground": 11,
+    "water": 1,
+    "fx": 3
+  },
+  "weaponCandidates": [
+    "001_トラック",
+    "004_トラック002",
+    "005_車001",
+    "024_一方通行",
+    "025_一方通行001",
+    "026_一方通行002",
+    "027_一方通行004",
+    "028_一方通行003",
+    "029_一方通行005",
+    "030_ガードレール002",
+    "031_ガードレール",
+    "065_Bus",
+    "066_Bus001",
+    "071_すだち箱",
+    "073_自転車004",
+    "074_自転車005",
+    "090_ぼうつき",
+    "106_スコップで掘る(Man)",
+    "110_スコップで掘る(Woman)"
+  ],
+  "assets": [
+    {
+      "id": "001_トラック",
+      "name": "トラック",
+      "category": "prop",
+      "tags": [
+        "prop",
+        "vehicle",
+        "weapon-candidate"
+      ],
+      "file": "props/001_トラック.glb",
+      "sourceNode": 0,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 26.854,
+        "y": 1.636,
+        "z": 43.366
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 77652,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "002_駐車場地面",
+      "name": "駐車場地面",
+      "category": "ground",
+      "tags": [
+        "ground",
+        "vehicle"
+      ],
+      "file": "environment/ground/002_駐車場地面.glb",
+      "sourceNode": 1,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 43.318,
+        "y": 2.912,
+        "z": 17.509
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 13824,
+      "weaponUse": null
+    },
+    {
+      "id": "003_ガソスタ地面",
+      "name": "ガソスタ地面",
+      "category": "ground",
+      "tags": [
+        "ground",
+        "building"
+      ],
+      "file": "environment/ground/003_ガソスタ地面.glb",
+      "sourceNode": 2,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 16.652,
+        "y": 0.187,
+        "z": 15.031
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 3300,
+      "weaponUse": null
+    },
+    {
+      "id": "004_トラック002",
+      "name": "トラック002",
+      "category": "prop",
+      "tags": [
+        "prop",
+        "vehicle",
+        "weapon-candidate"
+      ],
+      "file": "props/004_トラック002.glb",
+      "sourceNode": 3,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.57,
+        "y": 1.561,
+        "z": 2.765
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 38420,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "005_車001",
+      "name": "車001",
+      "category": "prop",
+      "tags": [
+        "prop",
+        "vehicle",
+        "weapon-candidate"
+      ],
+      "file": "props/005_車001.glb",
+      "sourceNode": 4,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 38.554,
+        "y": 1.398,
+        "z": 49.063
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 109132,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "006_地面",
+      "name": "地面",
+      "category": "ground",
+      "tags": [
+        "ground"
+      ],
+      "file": "environment/ground/006_地面.glb",
+      "sourceNode": 5,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 96.346,
+        "y": 3.576,
+        "z": 96.191
+      },
+      "materials": [
+        {
+          "name": "未来地面",
+          "color": "#7bcf5f",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 28376,
+      "weaponUse": null
+    },
+    {
+      "id": "007_ふち",
+      "name": "ふち",
+      "category": "ground",
+      "tags": [
+        "ground"
+      ],
+      "file": "environment/ground/007_ふち.glb",
+      "sourceNode": 6,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 98.699,
+        "y": 10.128,
+        "z": 98.699
+      },
+      "materials": [
+        {
+          "name": "未来地面",
+          "color": "#7bcf5f",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 85752,
+      "weaponUse": null
+    },
+    {
+      "id": "008_川",
+      "name": "川",
+      "category": "water",
+      "tags": [
+        "water"
+      ],
+      "file": "environment/water/008_川.glb",
+      "sourceNode": 7,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 93.346,
+        "y": 1.61,
+        "z": 69.137
+      },
+      "materials": [
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 30204,
+      "weaponUse": null
+    },
+    {
+      "id": "009_川岩",
+      "name": "川岩",
+      "category": "ground",
+      "tags": [
+        "ground"
+      ],
+      "file": "environment/ground/009_川岩.glb",
+      "sourceNode": 8,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 95.742,
+        "y": 73.942,
+        "z": 68.986
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 56152,
+      "weaponUse": null
+    },
+    {
+      "id": "010_杉",
+      "name": "杉",
+      "category": "nature",
+      "tags": [
+        "nature",
+        "plant"
+      ],
+      "file": "environment/nature/010_杉.glb",
+      "sourceNode": 9,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 91.845,
+        "y": 3.487,
+        "z": 52.191
+      },
+      "materials": [
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 48284,
+      "weaponUse": null
+    },
+    {
+      "id": "011_イチョウ",
+      "name": "イチョウ",
+      "category": "nature",
+      "tags": [
+        "nature",
+        "plant"
+      ],
+      "file": "environment/nature/011_イチョウ.glb",
+      "sourceNode": 10,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 107.594,
+        "y": 4.514,
+        "z": 102.917
+      },
+      "materials": [
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 21464,
+      "weaponUse": null
+    },
+    {
+      "id": "012_すだち002",
+      "name": "すだち002",
+      "category": "nature",
+      "tags": [
+        "nature",
+        "plant"
+      ],
+      "file": "environment/nature/012_すだち002.glb",
+      "sourceNode": 11,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 2.172,
+        "y": 0.069,
+        "z": 1.868
+      },
+      "materials": [
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 24036,
+      "weaponUse": null
+    },
+    {
+      "id": "013_イチョウ001",
+      "name": "イチョウ001",
+      "category": "nature",
+      "tags": [
+        "nature",
+        "plant"
+      ],
+      "file": "environment/nature/013_イチョウ001.glb",
+      "sourceNode": 12,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 60.132,
+        "y": 4.706,
+        "z": 56.904
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 39340,
+      "weaponUse": null
+    },
+    {
+      "id": "014_イチョウ002",
+      "name": "イチョウ002",
+      "category": "nature",
+      "tags": [
+        "nature",
+        "plant"
+      ],
+      "file": "environment/nature/014_イチョウ002.glb",
+      "sourceNode": 13,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 15.167,
+        "y": 1.66,
+        "z": 9.809
+      },
+      "materials": [
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来地面",
+          "color": "#7bcf5f",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 30768,
+      "weaponUse": null
+    },
+    {
+      "id": "015_イチョウ003",
+      "name": "イチョウ003",
+      "category": "nature",
+      "tags": [
+        "nature",
+        "plant"
+      ],
+      "file": "environment/nature/015_イチョウ003.glb",
+      "sourceNode": 14,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 15.167,
+        "y": 1.66,
+        "z": 9.809
+      },
+      "materials": [
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来地面",
+          "color": "#7bcf5f",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 30768,
+      "weaponUse": null
+    },
+    {
+      "id": "016_イチョウ004",
+      "name": "イチョウ004",
+      "category": "nature",
+      "tags": [
+        "nature",
+        "plant"
+      ],
+      "file": "environment/nature/016_イチョウ004.glb",
+      "sourceNode": 15,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 15.167,
+        "y": 1.66,
+        "z": 9.809
+      },
+      "materials": [
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来地面",
+          "color": "#7bcf5f",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 30768,
+      "weaponUse": null
+    },
+    {
+      "id": "017_イチョウ005",
+      "name": "イチョウ005",
+      "category": "nature",
+      "tags": [
+        "nature",
+        "plant"
+      ],
+      "file": "environment/nature/017_イチョウ005.glb",
+      "sourceNode": 16,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 15.167,
+        "y": 1.66,
+        "z": 9.809
+      },
+      "materials": [
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来地面",
+          "color": "#7bcf5f",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 30768,
+      "weaponUse": null
+    },
+    {
+      "id": "018_すだち001",
+      "name": "すだち001",
+      "category": "nature",
+      "tags": [
+        "nature",
+        "plant"
+      ],
+      "file": "environment/nature/018_すだち001.glb",
+      "sourceNode": 17,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.908,
+        "y": 0.065,
+        "z": 0.536
+      },
+      "materials": [
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 8436,
+      "weaponUse": null
+    },
+    {
+      "id": "019_イチョウ009",
+      "name": "イチョウ009",
+      "category": "nature",
+      "tags": [
+        "nature",
+        "plant"
+      ],
+      "file": "environment/nature/019_イチョウ009.glb",
+      "sourceNode": 18,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 12.131,
+        "y": 4.061,
+        "z": 12.651
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来桜",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 16148,
+      "weaponUse": null
+    },
+    {
+      "id": "020_社",
+      "name": "社",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/020_社.glb",
+      "sourceNode": 19,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 6.451,
+        "y": 3.609,
+        "z": 7.635
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 29952,
+      "weaponUse": null
+    },
+    {
+      "id": "021_鳥居",
+      "name": "鳥居",
+      "category": "structure",
+      "tags": [
+        "structure",
+        "street-fixture"
+      ],
+      "file": "structures/021_鳥居.glb",
+      "sourceNode": 20,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.719,
+        "y": 3.854,
+        "z": 4.508
+      },
+      "materials": [
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 30456,
+      "weaponUse": null
+    },
+    {
+      "id": "022_NURBSパス001",
+      "name": "NURBSパス001",
+      "category": "ground",
+      "tags": [
+        "ground"
+      ],
+      "file": "environment/ground/022_NURBSパス001.glb",
+      "sourceNode": 21,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 118.866,
+        "y": 1.878,
+        "z": 117.069
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 51080,
+      "weaponUse": null
+    },
+    {
+      "id": "023_NURBSパス002",
+      "name": "NURBSパス002",
+      "category": "ground",
+      "tags": [
+        "ground"
+      ],
+      "file": "environment/ground/023_NURBSパス002.glb",
+      "sourceNode": 22,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 103.474,
+        "y": 0.103,
+        "z": 101.402
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 23856,
+      "weaponUse": null
+    },
+    {
+      "id": "024_一方通行",
+      "name": "一方通行",
+      "category": "structure",
+      "tags": [
+        "structure",
+        "street-fixture",
+        "weapon-candidate"
+      ],
+      "file": "structures/024_一方通行.glb",
+      "sourceNode": 23,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.982,
+        "y": 2.654,
+        "z": 0.168
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "警告赤",
+          "color": "#d94f3d",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 14656,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "025_一方通行001",
+      "name": "一方通行001",
+      "category": "structure",
+      "tags": [
+        "structure",
+        "street-fixture",
+        "weapon-candidate"
+      ],
+      "file": "structures/025_一方通行001.glb",
+      "sourceNode": 24,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.982,
+        "y": 2.654,
+        "z": 0.168
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "警告赤",
+          "color": "#d94f3d",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 14668,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "026_一方通行002",
+      "name": "一方通行002",
+      "category": "structure",
+      "tags": [
+        "structure",
+        "street-fixture",
+        "weapon-candidate"
+      ],
+      "file": "structures/026_一方通行002.glb",
+      "sourceNode": 25,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.313,
+        "y": 3.197,
+        "z": 1.507
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "警告赤",
+          "color": "#d94f3d",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "警告黄",
+          "color": "#f2b84b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来地面",
+          "color": "#7bcf5f",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 27908,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "027_一方通行004",
+      "name": "一方通行004",
+      "category": "structure",
+      "tags": [
+        "structure",
+        "street-fixture",
+        "weapon-candidate"
+      ],
+      "file": "structures/027_一方通行004.glb",
+      "sourceNode": 26,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.763,
+        "y": 3.197,
+        "z": 1.703
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "警告赤",
+          "color": "#d94f3d",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "警告黄",
+          "color": "#f2b84b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来地面",
+          "color": "#7bcf5f",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 27912,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "028_一方通行003",
+      "name": "一方通行003",
+      "category": "structure",
+      "tags": [
+        "structure",
+        "street-fixture",
+        "weapon-candidate"
+      ],
+      "file": "structures/028_一方通行003.glb",
+      "sourceNode": 27,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.318,
+        "y": 3.197,
+        "z": 1.511
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "警告赤",
+          "color": "#d94f3d",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "警告黄",
+          "color": "#f2b84b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来地面",
+          "color": "#7bcf5f",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 27912,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "029_一方通行005",
+      "name": "一方通行005",
+      "category": "structure",
+      "tags": [
+        "structure",
+        "street-fixture",
+        "weapon-candidate"
+      ],
+      "file": "structures/029_一方通行005.glb",
+      "sourceNode": 28,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.746,
+        "y": 3.197,
+        "z": 1.665
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "警告赤",
+          "color": "#d94f3d",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "警告黄",
+          "color": "#f2b84b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来地面",
+          "color": "#7bcf5f",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 27908,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "030_ガードレール002",
+      "name": "ガードレール002",
+      "category": "structure",
+      "tags": [
+        "structure",
+        "street-fixture",
+        "weapon-candidate"
+      ],
+      "file": "structures/030_ガードレール002.glb",
+      "sourceNode": 29,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.085,
+        "y": 0.892,
+        "z": 0.777
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 19848,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "031_ガードレール",
+      "name": "ガードレール",
+      "category": "structure",
+      "tags": [
+        "structure",
+        "street-fixture",
+        "weapon-candidate"
+      ],
+      "file": "structures/031_ガードレール.glb",
+      "sourceNode": 30,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.075,
+        "y": 0.892,
+        "z": 0.794
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 19844,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "032_カフェ",
+      "name": "カフェ",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/032_カフェ.glb",
+      "sourceNode": 31,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 4.978,
+        "y": 2.249,
+        "z": 5.032
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来桜",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 209248,
+      "weaponUse": null
+    },
+    {
+      "id": "033_温泉",
+      "name": "温泉",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/033_温泉.glb",
+      "sourceNode": 32,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 9.895,
+        "y": 4.828,
+        "z": 10.057
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 79096,
+      "weaponUse": null
+    },
+    {
+      "id": "034_コンビニ",
+      "name": "コンビニ",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/034_コンビニ.glb",
+      "sourceNode": 33,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 5.841,
+        "y": 2.838,
+        "z": 5.101
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来地面",
+          "color": "#7bcf5f",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 125960,
+      "weaponUse": null
+    },
+    {
+      "id": "035_キャンプ",
+      "name": "キャンプ",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/035_キャンプ.glb",
+      "sourceNode": 34,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 9.223,
+        "y": 2.798,
+        "z": 9.212
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 92408,
+      "weaponUse": null
+    },
+    {
+      "id": "036_古民家002",
+      "name": "古民家002",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/036_古民家002.glb",
+      "sourceNode": 35,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.701,
+        "y": 2.526,
+        "z": 3.701
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36400,
+      "weaponUse": null
+    },
+    {
+      "id": "037_古民家004",
+      "name": "古民家004",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/037_古民家004.glb",
+      "sourceNode": 36,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.978,
+        "y": 2.526,
+        "z": 3.978
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36404,
+      "weaponUse": null
+    },
+    {
+      "id": "038_古民家2001",
+      "name": "古民家2001",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/038_古民家2001.glb",
+      "sourceNode": 37,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 5.28,
+        "y": 2.382,
+        "z": 4.833
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 35152,
+      "weaponUse": null
+    },
+    {
+      "id": "039_古民家005",
+      "name": "古民家005",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/039_古民家005.glb",
+      "sourceNode": 38,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.742,
+        "y": 2.526,
+        "z": 3.742
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36404,
+      "weaponUse": null
+    },
+    {
+      "id": "040_古民家2002",
+      "name": "古民家2002",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/040_古民家2002.glb",
+      "sourceNode": 39,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 4.865,
+        "y": 2.382,
+        "z": 3.526
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 35156,
+      "weaponUse": null
+    },
+    {
+      "id": "041_古民家007",
+      "name": "古民家007",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/041_古民家007.glb",
+      "sourceNode": 40,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 2.962,
+        "y": 2.526,
+        "z": 2.962
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36400,
+      "weaponUse": null
+    },
+    {
+      "id": "042_古民家2004",
+      "name": "古民家2004",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/042_古民家2004.glb",
+      "sourceNode": 41,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 5.221,
+        "y": 3.469,
+        "z": 7.128
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 35148,
+      "weaponUse": null
+    },
+    {
+      "id": "043_パン屋",
+      "name": "パン屋",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/043_パン屋.glb",
+      "sourceNode": 42,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 6.043,
+        "y": 2.583,
+        "z": 6.048
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 158952,
+      "weaponUse": null
+    },
+    {
+      "id": "044_古民家010",
+      "name": "古民家010",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/044_古民家010.glb",
+      "sourceNode": 43,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.277,
+        "y": 2.526,
+        "z": 3.277
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36404,
+      "weaponUse": null
+    },
+    {
+      "id": "045_古民家011",
+      "name": "古民家011",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/045_古民家011.glb",
+      "sourceNode": 44,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.277,
+        "y": 2.526,
+        "z": 3.277
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36404,
+      "weaponUse": null
+    },
+    {
+      "id": "046_古民家012",
+      "name": "古民家012",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/046_古民家012.glb",
+      "sourceNode": 45,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.277,
+        "y": 2.526,
+        "z": 3.277
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36404,
+      "weaponUse": null
+    },
+    {
+      "id": "047_古民家001",
+      "name": "古民家001",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/047_古民家001.glb",
+      "sourceNode": 46,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.701,
+        "y": 2.526,
+        "z": 3.701
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36400,
+      "weaponUse": null
+    },
+    {
+      "id": "048_古民家003",
+      "name": "古民家003",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/048_古民家003.glb",
+      "sourceNode": 47,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.96,
+        "y": 2.526,
+        "z": 3.96
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36400,
+      "weaponUse": null
+    },
+    {
+      "id": "049_古民家2003",
+      "name": "古民家2003",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/049_古民家2003.glb",
+      "sourceNode": 48,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 5.248,
+        "y": 2.382,
+        "z": 4.495
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 35152,
+      "weaponUse": null
+    },
+    {
+      "id": "050_古民家006",
+      "name": "古民家006",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/050_古民家006.glb",
+      "sourceNode": 49,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.559,
+        "y": 2.526,
+        "z": 3.559
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36404,
+      "weaponUse": null
+    },
+    {
+      "id": "051_古民家009",
+      "name": "古民家009",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/051_古民家009.glb",
+      "sourceNode": 50,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.549,
+        "y": 2.526,
+        "z": 3.549
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36400,
+      "weaponUse": null
+    },
+    {
+      "id": "052_古民家2005",
+      "name": "古民家2005",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/052_古民家2005.glb",
+      "sourceNode": 51,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 4.488,
+        "y": 3.025,
+        "z": 6.183
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 35156,
+      "weaponUse": null
+    },
+    {
+      "id": "053_古民家014",
+      "name": "古民家014",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/053_古民家014.glb",
+      "sourceNode": 52,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.378,
+        "y": 2.753,
+        "z": 3.378
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36404,
+      "weaponUse": null
+    },
+    {
+      "id": "054_古民家016",
+      "name": "古民家016",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/054_古民家016.glb",
+      "sourceNode": 53,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.341,
+        "y": 2.526,
+        "z": 3.341
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36404,
+      "weaponUse": null
+    },
+    {
+      "id": "055_古民家017",
+      "name": "古民家017",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/055_古民家017.glb",
+      "sourceNode": 54,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.82,
+        "y": 2.526,
+        "z": 3.82
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36404,
+      "weaponUse": null
+    },
+    {
+      "id": "056_古民家018",
+      "name": "古民家018",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/056_古民家018.glb",
+      "sourceNode": 55,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.202,
+        "y": 2.526,
+        "z": 3.202
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36400,
+      "weaponUse": null
+    },
+    {
+      "id": "057_古民家2006",
+      "name": "古民家2006",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/057_古民家2006.glb",
+      "sourceNode": 56,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 5.122,
+        "y": 2.382,
+        "z": 4.087
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 35152,
+      "weaponUse": null
+    },
+    {
+      "id": "058_古民家2007",
+      "name": "古民家2007",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/058_古民家2007.glb",
+      "sourceNode": 57,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 5.268,
+        "y": 2.382,
+        "z": 4.928
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 35152,
+      "weaponUse": null
+    },
+    {
+      "id": "059_古民家013",
+      "name": "古民家013",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/059_古民家013.glb",
+      "sourceNode": 58,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 4.032,
+        "y": 2.526,
+        "z": 4.032
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36400,
+      "weaponUse": null
+    },
+    {
+      "id": "060_古民家2008",
+      "name": "古民家2008",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/060_古民家2008.glb",
+      "sourceNode": 59,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 7.602,
+        "y": 3.469,
+        "z": 7.375
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 35152,
+      "weaponUse": null
+    },
+    {
+      "id": "061_古民家015",
+      "name": "古民家015",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/061_古民家015.glb",
+      "sourceNode": 60,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 4.985,
+        "y": 3.157,
+        "z": 4.985
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36400,
+      "weaponUse": null
+    },
+    {
+      "id": "062_古民家2009",
+      "name": "古民家2009",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/062_古民家2009.glb",
+      "sourceNode": 61,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 5.885,
+        "y": 3.025,
+        "z": 6.695
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 35152,
+      "weaponUse": null
+    },
+    {
+      "id": "063_古民家019",
+      "name": "古民家019",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/063_古民家019.glb",
+      "sourceNode": 62,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 4.319,
+        "y": 2.753,
+        "z": 4.319
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36400,
+      "weaponUse": null
+    },
+    {
+      "id": "064_ガソスタ",
+      "name": "ガソスタ",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/064_ガソスタ.glb",
+      "sourceNode": 63,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 9.201,
+        "y": 2.951,
+        "z": 9.454
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 20504,
+      "weaponUse": null
+    },
+    {
+      "id": "065_Bus",
+      "name": "Bus",
+      "category": "prop",
+      "tags": [
+        "prop",
+        "vehicle",
+        "weapon-candidate"
+      ],
+      "file": "props/065_Bus.glb",
+      "sourceNode": 64,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 6.68,
+        "y": 2.546,
+        "z": 3.161
+      },
+      "materials": [
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 90208,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "066_Bus001",
+      "name": "Bus001",
+      "category": "prop",
+      "tags": [
+        "prop",
+        "vehicle",
+        "weapon-candidate"
+      ],
+      "file": "props/066_Bus001.glb",
+      "sourceNode": 65,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 6.195,
+        "y": 2.546,
+        "z": 5.977
+      },
+      "materials": [
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 90216,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "067_Loop",
+      "name": "Loop",
+      "category": "ground",
+      "tags": [
+        "ground"
+      ],
+      "file": "environment/ground/067_Loop.glb",
+      "sourceNode": 66,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 5.111,
+        "y": 1.369,
+        "z": 5.394
+      },
+      "materials": [
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来桜",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 32728,
+      "weaponUse": null
+    },
+    {
+      "id": "068_ブランコ",
+      "name": "ブランコ",
+      "category": "structure",
+      "tags": [
+        "structure",
+        "playground"
+      ],
+      "file": "structures/068_ブランコ.glb",
+      "sourceNode": 67,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 4.992,
+        "y": 3.035,
+        "z": 5.199
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 16208,
+      "weaponUse": null
+    },
+    {
+      "id": "069_滑り台",
+      "name": "滑り台",
+      "category": "structure",
+      "tags": [
+        "structure",
+        "playground"
+      ],
+      "file": "structures/069_滑り台.glb",
+      "sourceNode": 68,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 5.494,
+        "y": 2.827,
+        "z": 2.301
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 32492,
+      "weaponUse": null
+    },
+    {
+      "id": "070_土",
+      "name": "土",
+      "category": "ground",
+      "tags": [
+        "ground"
+      ],
+      "file": "environment/ground/070_土.glb",
+      "sourceNode": 69,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 17.093,
+        "y": 0.409,
+        "z": 11.223
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 12008,
+      "weaponUse": null
+    },
+    {
+      "id": "071_すだち箱",
+      "name": "すだち箱",
+      "category": "prop",
+      "tags": [
+        "prop",
+        "plant",
+        "weapon-candidate"
+      ],
+      "file": "props/071_すだち箱.glb",
+      "sourceNode": 70,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.032,
+        "y": 0.528,
+        "z": 0.65
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 2440,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "072_集会所",
+      "name": "集会所",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/072_集会所.glb",
+      "sourceNode": 71,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 7,
+        "y": 3.669,
+        "z": 6.055
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 38760,
+      "weaponUse": null
+    },
+    {
+      "id": "073_自転車004",
+      "name": "自転車004",
+      "category": "prop",
+      "tags": [
+        "prop",
+        "vehicle",
+        "bicycle",
+        "weapon-candidate"
+      ],
+      "file": "props/073_自転車004.glb",
+      "sourceNode": 72,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 8.869,
+        "y": 1.197,
+        "z": 9.332
+      },
+      "materials": [
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 119656,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "074_自転車005",
+      "name": "自転車005",
+      "category": "prop",
+      "tags": [
+        "prop",
+        "vehicle",
+        "bicycle",
+        "weapon-candidate"
+      ],
+      "file": "props/074_自転車005.glb",
+      "sourceNode": 73,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 6.901,
+        "y": 1.357,
+        "z": 6.782
+      },
+      "materials": [
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 121208,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "075_棚田",
+      "name": "棚田",
+      "category": "ground",
+      "tags": [
+        "ground"
+      ],
+      "file": "environment/ground/075_棚田.glb",
+      "sourceNode": 74,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 15.978,
+        "y": 2.417,
+        "z": 11.333
+      },
+      "materials": [
+        {
+          "name": "未来地面",
+          "color": "#7bcf5f",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 491488,
+      "weaponUse": null
+    },
+    {
+      "id": "076_古民家008",
+      "name": "古民家008",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/076_古民家008.glb",
+      "sourceNode": 75,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.697,
+        "y": 2.526,
+        "z": 3.697
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 36400,
+      "weaponUse": null
+    },
+    {
+      "id": "077_畑",
+      "name": "畑",
+      "category": "ground",
+      "tags": [
+        "ground"
+      ],
+      "file": "environment/ground/077_畑.glb",
+      "sourceNode": 76,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 11.471,
+        "y": 1.765,
+        "z": 13.367
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 212456,
+      "weaponUse": null
+    },
+    {
+      "id": "078_ROOMS",
+      "name": "ROOMS",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/078_ROOMS.glb",
+      "sourceNode": 77,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 23.23,
+        "y": 2.139,
+        "z": 13.873
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 545316,
+      "weaponUse": null
+    },
+    {
+      "id": "079_Office",
+      "name": "Office",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/079_Office.glb",
+      "sourceNode": 78,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 13.207,
+        "y": 1.277,
+        "z": 6.466
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 34576,
+      "weaponUse": null
+    },
+    {
+      "id": "080_HOME",
+      "name": "HOME",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/080_HOME.glb",
+      "sourceNode": 79,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 16.878,
+        "y": 6.376,
+        "z": 17.065
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 74764,
+      "weaponUse": null
+    },
+    {
+      "id": "081_ステージ",
+      "name": "ステージ",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/081_ステージ.glb",
+      "sourceNode": 80,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 15.702,
+        "y": 3.637,
+        "z": 15.977
+      },
+      "materials": [
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 328808,
+      "weaponUse": null
+    },
+    {
+      "id": "082_学生体験",
+      "name": "学生体験",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/082_学生体験.glb",
+      "sourceNode": 81,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 6.964,
+        "y": 1.034,
+        "z": 11.537
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 57404,
+      "weaponUse": null
+    },
+    {
+      "id": "083_お話(男)",
+      "name": "お話(男)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/083_お話(男).glb",
+      "sourceNode": 82,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.385,
+        "y": 2.143,
+        "z": 1.037
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 72692,
+      "weaponUse": null
+    },
+    {
+      "id": "084_作業(Man)",
+      "name": "作業(Man)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/084_作業(Man).glb",
+      "sourceNode": 83,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.725,
+        "y": 1.755,
+        "z": 1.161
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 79808,
+      "weaponUse": null
+    },
+    {
+      "id": "085_作業(Woman)",
+      "name": "作業(Woman)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/085_作業(Woman).glb",
+      "sourceNode": 84,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.752,
+        "y": 1.706,
+        "z": 1.134
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来桜",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 81396,
+      "weaponUse": null
+    },
+    {
+      "id": "086_聞き手(Man)",
+      "name": "聞き手(Man)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/086_聞き手(Man).glb",
+      "sourceNode": 85,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.21,
+        "y": 1.695,
+        "z": 1.147
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 72684,
+      "weaponUse": null
+    },
+    {
+      "id": "087_聞き手(Woman)",
+      "name": "聞き手(Woman)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/087_聞き手(Woman).glb",
+      "sourceNode": 86,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.752,
+        "y": 1.667,
+        "z": 1.134
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 74120,
+      "weaponUse": null
+    },
+    {
+      "id": "088_聞き手(Woman)001",
+      "name": "聞き手(Woman)001",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/088_聞き手(Woman)001.glb",
+      "sourceNode": 87,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.194,
+        "y": 1.667,
+        "z": 1.144
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来桜",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 74368,
+      "weaponUse": null
+    },
+    {
+      "id": "089_聞き手(Man)001",
+      "name": "聞き手(Man)001",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/089_聞き手(Man)001.glb",
+      "sourceNode": 88,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.18,
+        "y": 1.695,
+        "z": 0.766
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 72888,
+      "weaponUse": null
+    },
+    {
+      "id": "090_ぼうつき",
+      "name": "ぼうつき",
+      "category": "structure",
+      "tags": [
+        "structure",
+        "street-fixture",
+        "weapon-candidate"
+      ],
+      "file": "structures/090_ぼうつき.glb",
+      "sourceNode": 89,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 8.042,
+        "y": 4.149,
+        "z": 8.083
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 16104,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "091_マルシェ",
+      "name": "マルシェ",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/091_マルシェ.glb",
+      "sourceNode": 90,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 16.765,
+        "y": 2.69,
+        "z": 16.242
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来桜",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 49064,
+      "weaponUse": null
+    },
+    {
+      "id": "092_店員(Woman)",
+      "name": "店員(Woman)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/092_店員(Woman).glb",
+      "sourceNode": 91,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.441,
+        "y": 2.09,
+        "z": 1.432
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 74388,
+      "weaponUse": null
+    },
+    {
+      "id": "093_店員(Woman)001",
+      "name": "店員(Woman)001",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/093_店員(Woman)001.glb",
+      "sourceNode": 92,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.152,
+        "y": 1.313,
+        "z": 0.956
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 74396,
+      "weaponUse": null
+    },
+    {
+      "id": "094_店員(Woman)004",
+      "name": "店員(Woman)004",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/094_店員(Woman)004.glb",
+      "sourceNode": 93,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.441,
+        "y": 2.09,
+        "z": 1.432
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来桜",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 74368,
+      "weaponUse": null
+    },
+    {
+      "id": "095_店員(Woman)005",
+      "name": "店員(Woman)005",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/095_店員(Woman)005.glb",
+      "sourceNode": 94,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.956,
+        "y": 1.313,
+        "z": 1.152
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 74392,
+      "weaponUse": null
+    },
+    {
+      "id": "096_物販",
+      "name": "物販",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/096_物販.glb",
+      "sourceNode": 95,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 18.667,
+        "y": 2.581,
+        "z": 18.758
+      },
+      "materials": [
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 78144,
+      "weaponUse": null
+    },
+    {
+      "id": "097_店員(Woman)002",
+      "name": "店員(Woman)002",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/097_店員(Woman)002.glb",
+      "sourceNode": 96,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.729,
+        "y": 1.145,
+        "z": 1.679
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来桜",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 74388,
+      "weaponUse": null
+    },
+    {
+      "id": "098_店員(Woman)003",
+      "name": "店員(Woman)003",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/098_店員(Woman)003.glb",
+      "sourceNode": 97,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.907,
+        "y": 1.145,
+        "z": 1.119
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来桜",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 74392,
+      "weaponUse": null
+    },
+    {
+      "id": "099_店員(Man)",
+      "name": "店員(Man)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/099_店員(Man).glb",
+      "sourceNode": 98,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.698,
+        "y": 2.143,
+        "z": 1.724
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来桜",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 72872,
+      "weaponUse": null
+    },
+    {
+      "id": "100_飲食",
+      "name": "飲食",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/100_飲食.glb",
+      "sourceNode": 99,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 6.66,
+        "y": 3.456,
+        "z": 6.449
+      },
+      "materials": [
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 404496,
+      "weaponUse": null
+    },
+    {
+      "id": "101_花火(中)",
+      "name": "花火(中)",
+      "category": "fx",
+      "tags": [
+        "fx",
+        "effect"
+      ],
+      "file": "effects/101_花火(中).glb",
+      "sourceNode": 100,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 15.281,
+        "y": 18.433,
+        "z": 17.25
+      },
+      "materials": [
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 64268,
+      "weaponUse": null
+    },
+    {
+      "id": "102_花火(小)",
+      "name": "花火(小)",
+      "category": "fx",
+      "tags": [
+        "fx",
+        "effect"
+      ],
+      "file": "effects/102_花火(小).glb",
+      "sourceNode": 101,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 12.769,
+        "y": 14.607,
+        "z": 15.224
+      },
+      "materials": [
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 64256,
+      "weaponUse": null
+    },
+    {
+      "id": "103_花火(大)",
+      "name": "花火(大)",
+      "category": "fx",
+      "tags": [
+        "fx",
+        "effect"
+      ],
+      "file": "effects/103_花火(大).glb",
+      "sourceNode": 102,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 23.671,
+        "y": 28.553,
+        "z": 26.72
+      },
+      "materials": [
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 64264,
+      "weaponUse": null
+    },
+    {
+      "id": "104_お話(Man)",
+      "name": "お話(Man)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/104_お話(Man).glb",
+      "sourceNode": 103,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.467,
+        "y": 2.162,
+        "z": 1.453
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 72660,
+      "weaponUse": null
+    },
+    {
+      "id": "105_寝転がり(Man)",
+      "name": "寝転がり(Man)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/105_寝転がり(Man).glb",
+      "sourceNode": 104,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 2.548,
+        "y": 0.848,
+        "z": 2.587
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 72880,
+      "weaponUse": null
+    },
+    {
+      "id": "106_スコップで掘る(Man)",
+      "name": "スコップで掘る(Man)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop",
+        "weapon-candidate"
+      ],
+      "file": "people/106_スコップで掘る(Man).glb",
+      "sourceNode": 105,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.152,
+        "y": 2.096,
+        "z": 0.911
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 86880,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "107_歩く(Man)",
+      "name": "歩く(Man)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/107_歩く(Man).glb",
+      "sourceNode": 106,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.177,
+        "y": 2.162,
+        "z": 1.229
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 72876,
+      "weaponUse": null
+    },
+    {
+      "id": "108_歩く(Woman)",
+      "name": "歩く(Woman)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/108_歩く(Woman).glb",
+      "sourceNode": 107,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.077,
+        "y": 2.135,
+        "z": 1.025
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来地面",
+          "color": "#7bcf5f",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 74384,
+      "weaponUse": null
+    },
+    {
+      "id": "109_お話(Woman)",
+      "name": "お話(Woman)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/109_お話(Woman).glb",
+      "sourceNode": 108,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.21,
+        "y": 2.09,
+        "z": 1.433
+      },
+      "materials": [
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来植物",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来桜",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 74388,
+      "weaponUse": null
+    },
+    {
+      "id": "110_スコップで掘る(Woman)",
+      "name": "スコップで掘る(Woman)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop",
+        "weapon-candidate"
+      ],
+      "file": "people/110_スコップで掘る(Woman).glb",
+      "sourceNode": 109,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.139,
+        "y": 2.064,
+        "z": 0.98
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来桜",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 88296,
+      "weaponUse": {
+        "recommended": true,
+        "attachBone": "WristR",
+        "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+      }
+    },
+    {
+      "id": "111_寝転がり(Woman)",
+      "name": "寝転がり(Woman)",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/111_寝転がり(Woman).glb",
+      "sourceNode": 110,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 2.109,
+        "y": 0.762,
+        "z": 2.297
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来茶色",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 74200,
+      "weaponUse": null
+    },
+    {
+      "id": "112_天を仰ぐ",
+      "name": "天を仰ぐ",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/112_天を仰ぐ.glb",
+      "sourceNode": 111,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.971,
+        "y": 1.278,
+        "z": 1.705
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 72672,
+      "weaponUse": null
+    },
+    {
+      "id": "113_阿波踊り_Woman006",
+      "name": "阿波踊り_Woman006",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/113_阿波踊り_Woman006.glb",
+      "sourceNode": 112,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.838,
+        "y": 2.422,
+        "z": 1.283
+      },
+      "materials": [
+        {
+          "name": "未来茶色.001",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黒(紺).001",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黄色.001",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来桜.001",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来植物.001",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来白.001",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        }
+      ],
+      "byteLength": 103480,
+      "weaponUse": null
+    },
+    {
+      "id": "114_阿波踊り_Woman005",
+      "name": "阿波踊り_Woman005",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/114_阿波踊り_Woman005.glb",
+      "sourceNode": 113,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.838,
+        "y": 2.422,
+        "z": 1.283
+      },
+      "materials": [
+        {
+          "name": "未来茶色.001",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黒(紺).001",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黄色.001",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来桜.001",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来植物.001",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来白.001",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        }
+      ],
+      "byteLength": 103476,
+      "weaponUse": null
+    },
+    {
+      "id": "115_阿波踊り_Woman004",
+      "name": "阿波踊り_Woman004",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/115_阿波踊り_Woman004.glb",
+      "sourceNode": 114,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.838,
+        "y": 2.422,
+        "z": 1.283
+      },
+      "materials": [
+        {
+          "name": "未来茶色.001",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黒(紺).001",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黄色.001",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来桜.001",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来植物.001",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来白.001",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        }
+      ],
+      "byteLength": 103480,
+      "weaponUse": null
+    },
+    {
+      "id": "116_阿波踊り_Woman002",
+      "name": "阿波踊り_Woman002",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/116_阿波踊り_Woman002.glb",
+      "sourceNode": 115,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.845,
+        "y": 2.422,
+        "z": 1.288
+      },
+      "materials": [
+        {
+          "name": "未来茶色.001",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黒(紺).001",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黄色.001",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来桜.001",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来植物.001",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来白.001",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        }
+      ],
+      "byteLength": 103480,
+      "weaponUse": null
+    },
+    {
+      "id": "117_阿波踊り_Woman001",
+      "name": "阿波踊り_Woman001",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/117_阿波踊り_Woman001.glb",
+      "sourceNode": 116,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.845,
+        "y": 2.422,
+        "z": 1.288
+      },
+      "materials": [
+        {
+          "name": "未来茶色.001",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黒(紺).001",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黄色.001",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来桜.001",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来植物.001",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来白.001",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        }
+      ],
+      "byteLength": 103480,
+      "weaponUse": null
+    },
+    {
+      "id": "118_阿波踊り_Woman",
+      "name": "阿波踊り_Woman",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/118_阿波踊り_Woman.glb",
+      "sourceNode": 117,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.845,
+        "y": 2.422,
+        "z": 1.288
+      },
+      "materials": [
+        {
+          "name": "未来茶色.001",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黒(紺).001",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黄色.001",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来桜.001",
+          "color": "#f29bef",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来植物.001",
+          "color": "#2f8a4a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来白.001",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        }
+      ],
+      "byteLength": 103472,
+      "weaponUse": null
+    },
+    {
+      "id": "119_阿波踊り006",
+      "name": "阿波踊り006",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/119_阿波踊り006.glb",
+      "sourceNode": 118,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 1.09,
+        "y": 2.649,
+        "z": 1.395
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺).003",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黄色.002",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来白.002",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        }
+      ],
+      "byteLength": 172244,
+      "weaponUse": null
+    },
+    {
+      "id": "120_阿波踊り005",
+      "name": "阿波踊り005",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/120_阿波踊り005.glb",
+      "sourceNode": 119,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.945,
+        "y": 2.649,
+        "z": 1.294
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺).003",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黄色.002",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来白.002",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        }
+      ],
+      "byteLength": 172248,
+      "weaponUse": null
+    },
+    {
+      "id": "121_阿波踊り004",
+      "name": "阿波踊り004",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/121_阿波踊り004.glb",
+      "sourceNode": 120,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.945,
+        "y": 2.649,
+        "z": 1.294
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺).003",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黄色.002",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来白.002",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        }
+      ],
+      "byteLength": 172244,
+      "weaponUse": null
+    },
+    {
+      "id": "122_阿波踊り003",
+      "name": "阿波踊り003",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/122_阿波踊り003.glb",
+      "sourceNode": 121,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.945,
+        "y": 2.649,
+        "z": 1.294
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺).003",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黄色.002",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来白.002",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        }
+      ],
+      "byteLength": 172244,
+      "weaponUse": null
+    },
+    {
+      "id": "123_阿波踊り002",
+      "name": "阿波踊り002",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/123_阿波踊り002.glb",
+      "sourceNode": 122,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.943,
+        "y": 2.649,
+        "z": 1.293
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺).003",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黄色.002",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来白.002",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        }
+      ],
+      "byteLength": 172248,
+      "weaponUse": null
+    },
+    {
+      "id": "124_阿波踊り001",
+      "name": "阿波踊り001",
+      "category": "people",
+      "tags": [
+        "people",
+        "human-prop"
+      ],
+      "file": "people/124_阿波踊り001.glb",
+      "sourceNode": 123,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 0.943,
+        "y": 2.649,
+        "z": 1.293
+      },
+      "materials": [
+        {
+          "name": "未来黒(紺).003",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来黄色.002",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        },
+        {
+          "name": "未来白.002",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": true
+        }
+      ],
+      "byteLength": 172248,
+      "weaponUse": null
+    },
+    {
+      "id": "125_物販_未来",
+      "name": "物販_未来",
+      "category": "building",
+      "tags": [
+        "building",
+        "building"
+      ],
+      "file": "buildings/125_物販_未来.glb",
+      "sourceNode": 124,
+      "worldUnitScale": 6,
+      "dimensions": {
+        "x": 3.725,
+        "y": 2.98,
+        "z": 3.536
+      },
+      "materials": [
+        {
+          "name": "未来茶色.001",
+          "color": "#b9825a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黒(紺)",
+          "color": "#4b539a",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来白",
+          "color": "#fff7e6",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来赤",
+          "color": "#f38c6b",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来水・空",
+          "color": "#5ec7e8",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来黄色",
+          "color": "#f5c84c",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        },
+        {
+          "name": "未来地面",
+          "color": "#7bcf5f",
+          "opacity": 1,
+          "transparent": false,
+          "vertexColors": false
+        }
+      ],
+      "byteLength": 114868,
+      "weaponUse": null
+    }
+  ]
+}

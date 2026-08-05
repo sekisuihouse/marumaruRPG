@@ -1,8 +1,9 @@
 import * as THREE from 'three'
 import { BOSS_LIST, BOSS_TYPES, BOSS_SCALING } from '../data/bosses.js'
 import { sim, addEffect, addProjectile, floater, say, gainXp, uid } from './sim.js'
-import { nearestWalkable, groundY, move } from './nav.js'
-import { buildingDestroyRatio } from './destruct.js'
+import { nearestWalkable, groundY, move, isNavReady } from './nav.js'
+import { buildingDestroyRatio, restoreObject } from './destruct.js'
+import { initArena, lockArena, unlockArena, isArenaLocked, resumeEnemies } from './arena.js'
 import { damagePlayer } from './damage.js'
 import { damageTarget } from './targets.js'
 import { hitDebris } from './debris.js'
@@ -43,6 +44,7 @@ function makeBoss(def) {
 }
 
 export function initBosses() {
+  initArena()
   sim.bosses = BOSS_LIST.map(makeBoss)
   sim.bossProgress = { defeatedBossCount: 0, order: [], rewards: {}, buildingRatios: {} }
   sim.bossArmedAt = Infinity
@@ -76,6 +78,7 @@ export function resetBossProgress() {
   sim.effects = sim.effects.filter((f) => !String(f.ownerId || '').startsWith('boss:') && f.kind !== 'bossHazard' && f.kind !== 'delayedBossCircle' && f.kind !== 'bossObject')
   sim.ragdolls = sim.ragdolls.filter((r) => !String(r.id || '').startsWith('boss:'))
   sim.bossProgress = { defeatedBossCount: 0, order: [], rewards: {}, buildingRatios: {} }
+  if (isArenaLocked()) { unlockArena('abort'); resumeEnemies(0) }
   // resetTown() の直後に誤出現しないよう、通常の開始と同じ短い猶予を置く。
   sim.bossArmedAt = sim.time + 1.2
 }
@@ -104,9 +107,13 @@ function scaleFor(b) {
 
 function spawnBoss(b, force = false) {
   const area = buildingDestroyRatio(b.def.objectName)
-  if (!area.total || (!force && area.ratio < b.def.spawnDestroyRatio)) return false
-  const p = nearestWalkable(area.center.x, area.center.z)
-  b.pos.set(p.x, groundY(p.x, p.z), p.z)
+  // 通常の出現は「対応する建物が規定割合まで壊れたとき」だけ。
+  if (!force && (!area.total || area.ratio < b.def.spawnDestroyRatio)) return false
+  // 強制出現(BOSS FORGE)は町の破壊データが未構築でも成立させる。
+  // 編集画面は町・NavMeshに依存させないため、無ければ原点へ置く。
+  const base = area.total ? area.center : { x: 0, z: 0 }
+  const p = isNavReady() ? nearestWalkable(base.x, base.z) : base
+  b.pos.set(p.x, isNavReady() ? groundY(p.x, p.z) : 0, p.z)
   b.home = { x: p.x, z: p.z }
   b.spawned = b.alive = true
   b.defeated = false
@@ -119,12 +126,16 @@ function spawnBoss(b, force = false) {
   b.vulnerableUntil = 0
   b.specialHits = 0
   b.nextSpecialAt = sim.time + 8
-  b.yaw = Math.atan2(sim.player.pos.x - p.x, sim.player.pos.z - p.z)
+  // 編集プレビューは常に +Z（カメラ既定位置）を向かせて、正面から確認できるようにする
+  b.yaw = sim.bossForge && !sim.bossForge.combat ? 0 : Math.atan2(sim.player.pos.x - p.x, sim.player.pos.z - p.z)
   scaleFor(b)
   setState(b, 'entrance')
   hitDebris(p.x, p.y + 0.6, p.z, 4.8, 0, 0.8, 0, 18)
   addEffect({ kind: 'burst', x: p.x, y: p.y + 1, z: p.z, color: b.def.color, radius: 3.2, life: 1.2 })
   say(`${b.label} が出現！ 建物の崩壊から現れた。`, 'boss')
+  // 橋を封鎖し、川へATフィールドを張り、通常の敵を止めてBGMを切り替える。
+  // BOSS FORGE の編集プレビューでは戦場化しない（BGMも通行止めも出さない）。
+  if (!sim.bossForge || sim.bossForge.combat) lockArena(b)
   return true
 }
 
@@ -134,13 +145,105 @@ export function debugSpawnBoss(id) {
   return b && !b.defeated ? spawnBoss(b, true) : false
 }
 
+/** BOSS FORGE用。AI抽選を待たず、既存の攻撃実行経路へ流す。 */
+export function debugForceBossAttack(id, actionId) {
+  const b = bossById(id)
+  const action = b?.def.abilities.find((a) => a.id === actionId)
+  if (!b?.alive || !action) return false
+  // 直前のポーズ再生や死亡表示を解除してから、通常の攻撃実行経路へ流す
+  b.forgePose = null
+  if (b.state === 'dead') { b.state = 'observe'; b.ragdollTime = 0; b.hp = Math.max(1, b.hp) }
+  b.attack = null
+  b.hitFlash = 0
+  setState(b, 'observe')
+  beginAttack(b, 0, action)
+  return true
+}
+
+/**
+ * BOSS FORGE用。攻撃以外の状態（待機・歩き・被弾・ダウン等）を単体再生する。
+ * AnimationClip が無いモデルでも、手続き姿勢へ明確な再生状態を渡す。
+ */
+export const FORGE_POSES = [
+  { id: 'idle', label: '待機', seconds: 0 },
+  { id: 'walk', label: '歩き', seconds: 0 },
+  { id: 'run', label: '走り', seconds: 0 },
+  { id: 'hit', label: '被弾', seconds: 0.45 },
+  { id: 'stagger', label: 'よろけ', seconds: 1.1 },
+  { id: 'down', label: 'ダウン', seconds: 1.6 },
+  { id: 'recover', label: '起き上がり', seconds: 1.2 },
+  { id: 'phaseChange', label: 'フェーズ移行', seconds: 1.4 },
+  { id: 'death', label: '死亡', seconds: 2.4 },
+]
+
+export function debugPlayBossPose(id, poseId) {
+  const b = bossById(id)
+  const pose = FORGE_POSES.find((p) => p.id === poseId)
+  if (!b || !pose) return false
+  b.attack = null
+  b.forgePose = { id: pose.id, startedAt: sim.time, seconds: pose.seconds }
+  // 見た目のためだけの状態遷移。AIは編集中に動かないので副作用は無い。
+  if (pose.id === 'idle') { setState(b, 'observe'); b.anim = 'idle'; b.hitFlash = 0 }
+  else if (pose.id === 'walk') { setState(b, 'approach'); b.anim = 'walk' }
+  else if (pose.id === 'run') { setState(b, 'reposition'); b.anim = 'run' }
+  else if (pose.id === 'hit') { b.hitFlash = 0.45; b.anim = 'hit' }
+  else if (pose.id === 'stagger') { setState(b, 'stagger'); b.vulnerableUntil = sim.time + pose.seconds; b.anim = 'hit' }
+  else if (pose.id === 'phaseChange') { b.phase = b.phase === 2 ? 1 : 2; setState(b, 'observe'); b.stateTime = 0 }
+  else if (pose.id === 'death') { b.state = 'dead'; b.stateTime = 0; b.ragdollTime = 0; b.anim = 'death' }
+  else { setState(b, 'observe'); b.anim = 'idle' }
+  return true
+}
+
+/** 再生中の単体ポーズを止めて待機へ戻す */
+export function debugStopBossPose(id) {
+  const b = bossById(id)
+  if (!b) return false
+  b.forgePose = null
+  b.attack = null
+  b.hitFlash = 0
+  b.ragdollTime = 0
+  if (b.state === 'dead') { b.alive = true; b.hp = Math.max(1, b.hp) }
+  setState(b, 'observe')
+  b.anim = 'idle'
+  return true
+}
+
+export function debugSetBossPhase(id, phase = 1) {
+  const b = bossById(id)
+  if (!b) return false
+  b.phase = Number(phase) >= 2 ? 2 : 1
+  b.hp = b.phase === 2 ? Math.min(b.hp, Math.floor(b.maxHp * b.def.phaseThreshold)) : Math.max(b.hp, Math.ceil(b.maxHp * b.def.phaseThreshold + 1))
+  return true
+}
+
+export function debugSetBossAi(id, enabled) {
+  const b = bossById(id)
+  if (!b) return false
+  b.debugAi = !!enabled
+  return true
+}
+
 export function updateBosses(dt) {
   if (!sim.bosses) initBosses()
-  if (sim.mode !== 'play' || !sim.townReady || sim.time < sim.bossArmedAt) return
+  // 戦闘中にプレイヤーが倒れたら、そこで仕切り直す。
+  // updatePlayer が同じフレームで復活させることがあるので、死亡時刻でも判定する。
+  const diedInFight = (sim.player.diedAt ?? -1) > (sim.arena?.since ?? 0)
+  if (isArenaLocked() && (sim.player.dead || diedInFight)) { abortBossFight('playerDown'); return }
+  if (sim.mode !== 'play') return
+  // BOSS FORGE は町の破壊による出現判定を行わない。ただし選択中のボスは必ず更新する。
+  // ここを通さないと runAttack が回らず、攻撃を再生しても静止したまま見える。
+  if (sim.bossForge) {
+    updateBossObjects(dt)
+    for (const b of sim.bosses) if (b.alive) updateBoss(b, dt)
+    return
+  }
+  if (!sim.townReady || sim.time < sim.bossArmedAt) return
   sim.bossProgress.buildingRatios = buildingRatios()
   updateBossObjects(dt)
   for (const b of sim.bosses) {
-    if (!b.spawned && !b.defeated) { spawnBoss(b); continue }
+    // 封鎖中は次のボスを出さない。閉じた戦場は1体ぶんしか作れないので、
+    // 2体目が場外に湧いて手が出せなくなるのを防ぐ（建物は壊れたままなので戦闘後に出る）。
+    if (!b.spawned && !b.defeated) { if (!isArenaLocked()) spawnBoss(b); continue }
     if (!b.alive) continue
     updateBoss(b, dt)
   }
@@ -181,7 +284,8 @@ function updateBoss(b, dt) {
   if (p.dead) return
   const dx = p.pos.x - b.pos.x, dz = p.pos.z - b.pos.z
   const d = Math.hypot(dx, dz) || 1
-  b.yaw = Math.atan2(dx, dz)
+  // 編集プレビューはプレイヤーとほぼ同座標なので、向きが毎フレーム暴れる。向きは固定する。
+  if (!sim.bossForge || sim.bossForge.combat) b.yaw = Math.atan2(dx, dz)
   if (b.hp / b.maxHp <= b.def.phaseThreshold && b.phase === 1) {
     b.phase = 2
     b.vulnerableUntil = sim.time + 0.8
@@ -196,6 +300,7 @@ function updateBoss(b, dt) {
   if (b.state === 'stagger' && sim.time >= b.vulnerableUntil) setState(b, 'observe')
   if (b.state === 'stagger') return
   if (b.attack) return runAttack(b, dt, dx, dz, d)
+  if (b.debugAi === false) { b.anim = 'idle'; return }
   if (b.def.id === 'food' && !b.cooked && b.hp / b.maxHp < 0.36 && sim.time >= (b.nextCookAt || 0)) {
     beginAttack(b, d, b.def.abilities.find((a) => a.id === 'cook'))
     return
@@ -429,6 +534,40 @@ export function defeatBoss(b) {
   spawnRagdoll({ ...b, scale: b.scale * 2.5 }, { x: b.pos.x, y: b.pos.y + 1, z: b.pos.z, dirX: Math.sin(b.yaw), dirY: 0.8, dirZ: Math.cos(b.yaw), power: 90, explosion: true })
   addEffect({ kind: 'burst', x: b.pos.x, y: b.pos.y + 1, z: b.pos.z, color: b.def.color, radius: 4.5, life: 1.4 })
   say(`${b.label} を撃破！ ${b.def.reward.label}を獲得。次のボスが強化される。`, 'boss')
+  // 封鎖解除と敵の復帰。出現元の建物は壊したままにする（同じボスは再登場しない）
+  if (isArenaLocked()) { unlockArena('clear'); resumeEnemies() }
+}
+
+/**
+ * ボス戦の中断（プレイヤーが死んだとき）。
+ * ボスを消し、出現元の建物を直し、封鎖を解いて敵を戻す。
+ * 建物を直すので、もう一度壊せば同じボスがまた出てくる。
+ */
+export function abortBossFight(reason = 'playerDown') {
+  const b = (sim.bosses || []).find((x) => x.alive && !x.defeated)
+  if (!b) { if (isArenaLocked()) { unlockArena('abort'); resumeEnemies() } return false }
+  clearBossObjects(b.id)
+  b.alive = false
+  b.spawned = false
+  b.defeated = false
+  b.state = 'hidden'
+  b.stateTime = 0
+  b.attack = null
+  b.phase = 1
+  b.hp = b.maxHp
+  b.ragdollTime = 0
+  sim.ragdolls = (sim.ragdolls || []).filter((r) => r.id !== b.id)
+  sim.projectiles = sim.projectiles.filter((p) => p.ownerId !== b.id)
+  sim.effects = sim.effects.filter((f) => f.ownerId !== b.id)
+  // 出現元の建物を元通りにする（＝また壊せば再戦できる）
+  const healed = restoreObject(b.def.objectName)
+  unlockArena('abort')
+  resumeEnemies()
+  // 直後に破壊率がまだ高いと即再出現するので、少し猶予を置く
+  sim.bossArmedAt = sim.time + 3
+  say(`${b.label} は霧の中へ消えた。${b.def.objectName}は元通りになっている。`, 'boss')
+  void reason
+  return healed >= 0
 }
 
 export function applyBossSave(data) {

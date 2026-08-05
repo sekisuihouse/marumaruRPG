@@ -76,6 +76,8 @@ function makePlayer() {
     deaths: 0,
     kills: {},
     skills: ['melee', 'heal'],
+    /** 数字キーで選ぶ4つの技。発動は常に R。 */
+    selectedAbility: 'magic',
     items: {},
     state: 'idle',
     stateTime: 0,
@@ -124,9 +126,11 @@ export const sim = {
   bosses: [],
   /** WebRTC参加者は可変Mapで保持し、ローカルプレイヤーとは別に補間描画する。 */
   remotePlayers: new Map(),
-  net: { active: false, sequence: 0, lastSnapshot: -1, correction: null, remoteAttack: null },
+  net: { active: false, epoch: 0, sequence: 0, lastSnapshot: -1, correction: null, remoteAttack: null },
   /** ボス戦専用の破壊可能な核・ドローン・鍋。通常の建物破片とは別管理する。 */
   bossObjects: [],
+  /** ボス戦のアリーナ封鎖（橋の封鎖・ATフィールド・敵の抑制） */
+  arena: { active: false, bossId: null, since: 0, blockedCells: 0, panels: [] },
   bossProgress: { defeatedBossCount: 0, order: [], rewards: {}, buildingRatios: {} },
   /** Town.jsx が破壊小片を登録済みか。登録前はボス出現判定を行わない。 */
   townReady: false,
@@ -150,15 +154,23 @@ export const sim = {
   juice: { hitstop: 0, shake: 0, slowmo: 0, shockwave: 0, shockwaveMax: 0.35 },
   /** 開発用の当たり判定表示 */
   debugDraw: false,
+  /** npm run dev:debug または ?debug=1 でだけ有効になる開発用のネタ技など。 */
+  debugMode: false,
+  debugPropShotsFired: 0,
   messages: [],
   levelUpNotice: null,
   tutorialCompleteUntil: 0,
   quests: {},
-  camera: { yaw: Math.PI, pitch: 0.42, dist: 9, target: new THREE.Vector3() },
+  // 正面より少し上を見る初期角。以前の0.42(約24°下向き)より地平・高所を見つけやすい。
+  camera: { yaw: Math.PI, pitch: 0.28, dist: 9, target: new THREE.Vector3() },
   dialogue: null,           // {npcId, nodeId}
   stats: { damageDealt: 0, damageTaken: 0, blocked: 0 },
   settings: {
     reducedMotion: false, largeText: false, highContrast: false, invertY: false,
+    /** 長押しが難しい人向けの代替操作。 */
+    guardMode: 'hold', sprintMode: 'hold',
+    /** action -> KeyboardEvent.code[]。入力設定画面がここへ保存する。 */
+    bindings: null,
     /** 破壊演出。0で完全に無効、1が既定 */
     shakeAmount: 1,
     reducedFlash: false,
@@ -167,6 +179,7 @@ export const sim = {
     /** 'high' | 'medium' | 'low'。低くしても「殴った所が壊れる」性質は保つ */
     destructionQuality: 'high',
     sfxVolume: 1,
+    musicVolume: 0.55,
     muteSfx: false,
   },
   autosaveAt: 0,
@@ -316,8 +329,9 @@ export function initQuests() {
 // ───────────────────────────── メッセージ / ダメージ表示
 
 export function say(text, kind = 'info') {
-  sim.messages.unshift({ id: uid(), text, kind, at: sim.time })
-  if (sim.messages.length > MAX_MESSAGES) sim.messages.length = MAX_MESSAGES
+  // 通知キューは持たない。既存の呼び出しは保ち、最新の状態だけ残す。
+  sim.messages[0] = { id: uid(), text, kind, at: sim.time }
+  sim.messages.length = 1
   sim.hudTick++
 }
 
@@ -401,6 +415,7 @@ export function buildSnapshot() {
     mp: Math.round(p.mp), maxMp: p.maxMp,
     stamina: Math.round(p.stamina), maxStamina: p.maxStamina,
     level: p.level, xp: Math.round(p.xp), xpNext: xpForLevel(p.level),
+    selectedAbility: p.selectedAbility || 'magic',
     gold: p.gold, skills: [...p.skills],
     cooldowns: { ...p.cooldowns },
     blocking: p.blocking,

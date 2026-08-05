@@ -6,6 +6,12 @@ screenshot.png
 .env.*
 !.env.example
 screenshot-*.png
+boss-motion-shots/
+.claude/
+.codex/
+UI参考画像.png
+WebRTCホスト権威型P2PにおけるFPS風リアルタイム同期の障害分析と改善実務.pdf
+追跡者.mp3
 *.zip
 marugotosai2026_KV.glb
 

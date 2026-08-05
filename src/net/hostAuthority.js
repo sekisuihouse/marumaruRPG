@@ -6,8 +6,23 @@ import { makeSnapshot, applySnapshot } from './snapshots.js'
 import { validateInput, validateAttack } from './validation.js'
 import { breakPart, onPartBroken, registry } from '../engine/destruct.js'
 import { groundY, move, nearestWalkable } from '../engine/nav.js'
-import { keys, moveAxis } from '../engine/input.js'
+import { moveAxis } from '../engine/input.js'
 import { netDebug } from './debug.js'
+import { recordCorrection, recordHostTick } from './diagnostics.js'
+import { answerTimeSync, applyTimeSync, dueTimeSync } from './clock.js'
+
+/**
+ * 自分の位置をホストの権威位置へ寄せる強さ。
+ * 一定の係数で毎フレーム引っ張ると、小さなジッタでも常に引き戻されて
+ * 歩きがざらつき、逆に大きくずれたときは何秒経っても追いつかない。
+ * 誤差の大きさで段階を変える（資料『推奨補正しきい値』）。
+ */
+const CORRECTION = [
+  { max: 0.15, seconds: 0 },     // 無視。ジッタで揺らさない
+  { max: 0.5, seconds: 0.2 },    // 滑らかに寄せる
+  { max: 1.5, seconds: 0.12 },   // 強めに寄せる
+  { max: Infinity, seconds: 0 }, // これを超えたら瞬間移動（テレポート・復活扱い）
+]
 
 const remoteInputs = new Map()
 let lastFast = 0, lastSnapshot = 0, lastWorldSnapshot = 0, inputSequence = 0
@@ -41,14 +56,17 @@ function guestWorldMove() {
 
 function applyRemoteInputs(dt) {
   const now = performance.now()
+  // 長いフレームでも参加者を飛ばさない（描画が詰まった直後のワープ防止）
+  const step = Math.min(dt, NET_RATE.maxRemoteStep)
   for (const [id, input] of remoteInputs) {
     const remote = multiplayer.remotePlayers.get(id)
     if (!remote) continue
+    // 入力が途切れた＝切断/フリーズ。その場で止める（勝手に走り続けさせない）
     const stale = now - input.receivedAt > NET_RATE.inputTimeoutMs
     const x = stale ? 0 : input.move.x
     const z = stale ? 0 : input.move.z
     const speed = input.running && !stale ? sim.player.runSpeed : sim.player.walkSpeed
-    const res = move(remote.pos.x, remote.pos.z, x * speed * dt, z * speed * dt, sim.player.hitRadius)
+    const res = move(remote.pos.x, remote.pos.z, x * speed * step, z * speed * step, sim.player.hitRadius)
     remote.pos.x = res.x; remote.pos.z = res.z; remote.pos.y = groundY(res.x, res.z, remote.pos.y)
     remote.vel.x = x * speed; remote.vel.y = 0; remote.vel.z = z * speed
     remote.moveSpeed = Math.hypot(x, z) * speed
@@ -96,18 +114,38 @@ export function initMultiplayerAuthority() {
         send(CHANNEL.reliable, { type: 'attackAccepted', ...m, hostTime: performance.now() })
       }
       if (m.type === 'attackAccepted' && isGuest()) sim.net.remoteAttack = m
+      // ホスト時刻とのオフセット推定。端末間で performance.now() の起点が違うため必要。
+      if (m.type === 'timeSync' && isHost()) send(CHANNEL.reliable, answerTimeSync(m), m.playerId)
+      if (m.type === 'timeSyncReply' && isGuest()) applyTimeSync(m)
     },
   })
 }
 export function tickMultiplayer(dt) {
+  const tickStarted = performance.now()
   if (isGuest()) {
     const p = sim.player
-    if (sim.net.correction) { p.pos.x += (sim.net.correction[0] - p.pos.x) * Math.min(1, dt * 8); p.pos.y += (sim.net.correction[1] - p.pos.y) * Math.min(1, dt * 8); p.pos.z += (sim.net.correction[2] - p.pos.z) * Math.min(1, dt * 8) }
+    const c = sim.net.correction
+    if (c) {
+      const error = Math.hypot(c[0] - p.pos.x, c[2] - p.pos.z)
+      recordCorrection(error)
+      const rule = CORRECTION.find((r) => error <= r.max)
+      if (rule.seconds === 0 && error > 1.5) {
+        // 大きく離れた＝テレポート・復活・引っかかり。演出で隠せる範囲なので即座に合わせる
+        p.pos.set(c[0], c[1], c[2])
+      } else if (rule.seconds > 0) {
+        const k = Math.min(1, dt / rule.seconds)
+        p.pos.x += (c[0] - p.pos.x) * k
+        p.pos.y += (c[1] - p.pos.y) * k
+        p.pos.z += (c[2] - p.pos.z) * k
+      }
+    }
+    const ping = dueTimeSync()
+    if (ping) send(CHANNEL.reliable, { ...ping, playerId: multiplayer.playerId })
     const hz = p.moveSpeed > 0.1 ? NET_RATE.movingHz : NET_RATE.idleHz
     if (performance.now() - lastFast > 1000 / hz) {
       lastFast = performance.now()
       const move = guestWorldMove()
-      const message = { type: 'input', sequence: ++inputSequence, playerId: multiplayer.playerId, move, rotation: p.yaw, running: !!keys.shift, jump: false, attack: p.action?.def?.id || null }
+      const message = { type: 'input', sequence: ++inputSequence, playerId: multiplayer.playerId, move, rotation: p.yaw, running: !!p.running, jump: false, attack: p.action?.def?.id || null }
       netDebug('GUEST INPUT CAPTURE', { playerId: multiplayer.playerId, sequence: message.sequence, move, position: [p.pos.x, p.pos.y, p.pos.z] })
       send(CHANNEL.unreliable, message)
     }
@@ -127,6 +165,12 @@ export function tickMultiplayer(dt) {
     }
   }
   if (multiplayer.role !== 'offline') { sim.net.active = true; publishHud() }
-  void dt
+  // ホストの tick 処理時間。tick 間隔を超えていたら送信Hzか処理量が過大
+  if (multiplayer.role !== 'offline') recordHostTick(performance.now() - tickStarted)
 }
+/** 開発用: ホストが今どんな入力を受け取っているかを覗く（__marugoto.net.inputs()） */
+export const debugRemoteInputs = () => [...remoteInputs.entries()].map(([id, i]) => ({
+  id, sequence: i.sequence, move: [i.move?.x, i.move?.z], running: !!i.running,
+  ageMs: Math.round(performance.now() - i.receivedAt),
+}))
 export function requestAttack(attackId, origin, direction) { if (!isGuest()) return false; send(CHANNEL.reliable, { type: 'attackRequest', sequence: ++inputSequence, playerId: multiplayer.playerId, attackId, origin, direction, clientTime: performance.now() }); return true }
