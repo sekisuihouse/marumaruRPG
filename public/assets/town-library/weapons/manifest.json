@@ -1,0 +1,273 @@
+{
+  "generatedAt": "2026-08-04T18:23:44.936Z",
+  "source": "public/assets/town.glb",
+  "note": "町モデルから敵の即席武器として再利用しやすい要素を抽出した参照カタログです。実体GLBはカテゴリ別フォルダに一度だけ保持します。敵へ装着するときは file を GLTFLoader で読み込み、敵モデルの手首ボーンへ必要な縮尺・回転でアタッチしてください。",
+  "assets": [
+    {
+      "id": "001_トラック",
+      "name": "トラック",
+      "category": "prop",
+      "file": "props/001_トラック.glb",
+      "dimensions": {
+        "x": 26.854,
+        "y": 1.636,
+        "z": 43.366
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "004_トラック002",
+      "name": "トラック002",
+      "category": "prop",
+      "file": "props/004_トラック002.glb",
+      "dimensions": {
+        "x": 3.57,
+        "y": 1.561,
+        "z": 2.765
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "005_車001",
+      "name": "車001",
+      "category": "prop",
+      "file": "props/005_車001.glb",
+      "dimensions": {
+        "x": 38.554,
+        "y": 1.398,
+        "z": 49.063
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "024_一方通行",
+      "name": "一方通行",
+      "category": "structure",
+      "file": "structures/024_一方通行.glb",
+      "dimensions": {
+        "x": 0.982,
+        "y": 2.654,
+        "z": 0.168
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "025_一方通行001",
+      "name": "一方通行001",
+      "category": "structure",
+      "file": "structures/025_一方通行001.glb",
+      "dimensions": {
+        "x": 0.982,
+        "y": 2.654,
+        "z": 0.168
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "026_一方通行002",
+      "name": "一方通行002",
+      "category": "structure",
+      "file": "structures/026_一方通行002.glb",
+      "dimensions": {
+        "x": 1.313,
+        "y": 3.197,
+        "z": 1.507
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "027_一方通行004",
+      "name": "一方通行004",
+      "category": "structure",
+      "file": "structures/027_一方通行004.glb",
+      "dimensions": {
+        "x": 1.763,
+        "y": 3.197,
+        "z": 1.703
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "028_一方通行003",
+      "name": "一方通行003",
+      "category": "structure",
+      "file": "structures/028_一方通行003.glb",
+      "dimensions": {
+        "x": 1.318,
+        "y": 3.197,
+        "z": 1.511
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "029_一方通行005",
+      "name": "一方通行005",
+      "category": "structure",
+      "file": "structures/029_一方通行005.glb",
+      "dimensions": {
+        "x": 1.746,
+        "y": 3.197,
+        "z": 1.665
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "030_ガードレール002",
+      "name": "ガードレール002",
+      "category": "structure",
+      "file": "structures/030_ガードレール002.glb",
+      "dimensions": {
+        "x": 1.085,
+        "y": 0.892,
+        "z": 0.777
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "031_ガードレール",
+      "name": "ガードレール",
+      "category": "structure",
+      "file": "structures/031_ガードレール.glb",
+      "dimensions": {
+        "x": 1.075,
+        "y": 0.892,
+        "z": 0.794
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "065_Bus",
+      "name": "Bus",
+      "category": "prop",
+      "file": "props/065_Bus.glb",
+      "dimensions": {
+        "x": 6.68,
+        "y": 2.546,
+        "z": 3.161
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "066_Bus001",
+      "name": "Bus001",
+      "category": "prop",
+      "file": "props/066_Bus001.glb",
+      "dimensions": {
+        "x": 6.195,
+        "y": 2.546,
+        "z": 5.977
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "071_すだち箱",
+      "name": "すだち箱",
+      "category": "prop",
+      "file": "props/071_すだち箱.glb",
+      "dimensions": {
+        "x": 1.032,
+        "y": 0.528,
+        "z": 0.65
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "073_自転車004",
+      "name": "自転車004",
+      "category": "prop",
+      "file": "props/073_自転車004.glb",
+      "dimensions": {
+        "x": 8.869,
+        "y": 1.197,
+        "z": 9.332
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "074_自転車005",
+      "name": "自転車005",
+      "category": "prop",
+      "file": "props/074_自転車005.glb",
+      "dimensions": {
+        "x": 6.901,
+        "y": 1.357,
+        "z": 6.782
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "090_ぼうつき",
+      "name": "ぼうつき",
+      "category": "structure",
+      "file": "structures/090_ぼうつき.glb",
+      "dimensions": {
+        "x": 8.042,
+        "y": 4.149,
+        "z": 8.083
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "106_スコップで掘る(Man)",
+      "name": "スコップで掘る(Man)",
+      "category": "people",
+      "file": "people/106_スコップで掘る(Man).glb",
+      "dimensions": {
+        "x": 1.152,
+        "y": 2.096,
+        "z": 0.911
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    },
+    {
+      "id": "110_スコップで掘る(Woman)",
+      "name": "スコップで掘る(Woman)",
+      "category": "people",
+      "file": "people/110_スコップで掘る(Woman).glb",
+      "dimensions": {
+        "x": 1.139,
+        "y": 2.064,
+        "z": 0.98
+      },
+      "recommended": true,
+      "attachBone": "WristR",
+      "note": "敵の武器・投擲物・障害物として使える。大きさは敵側で調整すること。"
+    }
+  ]
+}

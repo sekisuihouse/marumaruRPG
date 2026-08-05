@@ -328,10 +328,10 @@ export function pickVariant(def, rng = Math.random) {
 /** 主人公が使える攻撃。レベルで解禁される(既存デザインを踏襲) */
 export const PLAYER_ATTACKS = {
   melee: { id: 'melee', label: '⚔ 近接', power: 30, element: 'physical', range: 2.8, arc: 110, cost: { stamina: 12 }, windup: 0.18, cooldown: 0.5, knockback: 3.0, clip: 'attack', unlockLevel: 1, key: 'F' },
-  magic: { id: 'magic', label: '✦ 火球', power: 38, element: 'fire', range: 22, cost: { mp: 12 }, windup: 0.3, cooldown: 1.1, knockback: 2.4, speed: 24, clip: 'cast', unlockLevel: 2, key: 'R' },
-  area: { id: 'area', label: '◎ 範囲魔法', power: 34, element: 'thunder', range: 14, radius: 5, cost: { mp: 24 }, windup: 0.55, cooldown: 4.5, knockback: 4.0, clip: 'cast', unlockLevel: 4, key: 'L' },
-  arrow: { id: 'arrow', label: '➹ 弓矢', power: 26, element: 'wind', range: 28, cost: { stamina: 8 }, windup: 0.25, cooldown: 0.85, knockback: 1.6, speed: 34, clip: 'shoot', unlockLevel: 3, key: 'U' },
-  heal: { id: 'heal', label: '✚ 回復', power: 55, element: 'light', range: 0, cost: { mp: 30 }, windup: 0.4, cooldown: 7.0, clip: 'cast', unlockLevel: 1, key: 'E' },
+  magic: { id: 'magic', label: '✦ 火球', power: 38, element: 'fire', range: 22, cost: { mp: 12 }, windup: 0.3, cooldown: 1.1, knockback: 2.4, speed: 24, clip: 'cast', unlockLevel: 2, key: '1 → R' },
+  area: { id: 'area', label: '◎ 範囲魔法', power: 34, element: 'thunder', range: 14, radius: 5, cost: { mp: 24 }, windup: 0.55, cooldown: 4.5, knockback: 4.0, clip: 'cast', unlockLevel: 4, key: '2 → R' },
+  arrow: { id: 'arrow', label: '➹ 弓矢', power: 26, element: 'wind', range: 28, cost: { stamina: 8 }, windup: 0.25, cooldown: 0.85, knockback: 1.6, speed: 34, clip: 'shoot', unlockLevel: 3, key: '3 → R' },
+  heal: { id: 'heal', label: '✚ 回復', power: 55, element: 'light', range: 0, cost: { mp: 30 }, windup: 0.4, cooldown: 7.0, clip: 'cast', unlockLevel: 1, key: 'C' },
   // ── 押している間だけ働く長押し技（tryAttack ではなく毎フレーム処理される）
   webswing: {
     id: WEB_SWING.id, label: WEB_SWING.label, mode: 'hold', power: 0, element: 'physical',

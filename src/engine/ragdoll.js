@@ -53,6 +53,8 @@ export const RAGDOLL = {
   sleepTime: 1.4,
   /** 破片や壁から押し戻す距離 */
   skin: 0.16,
+  /** 関節が伸びてよい最大倍率。これ以上は必ず引き戻す（部位の分離を防ぐ） */
+  maxStretch: 1.12,
   maxImpulse: 26,
 }
 
@@ -206,6 +208,21 @@ export function updateRagdolls(dt) {
           n.z += (w.z - n.z) * 0.35
         }
       }
+    }
+
+    // 反復だけでは強い衝撃で関節が伸びきることがある（実測で最大2.1倍）。
+    // 最後に硬い上限を掛けて、部位が分離して見える状態を必ず防ぐ。
+    for (const n of rd.nodes) {
+      if (n.parent < 0) continue
+      const p = rd.nodes[n.parent]
+      const dx = n.x - p.x, dy = n.y - p.y, dz = n.z - p.z
+      const d = Math.hypot(dx, dy, dz)
+      const limit = n.len * RAGDOLL.maxStretch
+      if (d <= limit || d < 1e-6) continue
+      const k = limit / d
+      n.x = p.x + dx * k
+      n.y = p.y + dy * k
+      n.z = p.z + dz * k
     }
 
     if (maxMove < RAGDOLL.sleepSpeed * dt) {

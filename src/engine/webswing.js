@@ -2,15 +2,17 @@
  * ウェブスイング（糸移動）。
  *
  * カメラ中央から射線を飛ばし、建物の小片(destruct の part)か高い地形へ糸を張る。
- * 入力中は接続点へ引かれ、勢いを保ったまま弧を描く。離すと速度を保って飛び出す。
+ * Qを押している間だけ接続点へ糸を張り、引っ張られて飛ぶ。
+ * Qを離すと糸が切れ、水平速度を減らしてそのまま落下する。
  *
  * 既存の地上移動は step.js のまま。ここは「空中に居る間」だけを担当する。
  */
 import * as THREE from 'three'
-import { sim, say, addEffect } from './sim.js'
+import { sim, addEffect } from './sim.js'
 import { WEB_SWING as W } from '../data/abilities.js'
 import { groundY, isWalkable, nearestWalkable, move } from './nav.js'
 import { raycastStructure, registry } from './destruct.js'
+import { arenaBlocksPoint, arenaBlocksSegment } from './arena.js'
 
 export function initWeb() {
   const p = sim.player
@@ -22,11 +24,13 @@ export function initWeb() {
     cooldownUntil: 0,
     lastDetach: 0,
     swings: 0,
-    /** 離したあと接続点まで飛んでいる最中か */
+    /** 旧セーブとの互換用。通常のQ解除では使わない。 */
     zipping: false,
     zipUntil: 0,
     zipTarget: null,
     attachedAt: -99,
+    failHintUntil: 0,
+    failReason: '',
   }
   p.airborne = false
   p.vy = 0
@@ -90,6 +94,8 @@ export function findAnchor() {
       const height = hit.y - p.pos.y
       if (height < W.minHeight) continue
       // 高さを最優先し、カメラ中央からのズレをわずかに減点する
+      // ボス戦のATフィールドの向こう側へは張らせない（壁へ引っ張られて張り付く）
+      if (arenaBlocksPoint(hit.x, hit.y, hit.z)) continue
       const score = height - d.dev * 6 - hit.dist * 0.02
       if (!best || score > best.score) {
         best = { x: hit.x, y: hit.y, z: hit.z, partId: hit.part.id, kind: 'structure', height, score }
@@ -108,6 +114,7 @@ export function findAnchor() {
     if (gy > -900 && y <= gy) {
       const height = gy - p.pos.y
       if (height < W.minHeight) break
+      if (arenaBlocksPoint(x, gy + 0.2, z)) break
       const score = height - t * 0.02
       if (!best || score > best.score) best = { x, y: gy + 0.2, z, partId: -1, kind: 'terrain', height, score }
       break
@@ -125,7 +132,9 @@ export function tryWebAttach() {
   if (sim.time < w.cooldownUntil) return false
   const a = findAnchor()
   if (!a) {
-    if (sim.time - (w.lastFailSay || 0) > 1.2) { w.lastFailSay = sim.time; say('糸を張れる場所が無い。建物や柱を狙おう。', 'warn') }
+    // 画面下の通知へ積まず、照準の近くへ短時間だけ理由を出す。
+    w.failHintUntil = sim.time + 0.85
+    w.failReason = '接続先なし'
     return false
   }
   w.attached = true
@@ -145,16 +154,16 @@ export function tryWebAttach() {
 }
 
 /**
- * 糸を離す。
- * 既定では「糸を張った場所まで一気に飛んでいく」(ジップ)。
- * @param {boolean} zip false なら飛ばずに切るだけ（接続先が壊れたとき等）
+ * 糸を離す。通常はその場で切り、現在の速度を保つ。
+ * @param {boolean} zip 旧挙動との互換用。通常操作では false を渡す。
  */
-export function webRelease(zip = true) {
+export function webRelease(zip = false) {
   const p = sim.player
   const w = web()
   if (!w.attached) return
   w.attached = false
   w.lastDetach = sim.time
+  w.releaseHintUntil = sim.time + 0.9
   w.cooldownUntil = sim.time + W.cooldown
   if (zip) {
     // 接続点を目標にして飛ぶ。糸はまだ見えたままにしておく。
@@ -166,6 +175,10 @@ export function webRelease(zip = true) {
   } else {
     w.zipping = false
     w.partId = -1
+    // リリース後は飛び続けず、勢いを抑えて素直に落下する。
+    p.vel.x *= 0.5
+    p.vel.z *= 0.5
+    p.vy = Math.min(p.vy, -1.5)
   }
 }
 
@@ -193,11 +206,10 @@ export const webState = () => web()
 
 /**
  * 空中（スイング中・飛行中）のプレイヤー更新。
- * @param {{x:number,z:number,len:number}} axis カメラ相対の移動入力
- * @param {{forward:number, back:number}} hold 巻き取り／繰り出し
+ * @param {{x:number,z:number,len:number}} axis 互換用のカメラ相対入力
  * @returns {boolean} 空中処理を行ったか
  */
-export function updateWeb(dt, axis, hold) {
+export function updateWeb(dt, axis) {
   const p = sim.player
   const w = web()
   if (!p.airborne) return false
@@ -207,7 +219,8 @@ export function updateWeb(dt, axis, hold) {
   if ((w.attached || w.zipping) && w.partId >= 0) {
     const part = registry.parts[w.partId]
     if (!part || part.broken) {
-      say('糸をかけた場所が崩れた！', 'warn')
+      w.failHintUntil = sim.time + 0.85
+      w.failReason = '接続先が崩れた'
       if (w.attached) webRelease(false)
       else endZip(false)
     }
@@ -239,7 +252,9 @@ export function updateWeb(dt, axis, hold) {
     }
   }
 
-  let ax = 0, ay = -W.gravity, az = 0
+  // 接続中は「振り子で落ちる」よりも、接続点へ飛んでいく分かりやすさを優先する。
+  // Qを離した瞬間だけ通常重力へ戻るので、離すとそのまま落下する。
+  let ax = 0, ay = -(w.attached ? W.attachedGravity : W.gravity), az = 0
 
   if (w.attached) {
     const hx = p.pos.x, hy = p.pos.y + 1.4, hz = p.pos.z
@@ -247,23 +262,24 @@ export function updateWeb(dt, axis, hold) {
     const dist = Math.hypot(dx, dy, dz) || 1e-5
     dx /= dist; dy /= dist; dz /= dist
 
-    // 巻き取り / 繰り出し
-    if (hold.forward) w.rope = Math.max(W.minRope, w.rope - W.reelIn * dt)
-    if (hold.back) w.rope = Math.min(W.maxDistance, w.rope + W.reelOut * dt)
+    // 操作はQだけ。糸を自動で巻き取り、接続点まで確実に近づける。
+    // 長さを現在距離へ追従させるだけだった旧式では、重力に負けて下へ落ちていた。
+    w.rope = THREE.MathUtils.clamp(w.rope - W.autoReelSpeed * dt, W.minRope, Math.max(W.minRope, dist))
 
     const pull = dist < W.shortRange ? W.shortPull : W.pull
     ax += dx * pull
     ay += dy * pull
     az += dz * pull
 
-    // 横入力でスイング方向を補助（糸に対して垂直な水平方向へ）
-    if (axis.len > 0.01) {
-      const sx = -dz, sz = dx
-      const l = Math.hypot(sx, sz) || 1
-      const side = (axis.x * (sx / l) + axis.z * (sz / l))
-      ax += (sx / l) * side * W.lateral
-      az += (sz / l) * side * W.lateral
-    }
+    // 接続方向へ速度を素早く整える。急なテレポートにはせず、現在速度を残しながら
+    // 最低限の前進速度を作るため、建物の高所へ向けても真下に落ちにくい。
+    const currentSpeed = Math.hypot(p.vel.x, p.vy, p.vel.z)
+    const targetSpeed = Math.min(W.maxSpeed, Math.max(W.attachMinSpeed, currentSpeed + W.attachAccel * dt))
+    const steer = Math.min(1, dt * W.attachSteer)
+    p.vel.x += (dx * targetSpeed - p.vel.x) * steer
+    p.vy += (dy * targetSpeed - p.vy) * steer
+    p.vel.z += (dz * targetSpeed - p.vel.z) * steer
+
   }
 
   p.vel.x += ax * dt
@@ -328,6 +344,18 @@ function moveAirborne(dt, zipping) {
   const nz = p.pos.z + p.vel.z * dt
   const ny = p.pos.y + p.vy * dt
   const gy = groundY(nx, nz, p.pos.y)
+
+  // ボス戦のATフィールドは高さいっぱいの壁。空を飛んでいても通り抜けさせない。
+  if (arenaBlocksSegment(p.pos.x, p.pos.y, p.pos.z, nx, ny, nz)) {
+    p.vel.x *= -W.crashKeep * 0.5
+    p.vel.z *= -W.crashKeep * 0.5
+    p.pos.y = ny
+    if (w.attached) webRelease(false)
+    w.zipping = false
+    out.crashed = true
+    addEffect({ kind: 'ring', x: nx, y: ny, z: nz, radius: 1.6, color: '#ffb15f', life: 0.35 })
+    return out
+  }
 
   // 低空では壁に当たる（建物をすり抜けない）。ジップ中は少しだけ余裕を持たせる
   const clearance = zipping ? 1.2 : 2.2

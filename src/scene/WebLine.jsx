@@ -18,6 +18,7 @@ const quat = new THREE.Quaternion()
 export function WebLine() {
   const rope = useRef()
   const anchor = useRef()
+  const anchorRing = useRef()
   const preview = useRef()
   const scan = useRef(0)
   const cached = useRef(null)
@@ -27,8 +28,9 @@ export function WebLine() {
     const w = p.web
     const r = rope.current
     const a = anchor.current
+    const ar = anchorRing.current
     const pv = preview.current
-    if (!r || !a || !pv) return
+    if (!r || !a || !ar || !pv) return
 
     // 接続中もジップ中（離して接続点へ飛んでいる最中）も糸を描く
     if (w?.attached || w?.zipping) {
@@ -44,12 +46,17 @@ export function WebLine() {
       r.scale.set(1, len, 1)
       a.visible = true
       a.position.copy(to)
+      ar.visible = true
+      ar.position.copy(to)
+      ar.rotation.z += dt * 3
+      ar.scale.setScalar(0.9 + Math.sin(sim.time * 8) * 0.12)
       pv.visible = false
       return
     }
 
     r.visible = false
     a.visible = false
+    ar.visible = false
 
     // 接続候補の表示。毎フレーム走査すると重いので 10Hz に間引く
     scan.current -= dt
@@ -75,6 +82,10 @@ export function WebLine() {
       <mesh ref={anchor} visible={false} renderOrder={3}>
         <sphereGeometry args={[0.28, 10, 10]} />
         <meshBasicMaterial color="#bff2ff" transparent opacity={0.85} depthWrite={false} />
+      </mesh>
+      <mesh ref={anchorRing} visible={false} renderOrder={3}>
+        <torusGeometry args={[0.52, 0.045, 6, 18]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.92} depthWrite={false} />
       </mesh>
       <mesh ref={preview} visible={false} renderOrder={3}>
         <sphereGeometry args={[1, 10, 10]} />

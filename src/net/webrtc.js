@@ -2,6 +2,23 @@ import { CHANNEL, iceServers, signalUrl } from './protocol.js'
 import { multiplayer, notifyMultiplayer, resetMultiplayer, setMultiplayer } from './multiplayerStore.js'
 import { netDebug } from './debug.js'
 import { resetSnapshotState } from './snapshots.js'
+import { markStage, netStats, recordChannel, startStatsPolling, stopStatsPolling, resetSequenceStats } from './diagnostics.js'
+
+/**
+ * 接続の切り分け用。URLに ?ice=relay を付けるとTURN経由だけで試す。
+ * 資料の「本番接続性を確認する最も有効な試験」に対応する。
+ */
+const icePolicy = () => (typeof location !== 'undefined' && new URLSearchParams(location.search).get('ice') === 'relay' ? 'relay' : 'all')
+
+/**
+ * 送信待ちキュー(bufferedAmount)のしきい値。
+ * send() が成功してもネットワークへ出たとは限らず、キューが伸びると
+ * 「数秒前の動きを今再生している」状態になる。移動系は古いものを捨てて
+ * 最新だけを送り、重要イベントは限界まで送る。
+ */
+const BACKPRESSURE = { low: 64 * 1024, high: 256 * 1024, hard: 1024 * 1024 }
+/** 落としてよい（＝次の更新が来れば取り戻せる）メッセージ */
+const DROPPABLE = new Set(['snapshot', 'input'])
 
 let signal = null
 const peers = new Map()
@@ -19,12 +36,24 @@ function receive(channel, event) {
   notifyMultiplayer()
 }
 function peer(peerId, initiator) {
-  const pc = new RTCPeerConnection({ iceServers: iceServers() })
-  const p = { id: peerId, pc, channels: {}, connected: false }
+  const pc = new RTCPeerConnection({ iceServers: iceServers(), iceTransportPolicy: icePolicy() })
+  // pendingIce: remoteDescription が入る前に届いた candidate を貯める場所。
+  // ここを捨てると、候補の多い実ネットワークで接続できなくなる。
+  const p = { id: peerId, pc, channels: {}, connected: false, pendingIce: [], queue: Promise.resolve() }
   peers.set(peerId, p)
+  // 相手より先に届いていた candidate があれば引き継ぐ
+  const early = earlyIce.get(peerId)
+  if (early) { p.pendingIce.push(...early); earlyIce.delete(peerId) }
   pc.onicecandidate = ({ candidate }) => candidate && sendSignal({ type: 'relay', to: peerId, kind: 'ice', data: candidate })
+  pc.onicecandidateerror = (e) => {
+    // STUN/TURN へ届いていない・認証が切れている等はここに出る
+    netStats.iceErrors.push({ url: e.url, code: e.errorCode, text: e.errorText })
+    if (netStats.iceErrors.length > 8) netStats.iceErrors.shift()
+    netDebug('WEBRTC ICE CANDIDATE ERROR', { url: e.url, code: e.errorCode, text: e.errorText })
+  }
   pc.onconnectionstatechange = () => {
     p.connected = pc.connectionState === 'connected'
+    if (pc.connectionState === 'connected') markStage('ICE_CONNECTED')
     multiplayer.peers.set(peerId, { ...(multiplayer.peers.get(peerId) || {}), id: peerId, connected: p.connected, connectionState: pc.connectionState })
     netDebug('PEER CONNECTION STATE', { peerId, state: pc.connectionState })
     notifyMultiplayer()
@@ -38,24 +67,94 @@ function peer(peerId, initiator) {
 }
 function attachChannel(p, channel) {
   p.channels[channel.label] = channel
+  // バイナリ化したときに型付き配列へ直接変換できるようにしておく（既定に依存しない）
+  try { channel.binaryType = 'arraybuffer' } catch { /* 未対応環境 */ }
   channel.onmessage = (e) => receive(channel.label, e)
-  channel.onopen = () => { p.connected = true; netDebug('DATACHANNEL OPEN', { peerId: p.id, channel: channel.label, readyState: channel.readyState }); notifyMultiplayer() }
-  channel.onclose = () => { p.connected = false; notifyMultiplayer() }
+  channel.onopen = () => {
+    p.connected = true
+    markStage('DATA_CHANNEL_OPEN')
+    recordChannel(channel.label, channel)
+    netDebug('DATACHANNEL OPEN', { peerId: p.id, channel: channel.label, readyState: channel.readyState, ordered: channel.ordered, maxRetransmits: channel.maxRetransmits })
+    notifyMultiplayer()
+  }
+  channel.onclose = () => { p.connected = false; recordChannel(channel.label, channel); notifyMultiplayer() }
+  channel.onbufferedamountlow = () => recordChannel(channel.label, channel)
+  try { channel.bufferedAmountLowThreshold = BACKPRESSURE.low } catch { /* 未対応環境 */ }
 }
-async function offer(peerId) { const p = peer(peerId, true); const desc = await p.pc.createOffer(); await p.pc.setLocalDescription(desc); sendSignal({ type: 'relay', to: peerId, kind: 'offer', data: desc }) }
-async function relay(message) {
+async function offer(peerId) {
+  const p = peer(peerId, true)
+  const desc = await p.pc.createOffer()
+  await p.pc.setLocalDescription(desc)
+  markStage('LOCAL_DESCRIPTION_SET')
+  sendSignal({ type: 'relay', to: peerId, kind: 'offer', data: desc })
+}
+/** peer 生成前に届いた ICE candidate の一時置き場 */
+const earlyIce = new Map()
+
+/** remoteDescription が入ってから、溜めておいた candidate をまとめて流し込む */
+async function flushIce(p) {
+  if (!p.pc.remoteDescription || !p.pendingIce.length) return
+  const queued = p.pendingIce.splice(0)
+  for (const c of queued) {
+    await p.pc.addIceCandidate(c).catch((error) => netDebug('WEBRTC ICE ERROR', { peerId: p.id, error: error.message }))
+  }
+  netDebug('WEBRTC ICE FLUSH', { peerId: p.id, count: queued.length })
+}
+
+/**
+ * シグナリング中継の適用。
+ *
+ * onmessage は await しないので、offer/answer/ice が同時に走り得る。
+ * setRemoteDescription の完了前に addIceCandidate すると候補が失われるため、
+ * ピアごとに直列化し、remoteDescription が入るまで candidate を保留する。
+ */
+function relay(message) {
+  const existing = peers.get(message.from)
+  const chain = existing ? existing.queue : Promise.resolve()
+  const next = chain.then(() => applyRelay(message)).catch((e) => netDebug('WEBRTC RELAY ERROR', { peerId: message.from, error: e.message }))
+  const p = peers.get(message.from)
+  if (p) p.queue = next
+  return next
+}
+
+async function applyRelay(message) {
   let p = peers.get(message.from)
   if (message.kind === 'offer') {
-    p?.pc.close(); p = peer(message.from, false)
+    p?.pc.close()
+    p = peer(message.from, false)
+    markStage('REMOTE_DESCRIPTION_SET')
     await p.pc.setRemoteDescription(message.data)
-    const answer = await p.pc.createAnswer(); await p.pc.setLocalDescription(answer)
+    await flushIce(p)
+    const answer = await p.pc.createAnswer()
+    await p.pc.setLocalDescription(answer)
+    markStage('LOCAL_DESCRIPTION_SET')
     sendSignal({ type: 'relay', to: message.from, kind: 'answer', data: answer })
     netDebug('WEBRTC ANSWER', { peerId: message.from, signalingState: p.pc.signalingState })
     return
   }
+  if (message.kind === 'ice') {
+    // まだピアが無い / remoteDescription 前なら捨てずに貯める
+    if (!p) {
+      const list = earlyIce.get(message.from) || []
+      list.push(message.data)
+      earlyIce.set(message.from, list)
+      return
+    }
+    if (!p.pc.remoteDescription) { p.pendingIce.push(message.data); return }
+    await p.pc.addIceCandidate(message.data).catch((error) => netDebug('WEBRTC ICE ERROR', { peerId: message.from, error: error.message }))
+    return
+  }
   if (!p) return
-  if (message.kind === 'answer') { await p.pc.setRemoteDescription(message.data); netDebug('WEBRTC ANSWER APPLIED', { peerId: message.from, signalingState: p.pc.signalingState }) }
-  if (message.kind === 'ice') await p.pc.addIceCandidate(message.data).catch((error) => netDebug('WEBRTC ICE ERROR', { peerId: message.from, error: error.message }))
+  if (message.kind === 'answer') {
+    if (p.pc.signalingState !== 'have-local-offer') {
+      netDebug('WEBRTC ANSWER IGNORED', { peerId: message.from, signalingState: p.pc.signalingState })
+      return
+    }
+    await p.pc.setRemoteDescription(message.data)
+    markStage('REMOTE_DESCRIPTION_SET')
+    await flushIce(p)
+    netDebug('WEBRTC ANSWER APPLIED', { peerId: message.from, signalingState: p.pc.signalingState })
+  }
 }
 
 export function configureNetwork({ onReliable, onFast, onPeerLeft }) { reliableHandler = onReliable || (() => {}); fastHandler = onFast || (() => {}); peerLeftHandler = onPeerLeft || (() => {}) }
@@ -63,7 +162,7 @@ export function connectSignal() {
   if (signal && [WebSocket.OPEN, WebSocket.CONNECTING].includes(signal.readyState)) return signal
   setMultiplayer({ status: 'connecting', error: '' })
   signal = new WebSocket(signalUrl())
-  signal.onopen = () => setMultiplayer({ status: 'lobby' })
+  signal.onopen = () => { markStage('SIGNAL_CONNECTED'); resetSequenceStats(); startStatsPolling(() => [...peers.values()]); setMultiplayer({ status: 'lobby' }) }
   signal.onmessage = async ({ data }) => {
     let m; try { m = JSON.parse(data) } catch { return }
     if (m.type === 'pong') { multiplayer.ping = Date.now() - m.sentAt; notifyMultiplayer(); return }
@@ -88,17 +187,32 @@ export function updateRoomSettings(settings) { if (multiplayer.role === 'host') 
 export function setReady(ready) { sendSignal({ type: 'ready', ready }) }
 export function startNetworkGame(settings) { if (multiplayer.role === 'host') { multiplayer.gameStarted = true; sendSignal({ type: 'start' }); send(CHANNEL.reliable, { type: 'gameStart', settings }); notifyMultiplayer() } }
 export function send(channel, message, peerId = null) {
-  const data = encode(message); const targets = peerId ? [peers.get(peerId)] : [...peers.values()]
+  const data = encode(message)
+  const targets = peerId ? [peers.get(peerId)] : [...peers.values()]
+  const droppable = DROPPABLE.has(message.type)
   for (const p of targets) {
     const c = p?.channels[channel]
-    if (c?.readyState === 'open') {
-      c.send(data); meter(true, data)
-      if (message.type === 'input') netDebug('GUEST INPUT SEND', { playerId: multiplayer.playerId, peerId: p.id, channel, readyState: c.readyState, sequence: message.sequence, move: message.move })
+    if (c?.readyState !== 'open') {
+      netStats.droppedNotOpen++
+      if (message.type === 'input') netDebug('GUEST INPUT SEND', { playerId: multiplayer.playerId, peerId: p?.id, channel, readyState: c?.readyState || 'missing', sequence: message.sequence, move: message.move })
+      continue
     }
-    else if (message.type === 'input') netDebug('GUEST INPUT SEND', { playerId: multiplayer.playerId, peerId: p?.id, channel, readyState: c?.readyState || 'missing', sequence: message.sequence, move: message.move })
+    if (c.bufferedAmount > netStats.bufferedMax) netStats.bufferedMax = c.bufferedAmount
+    // 移動・入力は「最新が価値を持つ」。キューが伸びているなら送らずに捨て、
+    // 次のフレームの新しい状態を送るほうが結果的に追従が速い。
+    if (droppable && c.bufferedAmount > BACKPRESSURE.high) { netStats.droppedStale++; continue }
+    // 重要イベントは基本落とさないが、限界を超えたら回線側の異常として記録する
+    if (!droppable && c.bufferedAmount > BACKPRESSURE.hard) { netStats.droppedReliable++; continue }
+    c.send(data)
+    meter(true, data)
+    recordChannel(channel, c)
+    if (message.type === 'input') netDebug('GUEST INPUT SEND', { playerId: multiplayer.playerId, peerId: p.id, channel, readyState: c.readyState, sequence: message.sequence, move: message.move })
   }
   notifyMultiplayer()
 }
+
+/** 診断用: 現在のピア一覧（getStats のポーリングに使う） */
+export const netPeers = () => [...peers.values()]
 export function pingSignal() { sendSignal({ type: 'ping', sentAt: Date.now() }) }
-export function disconnect() { for (const p of peers.values()) p.pc.close(); peers.clear(); if (signal?.readyState === WebSocket.OPEN) sendSignal({ type: 'leave' }); signal?.close(); signal = null; sessionStorage.removeItem('marugoto.reconnectToken'); resetMultiplayer() }
+export function disconnect() { stopStatsPolling(); markStage('offline'); earlyIce.clear(); for (const p of peers.values()) p.pc.close(); peers.clear(); if (signal?.readyState === WebSocket.OPEN) sendSignal({ type: 'leave' }); signal?.close(); signal = null; sessionStorage.removeItem('marugoto.reconnectToken'); resetMultiplayer() }
 function closePeer(id) { const p = peers.get(id); p?.pc.close(); peers.delete(id) }

@@ -96,7 +96,10 @@ export function applySave(data) {
   else resetTown()
   if (data.bosses) applyBossSave(data.bosses)
   sim.dayTime = num(data.dayTime, sim.dayTime) % 1
-  if (data.settings && typeof data.settings === 'object') Object.assign(sim.settings, data.settings)
+  if (data.settings && typeof data.settings === 'object') {
+    Object.assign(sim.settings, data.settings)
+    delete sim.settings.webSwingMode
+  }
   if (data.stats && typeof data.stats === 'object') Object.assign(sim.stats, data.stats)
   p.dead = false
   publishHud()

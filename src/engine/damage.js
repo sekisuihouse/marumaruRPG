@@ -90,6 +90,9 @@ export function killPlayer() {
   p.action = null
   p.blocking = false
   p.respawnTimer = 4.0
+  // ボス戦の中断判定に使う。updatePlayer が同じフレームで復活させても
+  // 「死んだ事実」が残るようにする。
+  p.diedAt = sim.time
   sim.mode = 'dead'
   say('力尽きた……集会所前で目を覚ます。', 'death')
   // 敵はプレイヤーを見失う

@@ -15,7 +15,7 @@ import { spawnDebris, hitDebris, clearDebris, quality } from './debris.js'
 import { impact, dust, playBreakSound } from './juice.js'
 import {
   cellIndexAt, cellCenter, cellSize, cellGroundY, isCellBlocked,
-  forEachCellInBox, openCell, restoreNav, isNavReady,
+  forEachCellInBox, openCell, closeCell, restoreNav, isNavReady,
 } from './nav.js'
 
 const GRID = 4.0
@@ -372,6 +372,48 @@ export function resetTown() {
   sim.destructStats = { parts: registry.parts.length, broken: 0, pending: 0, openedCells: 0 }
   restoreNav()          // 開通させたセルもベイク時の状態へ戻す
   clearDebris()
+}
+
+/**
+ * オブジェクト単位で建物を直す（ボス戦を仕切り直すときに使う）。
+ * 見た目・当たり判定・支持関係をまとめて元へ戻す。
+ * @returns {number} 直した小片の数
+ */
+export function restoreObject(objectName) {
+  if (!registry.ready) return 0
+  const parts = registry.parts.filter((p) => p.objectName === objectName)
+  let healed = 0
+  const cells = new Set()
+  for (const p of parts) {
+    if (!p.broken) continue
+    p.broken = false
+    p.hp = p.maxHp
+    sink?.restorePart(p)
+    for (const k of p.cells || []) cells.add(k)
+    healed++
+  }
+  if (!healed) return 0
+  sim.destructStats.broken = Math.max(0, sim.destructStats.broken - healed)
+  // 支持関係の作り直し（直した小片が再び上を支える）
+  for (const p of registry.parts) p.supportCount = 0
+  for (const p of registry.parts) {
+    if (p.broken) continue
+    for (const id of p.supports || []) {
+      const up = registry.parts[id]
+      if (up && !up.broken) up.supportCount++
+    }
+  }
+  // 開けた通行判定を閉じ直す（そのセルを塞ぐ小片が1つでも戻っていれば閉じる）
+  for (const k of cells) {
+    const list = cellBlockers.get(k)
+    if (!list) continue
+    if (list.some((id) => !registry.parts[id].broken) && closeCell(k)) {
+      sim.destructStats.openedCells = Math.max(0, sim.destructStats.openedCells - 1)
+    }
+  }
+  // この建物に関する崩落予約も取り消す
+  sim.pendingCollapse = (sim.pendingCollapse || []).filter((c) => registry.parts[c.id]?.objectName !== objectName)
+  return healed
 }
 
 export function serializeBroken() {

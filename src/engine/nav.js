@@ -93,6 +93,8 @@ export function openCell(k) {
   nav.flags[k] = F.WALK
   // 遮蔽高さも下げる。壊れた壁でカメラが引き寄せられ続けないように。
   if (nav.ceils) nav.ceils[k] = nav.heights[k]
+  // ボス戦の封鎖中でも「壊した分だけ通れる」を保つ
+  if (arenaMask) growArena(k)
   return true
 }
 
@@ -102,6 +104,189 @@ export function restoreNav() {
   nav.flags.set(nav.baseFlags)
   if (nav.ceils && nav.baseCeils) nav.ceils.set(nav.baseCeils)
 }
+
+// ───────────────────────────── ボスアリーナの一時封鎖
+//
+// ボス戦の間だけ戦場の外を塞ぐ。破壊による開通(openCell)とは独立させたいので、
+// ベイク済みの flags は書き換えず、上から被せるマスクで判定する。
+// こうすると解除は「マスクを捨てるだけ」で、破壊状態を巻き戻さずに済む。
+//
+// ⚠️ ただし「封鎖中に壊して開通したセル」はマスクから外さないと、
+// 建物を壊したのに当たり判定が残る。growArena() がその面倒を見る。
+
+/** @type {Uint8Array|null} */
+let arenaMask = null
+/** 場外へ出てしまったときの戻り先（町の初期スポーンへ飛ばさないため） */
+let arenaHome = null
+/** 封鎖中の開通をどこまで場内へ取り込むか（闘技場の中心と半径） */
+let arenaGrowth = null
+
+export function setArenaMask(mask, { home = null, center = null, radius = 0 } = {}) {
+  arenaMask = mask
+  arenaHome = home
+  arenaGrowth = center ? { x: center.x, z: center.z, r2: radius * radius } : null
+}
+export function clearArenaMask() { arenaMask = null; arenaHome = null; arenaGrowth = null }
+export const hasArenaMask = () => !!arenaMask
+export const isArenaBlocked = (k) => !!arenaMask && k >= 0 && arenaMask[k] === 1
+
+/**
+ * 封鎖中に壊して開通したセルを場内へ取り込む。
+ *
+ * 場内セルに繋がっていて、闘技場の半径内にあるなら「壁が壊れて中まで通れるようになった」
+ * とみなしてマスクを外す。開通セルが連なっていれば芋づるで辿る。
+ * 半径で止めるので、境界の建物を壊しても戦場の外までは広がらない。
+ */
+function growArena(k) {
+  if (!arenaMask || !arenaGrowth || !arenaMask[k]) return 0
+  const n = nav.n
+  const within = (kk) => {
+    const c = cellCenter(kk)
+    return (c.x - arenaGrowth.x) ** 2 + (c.z - arenaGrowth.z) ** 2 <= arenaGrowth.r2
+  }
+  const queue = [k]
+  let opened = 0
+  while (queue.length) {
+    const c = queue.pop()
+    if (!arenaMask[c] || !(nav.flags[c] & F.WALK) || !within(c)) continue
+    const i = c % n, j = (c - (c % n)) / n
+    let touching = false
+    for (const [di, dj] of NEIGHBORS) {
+      const ii = i + di, jj = j + dj
+      if (!inside(ii, jj)) continue
+      const kk = jj * n + ii
+      if (!arenaMask[kk] && (nav.flags[kk] & F.WALK)) { touching = true; break }
+    }
+    if (!touching) continue
+    arenaMask[c] = 0
+    opened++
+    for (const [di, dj] of NEIGHBORS) {
+      const ii = i + di, jj = j + dj
+      if (!inside(ii, jj)) continue
+      const kk = jj * n + ii
+      if (arenaMask[kk] && (nav.flags[kk] & F.WALK)) queue.push(kk)
+    }
+  }
+  return opened
+}
+
+/** ベイク時の通行判定へ1セルだけ戻す（壊した建物を直すときに使う） */
+export function closeCell(k) {
+  if (!nav || k < 0 || !nav.baseFlags) return false
+  if (nav.flags[k] === nav.baseFlags[k]) return false
+  nav.flags[k] = nav.baseFlags[k]
+  if (nav.ceils && nav.baseCeils) nav.ceils[k] = nav.baseCeils[k]
+  return true
+}
+
+/**
+ * 川を渡っている歩行セル（＝橋）を厚みつきで列挙する。
+ *
+ * 「対向する2方向に span セル以内で水がある歩行セル」を橋とみなす。橋の上に立つと
+ * 川に沿った左右が水になる、という形だけで判定するので、名前にもメッシュにも依存しない。
+ * plug セルぶん膨らませて、高速移動ですり抜けられない厚みにする。
+ */
+export function riverCrossings(span = 10, plug = 4) {
+  const n = nav ? nav.n : 0
+  const mask = new Uint8Array(n * n)
+  if (!nav) return mask
+  const base = nav.baseFlags || nav.flags
+  const isWater = (k) => base[k] & F.WATER
+  const isWalk = (k) => base[k] & F.WALK
+  const waterToward = (i, j, di, dj) => {
+    for (let s = 1; s <= span; s++) {
+      const ii = i + di * s, jj = j + dj * s
+      if (ii < 0 || jj < 0 || ii >= n || jj >= n) return false
+      if (isWater(jj * n + ii)) return true
+    }
+    return false
+  }
+  for (let j = 0; j < n; j++) {
+    for (let i = 0; i < n; i++) {
+      const k = j * n + i
+      if (!isWalk(k) || isWater(k)) continue
+      if (!((waterToward(i, j, 1, 0) && waterToward(i, j, -1, 0))
+        || (waterToward(i, j, 0, 1) && waterToward(i, j, 0, -1)))) continue
+      for (let dj = -plug; dj <= plug; dj++) {
+        for (let di = -plug; di <= plug; di++) {
+          const ii = i + di, jj = j + dj
+          if (ii < 0 || jj < 0 || ii >= n || jj >= n) continue
+          const kk = jj * n + ii
+          if (isWalk(kk) && !isWater(kk)) mask[kk] = 1
+        }
+      }
+    }
+  }
+  return mask
+}
+
+/**
+ * ボス戦の闘技場を作る。
+ *
+ * 川べりを塞ぐだけでは閉じない（実測: 川の端を大きく迂回して対岸へ回り込めた）。
+ * そこで「中心から歩いて行ける範囲を radius 以内で塗りつぶし、その外は全部通行止め」
+ * という作り方にする。これなら地形に関係なく必ず閉じた場になる。橋は最初から
+ * 通れない扱いにして塗りつぶすので、橋の向こうは自動的に場外になる。
+ *
+ * @returns inside   セルごとの闘技場内フラグ
+ * @returns blocked  場外になる歩行セル（＝封鎖されるセル）
+ * @returns panels   ATフィールドの板を立てるセル（水面・場外へ抜けられる境界だけ）
+ */
+export function arenaRegion(centerX, centerZ, radius, { crossings = null } = {}) {
+  const empty = { inside: new Uint8Array(0), blocked: [], panels: [], reached: 0 }
+  if (!nav) return empty
+  const n = nav.n
+  const start = cellIndexAt(centerX, centerZ)
+  if (start < 0) return empty
+  const bridges = crossings || riverCrossings()
+  const inside = new Uint8Array(n * n)
+  const r2 = radius * radius
+  const queue = [start]
+  inside[start] = 1
+  let reached = 1
+  for (let head = 0; head < queue.length; head++) {
+    const k = queue[head]
+    const i = k % n, j = (k - (k % n)) / n
+    for (const [di, dj] of NEIGHBORS) {
+      const ii = i + di, jj = j + dj
+      if (!inside2(ii, jj, n)) continue
+      const kk = jj * n + ii
+      if (inside[kk] || !(nav.flags[kk] & F.WALK) || bridges[kk]) continue
+      const c = cellCenter(kk)
+      if ((c.x - centerX) * (c.x - centerX) + (c.z - centerZ) * (c.z - centerZ) > r2) continue
+      inside[kk] = 1
+      reached++
+      queue.push(kk)
+    }
+  }
+  const blocked = []
+  const panelMask = new Uint8Array(n * n)
+  const panels = []
+  for (let k = 0; k < inside.length; k++) {
+    if (inside[k]) {
+      // 境界のうち「歩けたはずの場所・水面」だけへ壁を立てる。建物の壁には立てない。
+      const i = k % n, j = (k - (k % n)) / n
+      for (const [di, dj] of NEIGHBORS) {
+        const ii = i + di, jj = j + dj
+        if (!inside2(ii, jj, n)) continue
+        const kk = jj * n + ii
+        if (inside[kk] || panelMask[kk]) continue
+        const f = nav.flags[kk]
+        if (!(f & F.WALK) && !(f & F.WATER)) continue
+        panelMask[kk] = 1
+        panels.push(kk)
+      }
+      continue
+    }
+    if (nav.flags[k] & F.WALK) blocked.push(k)
+  }
+  return { inside, blocked, panels, reached }
+}
+
+const NEIGHBORS = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+const inside2 = (i, j, n) => i >= 0 && j >= 0 && i < n && j < n
+
+export const navCellCount = () => (nav ? nav.n * nav.n : 0)
 
 export const getNav = () => nav
 export const isNavReady = () => !!nav
@@ -117,7 +302,10 @@ export function flagsAt(x, z) {
   if (!nav) return F.WALK
   const i = ci(x), j = ci(z)
   if (!inside(i, j)) return F.BLOCK
-  return nav.flags[j * nav.n + i]
+  const k = j * nav.n + i
+  // ボス戦の封鎖中は、そのセルを通れないものとして扱う（高さ情報はそのまま）
+  if (arenaMask && arenaMask[k]) return F.BLOCK
+  return nav.flags[k]
 }
 
 export const isWalkable = (x, z) => (flagsAt(x, z) & F.WALK) !== 0
@@ -195,7 +383,8 @@ export function nearestWalkable(x, z, maxRings = 24) {
       for (let di = -r; di <= r; di++) {
         if (Math.max(Math.abs(di), Math.abs(dj)) !== r) continue
         const i = i0 + di, j = j0 + dj
-        if (!inside(i, j) || !(nav.flags[j * nav.n + i] & F.WALK)) continue
+        const kk = j * nav.n + i
+        if (!inside(i, j) || !(nav.flags[kk] & F.WALK) || (arenaMask && arenaMask[kk])) continue
         const px = cx(i), pz = cx(j)
         if (!canStand(px, pz)) continue
         const d = (px - x) ** 2 + (pz - z) ** 2
@@ -204,6 +393,9 @@ export function nearestWalkable(x, z, maxRings = 24) {
     }
     if (best) return { x: best.x, z: best.z }
   }
+  // 見つからないとき。封鎖中に町のスポーンへ飛ばすと場外へ出てしまうので、
+  // ボス戦のあいだは戦場の中心へ戻す。
+  if (arenaHome) return { x: arenaHome.x, z: arenaHome.z }
   return { x: nav.spawn.x, z: nav.spawn.z }
 }
 
