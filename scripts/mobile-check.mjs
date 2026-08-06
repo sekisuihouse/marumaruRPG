@@ -100,26 +100,64 @@ try {
   if (!booted) throw new Error(`${URL_TARGET} でゲームが起動しませんでした（window.__sim が無い）`)
   await waitFrames(3)
 
-  // ── 縦画面では遊ばせない
+  // 移動の検証は毎回この位置から始める。前の検証で壁際まで歩いていると
+  // 「入力は入っているのに動けない」で落ちるため。
+  const home = await evalJs('({x: window.__sim.player.pos.x, y: window.__sim.player.pos.y, z: window.__sim.player.pos.z})')
+  const goHome = () => evalJs(`(() => { const p = window.__sim.player; p.pos.set(${home.x}, ${home.y}, ${home.z}); p.vel.set(0,0,0); return true })()`)
+
+  // ── 縦持ちの端末は、締め出さずに画面ごと90°回して横画面として出す
   const setViewport = (w, h) => send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 2, mobile: true }, sessionId)
   await setViewport(390, 844)
   await sleep(1500)
-  const portrait = await evalJs(`({ gate: !!document.querySelector('.orientation-gate'), blocked: !!window.__sim.orientationBlocked })`)
-  const held = await evalJs('({x: window.__sim.player.pos.x, z: window.__sim.player.pos.z})')
-  await touch('touchStart', [{ x: 100, y: 600, id: 90 }])
-  await touch('touchMove', [{ x: 100, y: 520, id: 90 }])
-  await sleep(1200)
-  const heldAfter = await evalJs('({x: window.__sim.player.pos.x, z: window.__sim.player.pos.z})')
+  const rot = await evalJs(`(() => {
+    const m = document.querySelector('main')
+    return {
+      rotated: !!window.__sim.screenRotated, cls: m.className,
+      layoutW: m.offsetWidth, layoutH: m.offsetHeight,
+      hint: !!document.querySelector('.rotate-hint'),
+    }
+  })()`)
+  check('縦持ちでは画面ごと90°回す', rot.rotated === true && rot.cls.includes('screen-rotated'), JSON.stringify(rot))
+  check('回した中身は横画面のレイアウトになる', rot.layoutW > rot.layoutH, `${rot.layoutW}×${rot.layoutH}`)
+  check('倒し方の案内が出る', rot.hint === true)
+  // キャンバスが回転後の枠を埋めているか（既定の測り方だと縦横が入れ替わって隙間が出る）
+  const canvas = await evalJs(`(() => {
+    const c = document.querySelector('canvas'), m = document.querySelector('main')
+    return { cw: c.offsetWidth, ch: c.offsetHeight, mw: m.offsetWidth, mh: m.offsetHeight }
+  })()`)
+  check('3D画面が回転後の枠を埋める',
+    Math.abs(canvas.cw - canvas.mw) <= 2 && Math.abs(canvas.ch - canvas.mh) <= 2,
+    `canvas ${canvas.cw}×${canvas.ch} / 枠 ${canvas.mw}×${canvas.mh}`)
+
+  // 回した状態でも指の座標が正しく変換されるか。
+  // ローカル(x,y) → 画面(sx,sy) は sx = w - y, sy = x。逆は x = sy, y = w - sx。
+  // 画面(195,200) は ローカル(200,195) ＝ ゲーム画面の左寄り＝移動スティック側。
+  await goHome()
+  const rp0 = await evalJs('({x: window.__sim.player.pos.x, z: window.__sim.player.pos.z})')
+  await touch('touchStart', [{ x: 195, y: 200, id: 91 }])
+  await touch('touchMove', [{ x: 265, y: 200, id: 91 }])
+  const stickBox = await evalJs(`(() => {
+    const el = document.querySelector('.mc-stick')
+    if (!el) return null
+    const r = el.getBoundingClientRect()
+    return { cx: Math.round(r.left + r.width / 2), cy: Math.round(r.top + r.height / 2) }
+  })()`)
+  await waitFrames(6)
+  const rp1 = await evalJs('({x: window.__sim.player.pos.x, z: window.__sim.player.pos.z})')
   await touch('touchEnd', [])
+  const rotMoved = Math.hypot(rp1.x - rp0.x, rp1.z - rp0.z)
+  check('回した画面でもスティックが指の位置に出る',
+    !!stickBox && Math.hypot(stickBox.cx - 195, stickBox.cy - 200) < 24,
+    stickBox ? `指(195,200) スティック(${stickBox.cx},${stickBox.cy})` : 'スティックが出ない')
+  check('回した画面でも動ける', rotMoved > 0.4, `${rotMoved.toFixed(2)}m`)
+
   const shotPortrait = await send('Page.captureScreenshot', { format: 'png' }, sessionId)
   fs.writeFileSync('screenshot-mobile-portrait.png', Buffer.from(shotPortrait.data, 'base64'))
-  check('縦画面では横にするよう促して覆う', portrait.gate === true, JSON.stringify(portrait))
-  check('縦画面のあいだは進行が止まる', portrait.blocked === true
-    && Math.hypot(heldAfter.x - held.x, heldAfter.z - held.z) < 0.05, JSON.stringify(portrait))
+
   await setViewport(844, 390)
   await sleep(1500)
-  const landscape = await evalJs(`({ gate: !!document.querySelector('.orientation-gate'), blocked: !!window.__sim.orientationBlocked })`)
-  check('横にすると覆いが消えて再開する', landscape.gate === false && landscape.blocked === false, JSON.stringify(landscape))
+  const landscape = await evalJs(`({ rotated: !!window.__sim.screenRotated, hint: !!document.querySelector('.rotate-hint') })`)
+  check('横向きになれば回転をやめる', landscape.rotated === false && landscape.hint === false, JSON.stringify(landscape))
 
   const ui = await evalJs(`(() => ({
     touchUi: !!document.querySelector('.hud.touch-ui'),
@@ -144,6 +182,7 @@ try {
   if (!probe) console.log('     （公開ビルド：入力値の直接確認はスキップし、結果で判定します）')
 
   // ── 左半分：フローティングスティックで移動
+  await goHome()
   const before = await evalJs('({x: window.__sim.player.pos.x, z: window.__sim.player.pos.z})')
   await touch('touchStart', [{ x: 160, y: 240, id: 1 }])
   await touch('touchMove', [{ x: 160, y: 170, id: 1 }])
@@ -172,6 +211,7 @@ try {
   check('右側のドラッグでカメラが回る', Math.abs(yaw1 - yaw0) > 0.2, `Δyaw=${(yaw1 - yaw0).toFixed(2)}rad`)
 
   // ── 移動と視点の同時操作（原神と同じく2本指）
+  await goHome()
   const yaw2 = await evalJs('window.__sim.camera.yaw')
   await touch('touchStart', [{ x: 160, y: 240, id: 3 }])
   await touch('touchStart', [{ x: 160, y: 240, id: 3 }, { x: 620, y: 150, id: 4 }])

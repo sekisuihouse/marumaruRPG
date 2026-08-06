@@ -121,8 +121,8 @@ export const sim = {
   dayTime: 0.34,
   dayLength: 300,           // 実時間300秒で1日
   paused: false,
-  /** スマホが縦向きで、横にするまで進行を止めている状態 */
-  orientationBlocked: false,
+  /** スマホが縦持ちで、画面ごと90°回して描いている状態（指の座標もその分だけ回す） */
+  screenRotated: false,
   /** 'play' | 'dialogue' | 'menu' | 'dead' */
   mode: 'play',
   player: makePlayer(),

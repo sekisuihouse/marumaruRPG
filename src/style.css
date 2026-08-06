@@ -268,21 +268,20 @@ kbd{display:inline-block;min-width:1.5em;padding:1px 5px;margin:0 2px;border:1px
 .stats>b{color:#f6e6b0;font-size:14px}.stats small{font-size:11px;line-height:1.45}.bar{height:11px;margin:5px 0;border:1px solid #d5b56d;border-radius:1px;background:#07101a}.bar i{box-shadow:inset 0 1px #ffffff66}
 .boss-hud{top:19px;width:min(500px,56vw);padding:7px 16px;background:linear-gradient(180deg,#0b2035ee,#061421f0);border:1px solid #d7b564;border-radius:1px;clip-path:polygon(0 8px,8px 0,calc(100% - 8px) 0,100% 8px,100% calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,0 calc(100% - 8px));color:#f2d98c;box-shadow:0 6px 20px #0009}
 .final-boss-hud{width:min(650px,72vw);background:linear-gradient(180deg,#29120ff2,#071521f2)}.final-boss-hud small{display:block;color:#fff3c7}.final-parts{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin-top:4px}.final-parts span{padding:2px 5px;border:1px solid #d7b56480;background:#071521;font-size:9px;color:#fff}
-/* ───────── 横画面の強制 ─────────
-   スマホが縦のあいだは全面を覆い、遊ばせない（進行も step.js 側で止める） */
-.orientation-gate{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:24px;
-  background:linear-gradient(160deg,#071522f5,#0d2436f8);color:#fff;pointer-events:auto;touch-action:none}
-.orientation-box{width:min(420px,88vw);text-align:center}
-.orientation-box b{display:block;margin-top:18px;font-size:clamp(20px,6vw,28px);font-weight:900;letter-spacing:.04em}
-.orientation-box p{margin:10px 0 18px;font-size:clamp(13px,3.6vw,16px);line-height:1.7;font-weight:700;opacity:.92}
-.orientation-box button{padding:12px 20px;border:2px solid #ffe9b8;border-radius:26px;background:#1a4a5ef0;color:#fff6dd;
-  font:900 15px/1.2 inherit;cursor:pointer;pointer-events:auto}
-.orientation-box small{display:block;margin-top:14px;font-size:11px;line-height:1.6;opacity:.72}
-/* 端末が回るアニメーション。動きを減らす設定では止める */
-.orientation-icon{display:block;width:64px;height:104px;margin:0 auto;border:4px solid #ffe9b8;border-radius:12px;
-  box-shadow:inset 0 0 0 2px #0b1c2a;animation:rotatehint 2.4s ease-in-out infinite}
+/* ───────── 横画面（縦持ちの端末は画面ごと90°回す） ─────────
+   サイズと transform は OrientationGate が実測値でインラインに当てる。
+   ここでは、回している間に画面外がはみ出さないようにするだけ。 */
+main.screen-rotated{overflow:hidden}
+/* 回している間の案内。回転の内側にあるので、正しく倒すと読める向きになる */
+.rotate-hint{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:10px;
+  padding:9px 15px;border:2px solid #ffe9b8;border-radius:28px;background:#071522f0;color:#fff6dd;
+  font:900 13px/1.3 inherit;pointer-events:auto;max-width:92%}
+.rotate-hint i{font-style:normal;font-size:20px;animation:rotatehint 2.4s ease-in-out infinite}
+.rotate-hint small{font-weight:700;font-size:10px;opacity:.78}
+.rotate-hint button{padding:5px 11px;border:1px solid #ffe9b8;border-radius:16px;background:#1a4a5ee8;color:#fff6dd;
+  font:800 11px/1 inherit;cursor:pointer;white-space:nowrap}
 @keyframes rotatehint{0%,25%{transform:rotate(0)}55%,100%{transform:rotate(-90deg)}}
-@media(prefers-reduced-motion:reduce){.orientation-icon{animation:none;transform:rotate(-90deg)}}
+@media(prefers-reduced-motion:reduce){.rotate-hint i{animation:none}}
 
 /* ───────── スマホ操作（原神と同じ操作系） ─────────
    左＝フローティングスティック / 右＝視点ドラッグ / 右下＝ボタン円弧 / 右端＝スロット列 */

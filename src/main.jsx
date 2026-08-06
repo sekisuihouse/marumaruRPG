@@ -43,7 +43,7 @@ import { World } from './scene/World.jsx'
 import { MOTION_GAIN } from './gfx/BossModel.jsx'
 import { Hud } from './ui/Hud.jsx'
 import { MultiplayerMenu } from './ui/MultiplayerMenu.jsx'
-import { OrientationGate, lockLandscape } from './ui/OrientationGate.jsx'
+import { RotateHint, lockLandscape, useScreenRotation } from './ui/OrientationGate.jsx'
 import { BossForge } from './ui/BossForge.jsx'
 
 function Loader() {
@@ -106,6 +106,8 @@ function App() {
     import.meta.env.MODE === 'debug' || new URLSearchParams(window.location.search).get('debug') === '1'
   )
   const debugStartLevel = Number(import.meta.env.VITE_DEBUG_START_LEVEL || 0)
+  // スマホが縦向きのときは、締め出さずに画面ごと90°回して横画面として出す
+  const screen = useScreenRotation()
 
   // 初期化
   useEffect(() => {
@@ -265,11 +267,15 @@ public/assets/characters/glb/*.glb を生成してください。</pre>
   }
 
   return (
-    <main ref={wrapRef}>
+    <main ref={wrapRef} className={screen.rotated ? 'screen-rotated' : ''} style={screen.style}>
       {phase !== 'boot' && (
         <Canvas
           shadows
           dpr={[1, 1.75]}
+          // 縦持ちで画面ごと回しているとき、既定の getBoundingClientRect は
+          // 回転後の外接矩形（＝縦横が入れ替わった値）を返す。レイアウト上の
+          // 実寸で測らせないと、キャンバスだけ画面を埋めない。
+          resize={{ offsetSize: true }}
           camera={{ fov: 52, near: 0.25, far: 420, position: [0, 6, 12] }}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
           onCreated={({ gl }) => {
@@ -289,8 +295,7 @@ public/assets/characters/glb/*.glb を生成してください。</pre>
       {phase === 'title' && <Title hasSave={!!saveRef.current} onContinue={() => start(true)} onNew={() => start(false)} onMultiplayer={() => setPhase('multiplayer')} />}
       {phase === 'multiplayer' && <MultiplayerMenu onBack={() => setPhase('title')} onStart={(settings) => start(false, settings)} />}
       <Loader />
-      {/* スマホは横画面必須。縦のあいだは覆いを出して進行も止める */}
-      <OrientationGate />
+      {screen.rotated && <RotateHint />}
     </main>
   )
 }

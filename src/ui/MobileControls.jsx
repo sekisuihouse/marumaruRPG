@@ -25,6 +25,21 @@ const LOOK_SENSITIVITY = 1
 const ATTACK_REPEAT = 120
 
 /**
+ * 指の座標をゲーム画面の座標へ直す。
+ *
+ * 縦向きの端末では画面ごと 90° 回して描いている（OrientationGate）。
+ * ポインタイベントは回す前の画面座標で届くので、同じ変換をここで掛ける。
+ *   画面 (sx, sy) ← ローカル (x, y) が  sx = w - y, sy = x  なので、
+ *   逆は  x = sy, y = w - sx。
+ */
+const localPoint = (event) => (sim.screenRotated
+  ? { x: event.clientY, y: window.innerWidth - event.clientX }
+  : { x: event.clientX, y: event.clientY })
+
+/** ゲーム画面としての横幅。回しているときは端末の高さがそれにあたる。 */
+const localWidth = () => (sim.screenRotated ? window.innerHeight : window.innerWidth)
+
+/**
  * 一瞬だけ押した扱いにする。回避や会話は「押した瞬間」だけを見ているので、
  * 立てっぱなしにすると次の入力が効かなくなる。1フレーム以上あけて必ず戻す。
  */
@@ -95,12 +110,13 @@ export function MobileControls({ hud }) {
     if (event.pointerType === 'mouse') return
     event.preventDefault()
     const hasMove = [...pointers.current.values()].some((p) => p.kind === 'move')
+    const at = localPoint(event)
     // 画面左寄りの最初の指が移動。以降の指は視点。
-    if (!hasMove && event.clientX < window.innerWidth * 0.46) {
-      pointers.current.set(event.pointerId, { kind: 'move', ox: event.clientX, oy: event.clientY })
-      setStick({ x: event.clientX, y: event.clientY, kx: 0, ky: 0 })
+    if (!hasMove && at.x < localWidth() * 0.46) {
+      pointers.current.set(event.pointerId, { kind: 'move', ox: at.x, oy: at.y })
+      setStick({ x: at.x, y: at.y, kx: 0, ky: 0 })
     } else {
-      pointers.current.set(event.pointerId, { kind: 'look', lx: event.clientX, ly: event.clientY })
+      pointers.current.set(event.pointerId, { kind: 'look', lx: at.x, ly: at.y })
     }
     field.current?.setPointerCapture?.(event.pointerId)
   }
@@ -109,17 +125,18 @@ export function MobileControls({ hud }) {
     const p = pointers.current.get(event.pointerId)
     if (!p) return
     event.preventDefault()
+    const at = localPoint(event)
     if (p.kind === 'move') {
-      let kx = event.clientX - p.ox, ky = event.clientY - p.oy
+      let kx = at.x - p.ox, ky = at.y - p.oy
       const len = Math.hypot(kx, ky)
       if (len > STICK_RADIUS) { kx *= STICK_RADIUS / len; ky *= STICK_RADIUS / len }
       touch.move.x = kx / STICK_RADIUS
       touch.move.y = -ky / STICK_RADIUS
       setStick((s) => (s ? { ...s, kx, ky } : s))
     } else {
-      addLookDelta((event.clientX - p.lx) * LOOK_SENSITIVITY, (event.clientY - p.ly) * LOOK_SENSITIVITY)
-      p.lx = event.clientX
-      p.ly = event.clientY
+      addLookDelta((at.x - p.lx) * LOOK_SENSITIVITY, (at.y - p.ly) * LOOK_SENSITIVITY)
+      p.lx = at.x
+      p.ly = at.y
     }
   }
 
