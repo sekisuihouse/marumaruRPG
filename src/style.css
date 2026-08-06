@@ -309,12 +309,13 @@ main.screen-rotated{overflow:hidden}
 /* 右端のスロット列を避けるため、円弧全体はその内側(right:80px〜)に置く */
 .mc-attack{right:80px;bottom:104px;width:var(--mc-attack);height:var(--mc-attack);font-size:16px;
   border-color:#ffe9b8;background:radial-gradient(circle at 50% 28%,#2c5f80f2,#0b1f2ff2)}
-.mc-jump{right:14px;bottom:18px;width:var(--mc-small);height:var(--mc-small)}
+.mc-jump{right:14px;bottom:18px;width:var(--mc-small);height:var(--mc-small);font-size:11px}
 .mc-skill{right:190px;bottom:168px;width:var(--mc-mid);height:var(--mc-mid)}
 .mc-burst{right:274px;bottom:104px;width:var(--mc-mid);height:var(--mc-mid)}
 .mc-sprint{right:196px;bottom:30px;width:var(--mc-small);height:var(--mc-small);font-size:11px}
-.mc-guard{right:272px;bottom:22px;width:50px;height:50px}
-.mc-heal{right:340px;bottom:52px;width:50px;height:50px}
+.mc-dodge{right:268px;bottom:26px;width:50px;height:50px}
+.mc-guard{right:334px;bottom:20px;width:50px;height:50px}
+.mc-heal{right:392px;bottom:52px;width:50px;height:50px}
 
 /* 原神のキャラ切替列と同じ、右端の縦並び */
 .mc-slots{position:absolute;right:8px;top:56px;display:flex;flex-direction:column;gap:7px;pointer-events:none}
@@ -339,8 +340,9 @@ main.screen-rotated{overflow:hidden}
   .mc-skill{right:168px;bottom:132px}
   .mc-burst{right:240px;bottom:84px}
   .mc-sprint{right:172px;bottom:20px}
-  .mc-guard{right:240px;bottom:16px;width:44px;height:44px}
-  .mc-heal{right:300px;bottom:36px;width:44px;height:44px}
+  .mc-dodge{right:236px;bottom:16px;width:44px;height:44px}
+  .mc-guard{right:292px;bottom:14px;width:44px;height:44px}
+  .mc-heal{right:344px;bottom:38px;width:44px;height:44px}
   .mc-slots{top:60px;gap:6px}
   .mc-slots .mc-slot{width:46px;height:46px}
   .mc-interact{bottom:186px;right:110px;padding:7px 11px;font-size:11px}

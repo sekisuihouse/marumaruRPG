@@ -7,7 +7,7 @@
  */
 export const DEFAULT_BINDINGS = Object.freeze({
   moveForward: ['KeyW'], moveBackward: ['KeyS'], moveLeft: ['KeyA'], moveRight: ['KeyD'],
-  sprint: ['ShiftLeft', 'ShiftRight'], dodge: ['Space'], interact: ['KeyE'],
+  sprint: ['ShiftLeft', 'ShiftRight'], jump: ['Space'], dodge: ['KeyX'], interact: ['KeyE'],
   meleeAttack: ['KeyF'], guard: ['KeyV'], heal: ['KeyC'],
   webSwing: ['KeyQ'], useAbility: ['KeyR'],
   ability1: ['Digit1'], ability2: ['Digit2'], ability3: ['Digit3'], ability4: ['Digit4'],
@@ -24,6 +24,7 @@ export const ACTION_META = [
   { id: 'moveLeft', group: '基本操作', label: '左へ移動' },
   { id: 'moveRight', group: '基本操作', label: '右へ移動' },
   { id: 'sprint', group: '基本操作', label: 'ダッシュ' },
+  { id: 'jump', group: '基本操作', label: 'ジャンプ' },
   { id: 'dodge', group: '基本操作', label: '回避ローリング' },
   { id: 'interact', group: '基本操作', label: '話す・調べる' },
   { id: 'meleeAttack', group: '戦闘', label: '近接攻撃' },
@@ -42,12 +43,12 @@ export const ACTION_META = [
 ]
 
 const CODE_LABEL = {
-  KeyW: 'W', KeyA: 'A', KeyS: 'S', KeyD: 'D', KeyE: 'E', KeyF: 'F', KeyQ: 'Q', KeyR: 'R', KeyC: 'C', KeyV: 'V', KeyP: 'P',
+  KeyW: 'W', KeyA: 'A', KeyS: 'S', KeyD: 'D', KeyE: 'E', KeyF: 'F', KeyQ: 'Q', KeyR: 'R', KeyC: 'C', KeyV: 'V', KeyP: 'P', KeyX: 'X',
   ShiftLeft: 'Shift', ShiftRight: 'Shift', Space: 'Space',
   Digit1: '1', Digit2: '2', Digit3: '3', Digit4: '4', KeyM: 'M', KeyJ: 'J', Escape: 'Esc', F1: 'F1',
 }
 const KEY_FALLBACK = {
-  w: 'KeyW', a: 'KeyA', s: 'KeyS', d: 'KeyD', e: 'KeyE', f: 'KeyF', q: 'KeyQ', r: 'KeyR', c: 'KeyC', v: 'KeyV', p: 'KeyP',
+  w: 'KeyW', a: 'KeyA', s: 'KeyS', d: 'KeyD', e: 'KeyE', f: 'KeyF', q: 'KeyQ', r: 'KeyR', c: 'KeyC', v: 'KeyV', p: 'KeyP', x: 'KeyX',
   m: 'KeyM', j: 'KeyJ', '1': 'Digit1', '2': 'Digit2', '3': 'Digit3', '4': 'Digit4',
   shift: 'ShiftLeft', control: 'ControlLeft', ctrl: 'ControlLeft', ' ': 'Space', spacebar: 'Space',
   escape: 'Escape', esc: 'Escape', f1: 'F1',
@@ -100,6 +101,20 @@ export function setBindings(next = {}) {
   const merged = cloneDefaults()
   for (const id of Object.keys(DEFAULT_BINDINGS)) {
     if (Array.isArray(next[id]) && next[id].length) merged[id] = [...new Set(next[id].filter((code) => typeof code === 'string' && code.length))]
+  }
+  // あとから増えたアクションの既定キーが、それを知らない古いセーブの別アクションと
+  // 重なると、1つのキーで2つ動いてしまう（ジャンプ追加時の Space など）。
+  // セーブが知らないアクションの既定キーは、他のアクションから外す。
+  for (const id of Object.keys(DEFAULT_BINDINGS)) {
+    if (Array.isArray(next[id]) && next[id].length) continue
+    const own = new Set(DEFAULT_BINDINGS[id])
+    for (const other of Object.keys(merged)) {
+      if (other === id) continue
+      const kept = merged[other].filter((code) => !own.has(code))
+      if (kept.length === merged[other].length) continue
+      // 取り上げた結果キーが無くなるなら、そのアクションは既定へ戻す
+      merged[other] = kept.length ? kept : [...DEFAULT_BINDINGS[other]]
+    }
   }
   bindings = merged
   clearKeys()

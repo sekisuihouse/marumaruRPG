@@ -12,6 +12,12 @@ import { QUESTS } from '../data/quests.js'
 import { spawnPoint, findLandmark, randomPointNear, groundY, nearestWalkable } from './nav.js'
 import { xpForLevel } from './combat.js'
 
+/**
+ * 三人称カメラの定位置の見下ろし角。
+ * 基本は主人公の後ろ上から見て、歩き出すと step.js がここへ戻す。
+ */
+export const CAMERA_HOME_PITCH = 0.34
+
 export const MAX_FLOATERS = 14
 export const MAX_MESSAGES = 5
 
@@ -168,8 +174,7 @@ export const sim = {
   /** 画面中央に数秒だけ出す「いま何をすべきか」。ボスのフェーズ切替で差し替わる。 */
   objectiveBanner: null,
   quests: {},
-  // 正面より少し上を見る初期角。以前の0.42(約24°下向き)より地平・高所を見つけやすい。
-  camera: { yaw: Math.PI, pitch: 0.28, dist: 9, target: new THREE.Vector3(), profile: 'normal' },
+  camera: { yaw: Math.PI, pitch: CAMERA_HOME_PITCH, dist: 9, target: new THREE.Vector3(), profile: 'normal', lookedAt: -99 },
   dialogue: null,           // {npcId, nodeId}
   stats: { damageDealt: 0, damageTaken: 0, blocked: 0 },
   settings: {
@@ -290,6 +295,10 @@ export function resetPlayer(full = true) {
   p.overheatUntil = 0
   p.staggerImmuneUntil = 0
   if (p.web) { p.web.attached = false; p.web.zipping = false; p.web.partId = -1 }
+  // カメラも定位置（主人公の後ろ上）へ。復活直後に変な方向を向いたままにしない。
+  sim.camera.yaw = p.yaw + Math.PI
+  sim.camera.pitch = CAMERA_HOME_PITCH
+  sim.camera.lookedAt = -99
   if (full) {
     p.hp = p.maxHp
     p.mp = p.maxMp

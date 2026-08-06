@@ -232,6 +232,35 @@ try {
   await touch('touchEnd', [])
   check('攻撃ボタンで攻撃が出る', attacked === true, JSON.stringify(box))
 
+  // ── ジャンプ
+  await goHome()
+  const jb = await evalJs(`(() => { const r = document.querySelector('.mc-jump').getBoundingClientRect(); return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) } })()`)
+  const groundY = await evalJs('window.__sim.player.pos.y')
+  await touch('touchStart', [{ x: jb.x, y: jb.y, id: 20 }])
+  await touch('touchEnd', [])
+  await waitFrames(2)
+  const jumping = await evalJs('({ airborne: !!window.__sim.player.airborne, y: window.__sim.player.pos.y, vy: window.__sim.player.vy })')
+  check('ジャンプボタンで跳べる', jumping.airborne === true && jumping.y > groundY,
+    `y ${groundY.toFixed(2)} → ${jumping.y.toFixed(2)} / vy ${jumping.vy.toFixed(1)}`)
+  for (let i = 0; i < 40; i++) { if (!(await evalJs('!!window.__sim.player.airborne'))) break; await waitFrames(2) }
+  const landed = await evalJs('({ airborne: !!window.__sim.player.airborne, y: window.__sim.player.pos.y })')
+  check('跳んだあと着地して操作へ戻る', landed.airborne === false, JSON.stringify(landed))
+
+  // ── 歩くとカメラが主人公の後ろへ戻る
+  await goHome()
+  await evalJs('(() => { window.__sim.camera.yaw += 2.2; window.__sim.camera.lookedAt = -99; return true })()')
+  const camBefore = await evalJs('({ yaw: window.__sim.camera.yaw, pyaw: window.__sim.player.yaw })')
+  await touch('touchStart', [{ x: 160, y: 240, id: 21 }])
+  await touch('touchMove', [{ x: 160, y: 170, id: 21 }])
+  await waitFrames(10)
+  const camAfter = await evalJs('({ yaw: window.__sim.camera.yaw, pyaw: window.__sim.player.yaw })')
+  await touch('touchEnd', [])
+  const gap = (a, b) => Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)))
+  const wasOff = gap(camBefore.yaw, camBefore.pyaw + Math.PI)
+  const nowOff = gap(camAfter.yaw, camAfter.pyaw + Math.PI)
+  check('歩くとカメラが主人公の後ろへ戻る', nowOff < wasOff - 0.2,
+    `ずれ ${wasOff.toFixed(2)} → ${nowOff.toFixed(2)} rad`)
+
   // ── スロット切替（原神のキャラ切替列）
   const slot = await evalJs(`(() => { const r = document.querySelectorAll('.mc-slot')[1].getBoundingClientRect(); return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) } })()`)
   await touch('touchStart', [{ x: slot.x, y: slot.y, id: 6 }])

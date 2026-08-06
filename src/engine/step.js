@@ -5,7 +5,7 @@
  *   入力 → プレイヤー → 敵AI → 弾 → エフェクト → クエスト → HUD配信
  */
 import * as THREE from 'three'
-import { sim, publishHud, say, floater, addEffect, addProjectile, resetPlayer, isNight } from './sim.js'
+import { sim, publishHud, say, floater, addEffect, addProjectile, resetPlayer, isNight, CAMERA_HOME_PITCH } from './sim.js'
 import { actionActive, endFrame, isHeld, mouse, moveAxis, wasPressed } from './input.js'
 import { move, groundY, isWalkable, findLandmark, nearestWalkable } from './nav.js'
 import { PLAYER_ATTACKS } from '../data/enemies.js'
@@ -18,12 +18,12 @@ import { saveGame } from './save.js'
 import { damageTarget, explode } from './targets.js'
 import { updateDestruct, isInsideStructure } from './destruct.js'
 import { updateBosses } from './bosses.js'
-import { damageFinalBossAt, finalBossFooting, finalBossMounted, recoverFinalBossFall, updateFinalBoss, updateMountedPlayer } from './finalBoss.js'
+import { damageFinalBossAt, detachMountedPlayer, finalBossFooting, finalBossMounted, recoverFinalBossFall, updateFinalBoss, updateMountedPlayer } from './finalBoss.js'
 import { updateDebris } from './debris.js'
 import { updateRagdolls } from './ragdoll.js'
 import { updateJuice, timeScale } from './juice.js'
 import { updateFireStream, fireBlast } from './firestream.js'
-import { updateWeb, tryWebAttach, webRelease, isSwinging, aimDirection } from './webswing.js'
+import { updateWeb, updateFreeFall, tryWebAttach, webRelease, isSwinging, isWebAirborne, aimDirection } from './webswing.js'
 import { isGuest, tickMultiplayer, requestAttack } from '../net/hostAuthority.js'
 import { multiplayer } from '../net/multiplayerStore.js'
 import { DEBUG_PROP_SHOT_ASSETS, DEBUG_PROP_SHOT_ATTACK, DEBUG_PROP_SHOT_MAX_ACTIVE } from '../data/debugPropShot.js'
@@ -124,8 +124,14 @@ function publishThrottled(dt) {
 
 // ───────────────────────────── カメラ(三人称)
 
+/** 歩いている間に定位置へ戻る速さ(1/秒)。大きいほど強く引き戻す。 */
+const CAMERA_RECENTER = 2.2
+/** 最後に視点を動かしてから、この秒数は自動で戻さない。 */
+const CAMERA_LOOK_GRACE = 0.35
+
 function updateCamera(dt) {
   const c = sim.camera
+  if (mouse.dx || mouse.dy) c.lookedAt = sim.time
   if (mouse.dx) c.yaw -= mouse.dx * 0.005
   if (mouse.dy) c.pitch += mouse.dy * 0.004 * (sim.settings.invertY ? -1 : 1)
   if (mouse.wheel) c.dist += mouse.wheel * 0.9
@@ -136,6 +142,26 @@ function updateCamera(dt) {
   c.pitch = THREE.MathUtils.clamp(c.pitch, preview ? -1.45 : -1.42, preview ? 1.4 : 1.15)
   const profile = preview ? [1.5, 80] : c.profile === 'finalGround' ? [2.5, 6] : c.profile === 'finalMounted' ? [1, 3.5] : c.profile === 'finalCore' ? [1, 3] : c.profile === 'finalDeath' ? [2, 5] : [3.5, 16]
   c.dist = THREE.MathUtils.clamp(c.dist, profile[0], profile[1])
+
+  // 基本は主人公の後ろ上から見る三人称。見回しは一時的に効き、
+  // 歩き出すと自動でこの定位置へ戻る。指・マウスを動かしている間は割り込まない。
+  const p = sim.player
+  const looking = sim.time - (c.lookedAt ?? -99) < CAMERA_LOOK_GRACE
+  if (!preview && !p.dead && !looking && p.moveSpeed > 0.4) {
+    const want = p.yaw + Math.PI            // カメラは主人公の背後に回る
+    const diff = Math.atan2(Math.sin(want - c.yaw), Math.cos(want - c.yaw))
+    const k = Math.min(1, dt * CAMERA_RECENTER)
+    c.yaw += diff * k
+    c.pitch += (CAMERA_HOME_PITCH - c.pitch) * k
+  }
+}
+
+/** カメラを主人公の後ろ上へ即座に置き直す（開始・復活時）。 */
+export function resetCameraBehindPlayer() {
+  const c = sim.camera
+  c.yaw = sim.player.yaw + Math.PI
+  c.pitch = CAMERA_HOME_PITCH
+  c.lookedAt = -99
 }
 
 // ───────────────────────────── プレイヤー
@@ -182,10 +208,19 @@ function updatePlayer(dt) {
   else if (!isHeld('webSwing') && isSwinging()) webRelease(false)
   updateFireStream(dt, p.selectedAbility === 'firestream' && isHeld('useAbility'))
 
-  // ── 空中（スイング中・飛び出し中）は専用の物理で動かす
+  // ── ジャンプ。地上（ボスの身体の上を含む）からだけ跳べる。
+  if (wasPressed('jump') && !p.airborne && !p.dead && p.state !== 'roll' && p.state !== 'hit') {
+    if (finalBossMounted()) detachMountedPlayer(p.jumpSpeed)
+    else { p.airborne = true; p.vy = p.jumpSpeed }
+    p.tutorialActions.jump = true
+  }
+
+  // ── 空中（ジャンプ・スイング中・飛び出し中）は専用の物理で動かす
   if (p.airborne) {
     const axis = cameraRelative(moveAxis())
-    updateWeb(dt, axis)
+    // 糸に繋がっている間だけウェブの物理。ただのジャンプ・落下は自由落下側で動かす。
+    if (isWebAirborne()) updateWeb(dt, axis)
+    else updateFreeFall(dt, axis)
     // 落ちてきた先にボスの身体があれば、そこへ着地する
     if (!finalBossFooting()) recoverFinalBossFall()
     if (p.action) runPlayerAttack(dt)

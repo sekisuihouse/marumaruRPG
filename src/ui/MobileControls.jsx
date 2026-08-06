@@ -195,11 +195,12 @@ export function MobileControls({ hud }) {
         />}
       {/* 通常攻撃。最大の円 */}
       <TapButton className="mc-attack" label="攻撃" onFire={() => tryAttack('melee')} repeat />
-      {/* ジャンプの位置。このゲームでは回避ローリング */}
-      <TapButton className="mc-jump" label="回避" onFire={() => pulse('dodge')} />
+      {/* ジャンプ */}
+      <TapButton className="mc-jump" label="ジャンプ" onFire={() => pulse('jump')} />
       {/* ダッシュ */}
       <HoldButton action="sprint" className="mc-sprint" label="ダッシュ" />
       {/* 原神に無いこのゲーム固有の操作 */}
+      <TapButton className="mc-dodge" label="回避" onFire={() => pulse('dodge')} />
       <HoldButton action="guard" className="mc-guard" label="🛡" active={hud.blocking} />
       <TapButton className="mc-heal" label="✚" onFire={() => tryAttack('heal')} cooldown={cooldownOf('heal')} />
     </div>

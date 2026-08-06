@@ -213,6 +213,17 @@ try {
     return best.reach
   })()`)
   const before = await evalJs(`(() => { const s = window.__sim; return s ? [s.player.pos.x, s.player.pos.z] : null })()`)
+  // Space でジャンプできるか（回避は X へ移したので、1キーで両方動かないことも見る）
+  const groundY = await evalJs(`(() => window.__sim?.player.pos.y ?? null)()`)
+  await key('keyDown', ' ', 'Space', 32)
+  await key('keyUp', ' ', 'Space', 32)
+  await sleep(400)
+  const jumped = await evalJs(`(() => { const p = window.__sim?.player; return p ? { airborne: !!p.airborne, y: p.pos.y, rolling: p.state === 'roll' } : null })()`)
+  check('Spaceでジャンプする', !!jumped && jumped.airborne === true && jumped.y > groundY,
+    jumped ? `y ${groundY.toFixed(2)} → ${jumped.y.toFixed(2)}` : 'sim未公開')
+  check('Spaceで回避ローリングは出ない', !!jumped && jumped.rolling === false)
+  for (let i = 0; i < 40 && await evalJs(`!!window.__sim?.player.airborne`); i++) await sleep(250)
+
   await key('keyDown', 'w', 'KeyW', 87)
   await sleep(5000)
   await key('keyUp', 'w', 'KeyW', 87)

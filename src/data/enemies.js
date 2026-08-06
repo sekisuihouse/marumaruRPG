@@ -358,4 +358,6 @@ export const PLAYER_BASE = {
   /** 盾: 正面 blockAngle 度以内のダメージを blockReduction 分カットする */
   blockAngle: 120, blockReduction: 0.72, blockStaminaPerHit: 18,
   dodgeInvuln: 0.42, dodgeCost: 22, dodgeSpeed: 11,
+  /** ジャンプの初速(m/s)と、空中で進行方向を変えられる強さ */
+  jumpSpeed: 7.6, airControl: 5.5,
 }
