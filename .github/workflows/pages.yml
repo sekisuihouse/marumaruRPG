@@ -37,3 +37,7 @@ jobs:
           path: dist
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # 既定の10分では、Pages側のキューが混んでいるときに
+          # deployment_queued のまま打ち切られる。待てる時間を伸ばしておく。
+          timeout: 1800000
