@@ -31,7 +31,7 @@ export function FinalBossModel() {
       baseHeight = Math.max(baseHeight, (b.max.y - b.min.y) * sy)
       baseMinY = Math.min(baseMinY, e[13] + b.min.y * sy)
     })
-    // FBXの補助リグ境界は主スキン実寸の約5.03倍。主メッシュを36mへ合わせる補正。
+    // FBXの補助リグ境界は主スキン実寸の約5.03倍。主メッシュを指定全高へ合わせる補正。
     const scale = FINAL_BOSS.displayHeight / Math.max(0.001, baseHeight) * FINAL_BOSS.sourceRigBoundsRatio
     root.scale.setScalar(scale)
     root.position.y = -baseMinY * scale
