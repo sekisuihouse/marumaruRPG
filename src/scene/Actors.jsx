@@ -7,6 +7,7 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { CharacterModel } from '../gfx/CharacterModel.jsx'
 import { BossModel } from '../gfx/BossModel.jsx'
+import { FinalBossModel } from '../gfx/FinalBossModel.jsx'
 import { Nameplate } from '../gfx/Nameplate.jsx'
 import { sim } from '../engine/sim.js'
 import { multiplayer, subscribeMultiplayer, multiplayerSnapshot } from '../net/multiplayerStore.js'
@@ -58,7 +59,13 @@ export function EnemyActors() {
 }
 
 export function BossActors() {
-  return <>{(sim.bosses || []).map((b, i) => <BossActor key={b.id} index={i} />)}</>
+  return <>{(sim.bosses || []).map((b, i) => <BossActor key={b.id} index={i} />)}<FinalBossActor /></>
+}
+
+function FinalBossActor() {
+  const [visible, setVisible] = React.useState(() => !!sim.finalBoss?.spawned)
+  useFrame(() => { const next = !!sim.finalBoss?.spawned; if (next !== visible) setVisible(next) })
+  return visible ? <FinalBossModel /> : null
 }
 
 /** 接続人数に応じて増減する参加者。join/leave時だけReactツリーを更新する。 */

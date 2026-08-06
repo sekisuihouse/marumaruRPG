@@ -55,13 +55,13 @@ const crossings = () => (bridgeCells ||= riverCrossings(ARENA.bridgeSpan, ARENA.
  * 中心から届く範囲で闘技場を作る。プレイヤーが場外になるときだけ半径を広げる。
  * それでも入らなければ（対岸にいる等）プレイヤーを中心にして作り直す。
  */
-function buildArena(center, player) {
+function buildArena(center, player, initialRadius = ARENA.radius) {
   const bridges = crossings()
   // 空中（建物の上など）に居ても判定できるよう、最寄りの歩けるセルで見る
   const foot = nearestWalkable(player.x, player.z)
   const k = cellIndexAt(foot.x, foot.z)
   let last = null
-  for (let radius = ARENA.radius; radius <= ARENA.maxRadius; radius *= 1.5) {
+  for (let radius = initialRadius; radius <= ARENA.maxRadius; radius *= 1.5) {
     last = arenaRegion(center.x, center.z, radius, { crossings: bridges })
     if (last.reached > 0 && k >= 0 && last.inside[k]) return { region: last, center, radius }
   }
@@ -79,7 +79,7 @@ export function lockArena(boss) {
   const a = arena()
   if (a.active) return false
   const wanted = boss?.pos ? { x: boss.pos.x, z: boss.pos.z } : { x: sim.player.pos.x, z: sim.player.pos.z }
-  const built = isNavReady() ? buildArena(wanted, sim.player.pos) : null
+  const built = isNavReady() ? buildArena(wanted, sim.player.pos, Math.min(ARENA.maxRadius, boss?.def?.arenaRadius || ARENA.radius)) : null
   const region = built?.region
   const center = built?.center || wanted
   if (!region || !region.reached) {

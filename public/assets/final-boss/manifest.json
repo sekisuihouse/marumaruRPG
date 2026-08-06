@@ -1,0 +1,67 @@
+{
+  "model": "assets/final-boss/final-boss.glb",
+  "source": "bosstiu",
+  "mesh": {
+    "vertices": 46895,
+    "polygons": 93790
+  },
+  "bones": 41,
+  "clips": {
+    "idle": {
+      "source": "Walking.fbx",
+      "name": "idle",
+      "duration": 1.9,
+      "loop": true,
+      "speed": 0.16,
+      "event": null
+    },
+    "walk": {
+      "source": "Walking.fbx",
+      "name": "walk",
+      "duration": 1.9,
+      "loop": true,
+      "speed": 1.0,
+      "event": null
+    },
+    "swagger": {
+      "source": "Swagger Walk.fbx",
+      "name": "swagger",
+      "duration": 5.567,
+      "loop": false,
+      "speed": 1.0,
+      "event": null
+    },
+    "stomp": {
+      "source": "Stomp.fbx",
+      "name": "stomp",
+      "duration": 3.733,
+      "loop": false,
+      "speed": 1.0,
+      "event": 0.62
+    },
+    "throw": {
+      "source": "Throw Object.fbx",
+      "name": "throw",
+      "duration": 9.733,
+      "loop": false,
+      "speed": 1.35,
+      "event": 0.68
+    },
+    "swat": {
+      "source": "Swatting Bugs.fbx",
+      "name": "swat",
+      "duration": 13.333,
+      "loop": false,
+      "speed": 1.5,
+      "event": 0.48
+    },
+    "death": {
+      "source": "Two Handed Sword Death.fbx",
+      "name": "death",
+      "duration": 4.8,
+      "loop": false,
+      "speed": 0.4,
+      "event": null
+    }
+  }
+}
