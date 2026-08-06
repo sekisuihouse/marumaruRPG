@@ -7,6 +7,7 @@
  */
 import * as THREE from 'three'
 import { ENEMY_LIST, PLAYER_BASE, pickVariant, PLAYER_ATTACKS, enemyHpMul } from '../data/enemies.js'
+import { FINAL_PHASE_OBJECTIVES } from '../data/finalBoss.js'
 import { QUESTS } from '../data/quests.js'
 import { spawnPoint, findLandmark, randomPointNear, groundY, nearestWalkable } from './nav.js'
 import { xpForLevel } from './combat.js'
@@ -162,6 +163,8 @@ export const sim = {
   messages: [],
   levelUpNotice: null,
   tutorialCompleteUntil: 0,
+  /** 画面中央に数秒だけ出す「いま何をすべきか」。ボスのフェーズ切替で差し替わる。 */
+  objectiveBanner: null,
   quests: {},
   // 正面より少し上を見る初期角。以前の0.42(約24°下向き)より地平・高所を見つけやすい。
   camera: { yaw: Math.PI, pitch: 0.28, dist: 9, target: new THREE.Vector3(), profile: 'normal' },
@@ -406,7 +409,7 @@ function emptySnapshot() {
     level: 1, xp: 0, xpNext: 1, gold: 0, skills: [], cooldowns: {},
     messages: [], quests: [], mode: 'play', dialogue: null, dead: false,
     dayTime: 0, isNight: false, enemies: [], settings: sim.settings,
-    blocking: false, kills: 0, deaths: 0, nearest: null, items: {}, levelUp: null, tutorialComplete: false,
+    blocking: false, kills: 0, deaths: 0, nearest: null, items: {}, levelUp: null, objectiveBanner: null, tutorialComplete: false,
     heat: 0, overheat: false, swinging: false, canWeb: false, brokenParts: 0, debris: 0, bosses: [], finalBoss: null, bossProgress: { defeatedBossCount: 0, buildingRatios: {} },
   }
 }
@@ -435,6 +438,7 @@ export function buildSnapshot() {
     settings: { ...sim.settings },
     nearest: sim.nearestNpc ? { id: sim.nearestNpc.id, name: sim.nearestNpc.name } : null,
     levelUp: sim.levelUpNotice && sim.time < sim.levelUpNotice.until ? { ...sim.levelUpNotice } : null,
+    objectiveBanner: sim.objectiveBanner && sim.time < sim.objectiveBanner.until ? { ...sim.objectiveBanner } : null,
     tutorialComplete: sim.time < sim.tutorialCompleteUntil,
     heat: Math.round(p.heat ?? 0),
     overheat: sim.time < (p.overheatUntil ?? 0),
@@ -446,7 +450,13 @@ export function buildSnapshot() {
     finalBoss: sim.finalBoss?.alive ? {
       id: sim.finalBoss.id, label: sim.finalBoss.label, hp: Math.max(0, Math.round(sim.finalBoss.hp)), maxHp: sim.finalBoss.maxHp,
       phase: sim.finalBoss.phase, state: sim.finalBoss.state, color: sim.finalBoss.def.color,
-      objective: sim.finalBoss.phase <= 1 ? '左右どちらかのすねを破壊' : sim.finalBoss.phase === 2 ? '身体を登り、祭導管を破壊' : sim.finalBoss.phase === 3 ? '視界冠と残る祭導管を破壊' : sim.finalBoss.phase === 4 ? '胸の祭核を破壊' : '手のひらまで降りる',
+      objective: FINAL_PHASE_OBJECTIVES[sim.finalBoss.phase] || '',
+      regen: sim.finalBoss.regen,
+      // 小片が登録済みならそちらが身体の実体。未登録（モデル読込前）はカプセル数で代用する。
+      bodyIntact: sim.finalBoss.chunks.length
+        ? sim.finalBoss.chunks.reduce((n, c) => n + (c.broken ? 0 : 1), 0)
+        : sim.finalBoss.body.reduce((n, s) => n + (s.broken ? 0 : 1), 0),
+      bodyTotal: sim.finalBoss.chunks.length || sim.finalBoss.body.length,
       parts: Object.values(sim.finalBoss.parts).map((part) => ({ id: part.id, label: part.label, hp: Math.max(0, part.hp), maxHp: part.maxHp, state: part.state, color: part.color })),
     } : null,
     bossProgress: { defeatedBossCount: sim.bossProgress?.defeatedBossCount || 0, buildingRatios: { ...(sim.bossProgress?.buildingRatios || {}) } },

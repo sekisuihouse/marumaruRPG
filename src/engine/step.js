@@ -18,7 +18,7 @@ import { saveGame } from './save.js'
 import { damageTarget, explode } from './targets.js'
 import { updateDestruct, isInsideStructure } from './destruct.js'
 import { updateBosses } from './bosses.js'
-import { damageFinalBossAt, finalBossMounted, recoverFinalBossFall, updateFinalBoss, updateMountedPlayer } from './finalBoss.js'
+import { damageFinalBossAt, finalBossFooting, finalBossMounted, recoverFinalBossFall, updateFinalBoss, updateMountedPlayer } from './finalBoss.js'
 import { updateDebris } from './debris.js'
 import { updateRagdolls } from './ragdoll.js'
 import { updateJuice, timeScale } from './juice.js'
@@ -131,9 +131,10 @@ function updateCamera(dt) {
   if (mouse.wheel) c.dist += mouse.wheel * 0.9
   // BOSS FORGE のプレビューは大きなボスを丸ごと見たいので、可動域を広げる
   const preview = sim.bossForge && !sim.bossForge.combat
-  // 通常プレイも上方向へ見上げられるよう、下限を0より下へ広げる。
-  c.pitch = THREE.MathUtils.clamp(c.pitch, preview ? -0.45 : -0.35, preview ? 1.4 : 1.15)
-  const profile = preview ? [1.5, 80] : c.profile === 'finalGround' ? [5, 18] : c.profile === 'finalMounted' ? [3.5, 12] : c.profile === 'finalCore' ? [3, 10] : c.profile === 'finalDeath' ? [5, 16] : [3.5, 16]
+  // 見上げ側(負)はほぼ真上まで開ける。巨大な最終ボスを首だけで見上げられるようにする。
+  // 実際にカメラが地面へ潜らないよう、急角度では ThirdPersonCamera が距離を詰める。
+  c.pitch = THREE.MathUtils.clamp(c.pitch, preview ? -1.45 : -1.42, preview ? 1.4 : 1.15)
+  const profile = preview ? [1.5, 80] : c.profile === 'finalGround' ? [2.5, 6] : c.profile === 'finalMounted' ? [1, 3.5] : c.profile === 'finalCore' ? [1, 3] : c.profile === 'finalDeath' ? [2, 5] : [3.5, 16]
   c.dist = THREE.MathUtils.clamp(c.dist, profile[0], profile[1])
 }
 
@@ -185,7 +186,8 @@ function updatePlayer(dt) {
   if (p.airborne) {
     const axis = cameraRelative(moveAxis())
     updateWeb(dt, axis)
-    recoverFinalBossFall()
+    // 落ちてきた先にボスの身体があれば、そこへ着地する
+    if (!finalBossFooting()) recoverFinalBossFall()
     if (p.action) runPlayerAttack(dt)
     return
   }
@@ -265,8 +267,11 @@ function updatePlayer(dt) {
     p.pos.x = n.x
     p.pos.z = n.z
   }
-  const gy = groundY(p.pos.x, p.pos.z, p.pos.y)
-  p.pos.y += (gy - p.pos.y) * Math.min(1, dt * 12)
+  // 足元にボスの身体があれば、そこが地面になる（歩いて足の甲へ登れる）
+  if (!finalBossFooting()) {
+    const gy = groundY(p.pos.x, p.pos.z, p.pos.y)
+    p.pos.y += (gy - p.pos.y) * Math.min(1, dt * 12)
+  }
   p.vel.set(moveX * speed, 0, moveZ * speed)
   p.moveSpeed = speed * Math.hypot(moveX, moveZ)
   if (p.moveSpeed > 0.25) p.tutorialActions[p.running ? 'run' : 'walk'] = true

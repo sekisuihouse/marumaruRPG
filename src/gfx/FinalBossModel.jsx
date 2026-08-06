@@ -3,9 +3,10 @@ import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import * as THREE from 'three'
-import { FINAL_BOSS, FINAL_CLIPS } from '../data/finalBoss.js'
+import { boneKey, FINAL_BOSS, FINAL_CLIPS } from '../data/finalBoss.js'
 import { sim } from '../engine/sim.js'
-import { updateFinalBossTransforms } from '../engine/finalBoss.js'
+import { registerFinalBossChunks, setFinalBossChunkSink, updateFinalBossTransforms } from '../engine/finalBoss.js'
+import { buildFinalBossChunks } from './finalBossChunks.js'
 
 const boneMatrices = {}
 const worldPos = new THREE.Vector3(), worldQuat = new THREE.Quaternion(), worldScale = new THREE.Vector3(), unitScale = new THREE.Vector3(1, 1, 1)
@@ -37,6 +38,19 @@ export function FinalBossModel() {
     root.position.y = -baseMinY * scale
     return root
   }, [gltf.scene])
+
+  // 身体を「建物の小片」相当へ分割する。壊れた小片はシェーダで描かれなくなり、
+  // その位置から破片・粉塵・破壊音が出る（destruct.js と同じ見え方）。
+  const carve = useMemo(() => {
+    const meshes = []
+    scene.traverse((o) => { if (o.isSkinnedMesh && o.visible) meshes.push(o) })
+    if (!meshes.length) return null
+    const built = buildFinalBossChunks(meshes)
+    if (!built?.bindHeight) return null
+    if (import.meta.env.DEV && typeof window !== 'undefined') window.__finalBossCarve = built
+    return built
+  }, [scene])
+  const registered = useRef(false)
   const mixer = useMemo(() => new THREE.AnimationMixer(scene), [scene])
   const actions = useMemo(() => Object.fromEntries(gltf.animations.map((clip) => [clip.name, mixer.clipAction(clip)])), [gltf.animations, mixer])
   const current = useRef(null)
@@ -66,11 +80,32 @@ export function FinalBossModel() {
     scene.traverse((o) => {
       if (!o.isBone) return
       o.matrixWorld.decompose(worldPos, worldQuat, worldScale)
-      // 表示用の巨大化スケールは足場の座標へ持ち込まず、位置と回転だけを渡す。
-      boneMatrices[o.name] = new THREE.Matrix4().compose(worldPos.clone(), worldQuat.clone(), unitScale)
+      // 表示用の巨大化スケールは判定へ持ち込まず、位置と回転だけを渡す。
+      // 名前は boneKey で正規化する（GLTFLoader が 'mixamorig:Hips' の ':' を落とすため）。
+      boneMatrices[boneKey(o.name)] = new THREE.Matrix4().compose(worldPos.clone(), worldQuat.clone(), unitScale)
     })
     boss.modelReady = Object.keys(boneMatrices).length > 0
     updateFinalBossTransforms(boneMatrices)
+
+    // 小片の登録と追従。ボスを作り直すと chunks が空になるので、その都度入れ直す。
+    if (carve) {
+      // 骨ローカル → ワールドの倍率。骨ローカルはアーマチュアの拡大ぶんだけ
+      // 引き伸ばされているので、バインド姿勢で測った倍率を掛けて戻す。
+      const unit = boss.visualHeight / carve.bindHeight * carve.bindScale
+      if (!registered.current || !boss.chunks.length) {
+        for (const built of carve.chunks) built.radius = Math.max(0.2, built.localRadius * unit)
+        setFinalBossChunkSink(carve)
+        registerFinalBossChunks(carve.chunks)
+        registered.current = true
+      }
+      for (let i = 0; i < carve.chunks.length; i++) {
+        const built = carve.chunks[i]
+        const bone = boneMatrices[built.boneName]
+        const chunk = boss.chunks[i]
+        if (!bone || !chunk) continue
+        chunk.world.set(built.localX * unit, built.localY * unit, built.localZ * unit).applyMatrix4(bone)
+      }
+    }
     scene.traverse((o) => {
       if (!o.isMesh || !o.material?.emissive) return
       o.material.emissive.set(boss.hitFlash > 0 ? '#7a2b15' : '#000000')

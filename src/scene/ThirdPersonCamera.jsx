@@ -11,6 +11,11 @@ import { sim } from '../engine/sim.js'
 import { groundY, cameraDistance } from '../engine/nav.js'
 
 const want = new THREE.Vector3()
+const aim = new THREE.Vector3()
+/** カメラ位置の回り込み下限。ここより下は視線だけを上へ振る。 */
+const ORBIT_MIN_PITCH = -0.38
+/** 視線方向を作るための仮想注視点までの距離(向きだけ使うので大きめで良い) */
+const AIM_REACH = 40
 
 export function ThirdPersonCamera() {
   const { camera } = useThree()
@@ -32,10 +37,13 @@ export function ThirdPersonCamera() {
     c.target.lerp(want, follow)
 
     const wanted = p.dead ? c.dist * 1.25 : c.dist
-    const cosP = Math.cos(c.pitch)
+    // カメラ位置の回り込みは水平より少し下までに留める。これ以上下げると
+    // 地面に潜って画角が寝るので、そこから先は「視線だけ」を上へ振る(下の aim)。
+    const orbitPitch = Math.max(c.pitch, ORBIT_MIN_PITCH)
+    const cosP = Math.cos(orbitPitch)
     // 注視点からカメラへ向かう単位ベクトル
     const dirX = Math.sin(c.yaw) * cosP
-    const dirY = Math.sin(c.pitch)
+    const dirY = Math.sin(orbitPitch)
     const dirZ = Math.cos(c.yaw) * cosP
     // 建物・地形にめり込む手前までしか離れない(ベイク済みの遮蔽高さを利用)
     const safe = cameraDistance(c.target.x, c.target.y, c.target.z, dirX, dirY, dirZ, wanted, 1.8)
@@ -72,7 +80,12 @@ export function ThirdPersonCamera() {
     if (py < floor) py = floor
 
     camera.position.set(px, py, pz)
-    camera.lookAt(c.target)
+    // 見たい仰角は常に -pitch。通常域では注視点と一致し、真上付近を向いたときだけ
+    // 注視点より上を見る。webswing の aimDirection() と同じ向きの定義。
+    const viewPitch = -c.pitch
+    const cosV = Math.cos(viewPitch)
+    aim.set(px - Math.sin(c.yaw) * cosV * AIM_REACH, py + Math.sin(viewPitch) * AIM_REACH, pz - Math.cos(c.yaw) * cosV * AIM_REACH)
+    camera.lookAt(aim)
   }, -5)
 
   return null
