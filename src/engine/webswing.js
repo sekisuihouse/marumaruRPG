@@ -221,6 +221,33 @@ function endZip(arrived) {
 }
 
 export const isSwinging = () => !!sim.player.web?.attached
+
+/** 糸に繋がっているか、ジップで飛んでいる最中か。 */
+export const isWebAirborne = () => !!(sim.player.web?.attached || sim.player.web?.zipping)
+
+/**
+ * 糸を使っていない空中（ジャンプ・落下）。
+ * 着地・壁・場外復帰は moveAirborne を共用するので、ウェブと挙動がズレない。
+ */
+export function updateFreeFall(dt, axis) {
+  const p = sim.player
+  if (!p.airborne) return false
+  if (p.dead) { p.airborne = false; p.vy = 0; return false }
+
+  // 空中制御は控えめ。地上の機動力をそのまま持ち込ませない。
+  if (axis && axis.len > 0.01) {
+    const want = (p.running ? p.runSpeed : p.walkSpeed) * axis.len
+    const k = Math.min(1, dt * (p.airControl ?? 5.5))
+    p.vel.x += (axis.x * want - p.vel.x) * k
+    p.vel.z += (axis.z * want - p.vel.z) * k
+    p.yaw = Math.atan2(axis.x, axis.z)
+  }
+  p.vy -= W.gravity * dt
+  moveAirborne(dt, false)
+  p.moveSpeed = Math.hypot(p.vel.x, p.vel.z)
+  if (p.airborne) p.anim = 'run'
+  return true
+}
 export const isZipping = () => !!sim.player.web?.zipping
 /** 糸が伸びている状態（描画用）: 接続中またはジップ中 */
 export const webLineActive = () => !!(sim.player.web?.attached || sim.player.web?.zipping)
