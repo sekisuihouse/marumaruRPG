@@ -66,8 +66,29 @@ const virtual = Object.create(null)
 const latched = Object.create(null)
 export const mouse = { dx: 0, dy: 0, wheel: 0, dragging: false }
 
-/** スマホの補助ボタン用。PCの必須操作には使わない。 */
+/** スマホの移動スティック。PCの必須操作には使わない。 */
 export const touch = { move: { x: 0, y: 0 } }
+
+/**
+ * スマホの視点ドラッグ。原神と同じく画面右側をなぞるとカメラが回る。
+ * Pointer Lock はモバイルで使えないため、HUD 側が指の移動量をここへ渡す。
+ * 反転設定や感度は updateCamera 側で一括して掛かる（マウスと同じ経路）。
+ */
+export function addLookDelta(dx, dy) {
+  mouse.dx += dx
+  mouse.dy += dy
+}
+
+/**
+ * 主な入力がタッチか。CSS の pointer:coarse と同じ判定にする。
+ * maxTouchPoints だけで見ると、マウス付きのタッチ対応PCまでスマホUIになるので使わない
+ * （そういう端末は主ポインタが fine と報告される）。
+ */
+export const isTouchDevice = () => {
+  if (typeof window === 'undefined') return false
+  if (window.matchMedia) return window.matchMedia('(pointer: coarse)').matches
+  return (navigator.maxTouchPoints || 0) > 0
+}
 let handlers = null
 
 export const bindingCodes = (action) => [...(bindings[action] || DEFAULT_BINDINGS[action] || DEBUG_BINDINGS[action] || [])]
@@ -192,6 +213,9 @@ export function attachInput(target = window, canvasEl = null, options = {}) {
   const onPointerLockChange = () => { if (document.pointerLockElement !== el) clearKeys() }
   const onWheel = (event) => { mouse.wheel += Math.sign(event.deltaY); event.preventDefault() }
   const onPointerDown = (event) => {
+    // 指の操作はモバイルHUD(MobileControls)が受け持つ。Pointer Lock はモバイルで
+    // 使えず、ここで dragging を立てると視点が二重に動くので触らない。
+    if (event.pointerType === 'touch') return
     // クリックは攻撃に使わず、3Dカメラ用の Pointer Lock を開始するだけ。
     // BOSS FORGEの編集画面など、UIを操作するモードではカーソルを保持する。
     if (options.allowPointerLock && !options.allowPointerLock()) {
@@ -207,6 +231,7 @@ export function attachInput(target = window, canvasEl = null, options = {}) {
   }
   const onPointerUp = () => { mouse.dragging = false }
   const onPointerMove = (event) => {
+    if (event.pointerType === 'touch') return
     if (document.pointerLockElement !== el && !mouse.dragging) return
     mouse.dx += event.movementX || 0
     mouse.dy += event.movementY || 0

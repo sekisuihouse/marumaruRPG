@@ -6,7 +6,8 @@ import React, { useEffect, useState, useSyncExternalStore } from 'react'
 import { sim, subscribeHud, getHudSnapshot, publishHud } from '../engine/sim.js'
 import { PLAYER_ATTACKS, ELEMENTS, ENEMY_TYPES, ENEMY_BALANCE } from '../data/enemies.js'
 import { QUESTS, ITEMS } from '../data/quests.js'
-import { ACTION_META, bindingCodes, bindingConflicts, bindingLabel, bindingsSnapshot, clearKeys, resetBindings, setBinding, setInputContext, setVirtualAction, touch } from '../engine/input.js'
+import { ACTION_META, bindingCodes, bindingConflicts, bindingLabel, bindingsSnapshot, clearKeys, isTouchDevice, resetBindings, setBinding, setInputContext, setVirtualAction } from '../engine/input.js'
+import { MobileControls } from './MobileControls.jsx'
 import { findAnchor } from '../engine/webswing.js'
 import { tryAttack } from '../engine/step.js'
 import { dialogueView, chooseDialogue, closeDialogue, useItem } from '../engine/quests.js'
@@ -81,10 +82,15 @@ export function Hud({ onRequestPointerLock }) {
   }, [showHelp, showQuests, hud.mode])
 
   const dialogue = hud.mode === 'dialogue' ? dialogueView() : null
+  // タッチ端末は原神と同じ操作系(MobileControls)へ丸ごと差し替える。
+  // 判定は初回だけで固定し、途中で操作系が入れ替わらないようにする。
+  const [touchUi] = useState(isTouchDevice)
+  const playing = !showHelp && !showQuests && !dialogue && hud.mode === 'play'
   const cls = [
     'hud',
     hud.settings.largeText ? 'large-text' : '',
     hud.settings.highContrast ? 'high-contrast' : '',
+    touchUi ? 'touch-ui' : '',
   ].join(' ')
 
   return (
@@ -115,9 +121,9 @@ export function Hud({ onRequestPointerLock }) {
 
       <Minimap large={bigMap} />
 
-      <CombatHud hud={hud} />
-      <ContextHint hud={hud} />
-      <VirtualJoystick />
+      {touchUi
+        ? playing && <MobileControls hud={hud} />
+        : <><CombatHud hud={hud} /><ContextHint hud={hud} /></>}
 
       <Shockwave />
 
@@ -157,31 +163,6 @@ function FinalBossHud({ boss }) {
       ? <div className="final-parts"><span>身体 残り {boss.bodyIntact}/{boss.bodyTotal}</span></div>
       : <div className="final-parts">{live.map((part) => <span key={part.id}>{part.label} {Math.ceil(part.hp / part.maxHp * 100)}%</span>)}</div>}
   </section>
-}
-
-function VirtualJoystick() {
-  const pad = React.useRef()
-  const [knob, setKnob] = useState({ x: 0, y: 0 })
-  const move = (event) => {
-    const box = pad.current?.getBoundingClientRect()
-    if (!box) return
-    const radius = box.width * 0.36
-    let x = event.clientX - (box.left + box.width / 2), y = event.clientY - (box.top + box.height / 2)
-    const len = Math.hypot(x, y)
-    if (len > radius) { x *= radius / len; y *= radius / len }
-    touch.move.x = x / radius; touch.move.y = -y / radius
-    setKnob({ x, y })
-  }
-  const down = (event) => { event.preventDefault(); pad.current?.setPointerCapture?.(event.pointerId); move(event) }
-  const up = () => { touch.move.x = 0; touch.move.y = 0; setKnob({ x: 0, y: 0 }) }
-  useEffect(() => {
-    const hidden = () => { if (document.hidden) up() }
-    document.addEventListener('visibilitychange', hidden)
-    return () => { document.removeEventListener('visibilitychange', hidden); up() }
-  }, [])
-  return <div ref={pad} className="virtual-joystick" aria-label="移動スティック" onPointerDown={down} onPointerMove={(e) => { if (e.buttons || e.pointerType === 'touch') move(e) }} onPointerUp={up} onPointerCancel={up}>
-    <i style={{ transform: `translate(${knob.x}px,${knob.y}px)` }} />
-  </div>
 }
 
 function HoldActionButton({ action, children, active = false, className = '' }) {

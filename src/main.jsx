@@ -19,7 +19,7 @@ import { sim, initEnemies, initQuests, resetPlayer, setPlayerDebugLevel, publish
 import { initNpcs } from './engine/step.js'
 import { stepSim } from './engine/step.js'
 import { ACTION_META, attachInput, bindingLabel, setBindings, setDebugInputEnabled } from './engine/input.js'
-import { keys } from './engine/input.js'
+import { isHeld, keys, touch } from './engine/input.js'
 import { readSave, applySave, deleteSave, saveGame } from './engine/save.js'
 import { initDebris } from './engine/debris.js'
 import { initRagdolls } from './engine/ragdoll.js'
@@ -310,6 +310,8 @@ if (typeof window !== 'undefined') {
     // ネットワーク診断の入口。__marugoto.net.stats() で接続段階から補間まで一望できる
     window.__marugoto.net = { stats: netDiagnostics, inputs: bossesApiNet.debugRemoteInputs, keepAlive: keepAliveRunning }
     window.__marugoto.keys = keys
+    // スマホ操作の外部検証用。動的importだと別インスタンスを掴むので、実体をそのまま渡す。
+    window.__marugoto.input = { touch, isHeld }
     // 接地・通行判定の外部検証用（カメラが地面へ沈まないか等）
     window.__marugoto.nav = { groundY: navGroundY, isWalkable: navIsWalkable }
     window.__marugoto.killPlayer = () => import('./engine/damage.js').then((m) => m.killPlayer())
