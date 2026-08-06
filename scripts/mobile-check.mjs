@@ -239,9 +239,19 @@ try {
   await touch('touchStart', [{ x: jb.x, y: jb.y, id: 20 }])
   await touch('touchEnd', [])
   await waitFrames(2)
-  const jumping = await evalJs('({ airborne: !!window.__sim.player.airborne, y: window.__sim.player.pos.y, vy: window.__sim.player.vy })')
+  const jumping = await evalJs('({ airborne: !!window.__sim.player.airborne, y: window.__sim.player.pos.y, vy: window.__sim.player.vy, invuln: window.__sim.player.invuln })')
   check('ジャンプボタンで跳べる', jumping.airborne === true && jumping.y > groundY,
     `y ${groundY.toFixed(2)} → ${jumping.y.toFixed(2)} / vy ${jumping.vy.toFixed(1)}`)
+  check('ジャンプに回避の無敵が付く', jumping.invuln > 0, `無敵 ${jumping.invuln.toFixed(2)}秒`)
+  // スタミナが尽きていても、移動手段としては跳べる（無敵は付かない）
+  await evalJs('(() => { const p = window.__sim.player; p.stamina = 0; return true })()')
+  for (let i = 0; i < 40 && await evalJs('!!window.__sim.player.airborne'); i++) await waitFrames(2)
+  await evalJs('(() => { const p = window.__sim.player; p.stamina = 0; p.invuln = 0; return true })()')
+  await touch('touchStart', [{ x: jb.x, y: jb.y, id: 24 }])
+  await touch('touchEnd', [])
+  await waitFrames(2)
+  const tired = await evalJs('({ airborne: !!window.__sim.player.airborne, invuln: window.__sim.player.invuln })')
+  check('スタミナ切れでも跳べる（無敵は付かない）', tired.airborne === true && tired.invuln <= 0.001, JSON.stringify(tired))
   for (let i = 0; i < 40; i++) { if (!(await evalJs('!!window.__sim.player.airborne'))) break; await waitFrames(2) }
   const landed = await evalJs('({ airborne: !!window.__sim.player.airborne, y: window.__sim.player.pos.y })')
   check('跳んだあと着地して操作へ戻る', landed.airborne === false, JSON.stringify(landed))
