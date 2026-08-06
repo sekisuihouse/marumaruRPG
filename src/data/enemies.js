@@ -360,4 +360,9 @@ export const PLAYER_BASE = {
   dodgeInvuln: 0.42, dodgeCost: 22, dodgeSpeed: 11,
   /** ジャンプの初速(m/s)と、空中で進行方向を変えられる強さ */
   jumpSpeed: 7.6, airControl: 5.5,
+  /**
+   * ジャンプも回避扱い。跳んだ瞬間に回避と同じ無敵が付く。
+   * スタミナが足りないときは跳べるが無敵は付かない（移動手段としては常に使える）。
+   */
+  jumpInvuln: 0.42, jumpCost: 12,
 }

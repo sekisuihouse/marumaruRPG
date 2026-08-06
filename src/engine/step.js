@@ -241,6 +241,13 @@ function updatePlayer(dt) {
   if (wasPressed('jump') && !p.airborne && !p.dead && p.state !== 'roll' && p.state !== 'hit') {
     if (finalBossMounted()) detachMountedPlayer(p.jumpSpeed)
     else { p.airborne = true; p.vy = p.jumpSpeed }
+    // ジャンプも回避扱い。スタミナがあるときだけ無敵が付き、
+    // 足りなくても移動手段としては跳べる。
+    if (p.stamina >= p.jumpCost) {
+      p.stamina -= p.jumpCost
+      p.invuln = Math.max(p.invuln, p.jumpInvuln)
+      floater(p.pos, '回避', '#a8ffdf', 0.9)
+    }
     p.tutorialActions.jump = true
   }
 
