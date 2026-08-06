@@ -100,6 +100,11 @@ try {
   check('原神配置のボタンが揃っている', ui.attack && ui.skill && ui.burst && ui.jump && ui.sprint && ui.slots === 4,
     `攻撃/スキル/爆発/ジャンプ/ダッシュ + スロット${ui.slots}`)
 
+  // 入力モジュールの実体は開発ビルドだけが公開する。公開ビルドでは
+  // 「実際にプレイヤーが動いたか」など、観測できる結果だけで判定する。
+  const probe = await evalJs('!!window.__marugoto?.input')
+  if (!probe) console.log('     （公開ビルド：入力値の直接確認はスキップし、結果で判定します）')
+
   // ── 左半分：フローティングスティックで移動
   const before = await evalJs('({x: window.__sim.player.pos.x, z: window.__sim.player.pos.z})')
   await touch('touchStart', [{ x: 160, y: 240, id: 1 }])
@@ -108,9 +113,11 @@ try {
     const el = document.querySelector('.mc-stick')
     return { visible: !!el, moveX: Math.round(window.__marugoto?.touchMove?.x * 100) / 100 }
   })()`)
-  const axis = await evalJs(`(() => { const t = window.__marugoto.input.touch.move; return { x: Math.round(t.x * 100) / 100, y: Math.round(t.y * 100) / 100 } })()`)
+  const axis = probe
+    ? await evalJs(`(() => { const t = window.__marugoto.input.touch.move; return { x: Math.round(t.x * 100) / 100, y: Math.round(t.y * 100) / 100 } })()`)
+    : null
   check('左側を触るとスティックが出る', stick.visible === true)
-  check('スティックの入力が前進として入る', axis.y > 0.8, `move.y=${axis.y}`)
+  if (axis) check('スティックの入力が前進として入る', axis.y > 0.8, `move.y=${axis.y}`)
   await waitFrames(6)
   const after = await evalJs('({x: window.__sim.player.pos.x, z: window.__sim.player.pos.z})')
   const moved = Math.hypot(after.x - before.x, after.z - before.z)
@@ -131,12 +138,14 @@ try {
   await touch('touchStart', [{ x: 160, y: 240, id: 3 }])
   await touch('touchStart', [{ x: 160, y: 240, id: 3 }, { x: 620, y: 150, id: 4 }])
   await touch('touchMove', [{ x: 200, y: 240, id: 3 }, { x: 700, y: 150, id: 4 }])
-  const both = await evalJs(`({ moveX: Math.round(window.__marugoto.input.touch.move.x * 100) / 100 })`)
-  await waitFrames(2)
+  const posA = await evalJs('({x: window.__sim.player.pos.x, z: window.__sim.player.pos.z})')
+  await waitFrames(4)
   const yaw3 = await evalJs('window.__sim.camera.yaw')
+  const posB = await evalJs('({x: window.__sim.player.pos.x, z: window.__sim.player.pos.z})')
   await touch('touchEnd', [])
-  check('移動しながら視点を回せる', both.moveX > 0.5 && Math.abs(yaw3 - yaw2) > 0.1,
-    `move.x=${both.moveX} Δyaw=${(yaw3 - yaw2).toFixed(2)}`)
+  const movedBoth = Math.hypot(posB.x - posA.x, posB.z - posA.z)
+  check('移動しながら視点を回せる', movedBoth > 0.2 && Math.abs(yaw3 - yaw2) > 0.1,
+    `移動 ${movedBoth.toFixed(2)}m / Δyaw=${(yaw3 - yaw2).toFixed(2)}`)
 
   // ── 攻撃ボタン
   const box = await evalJs(`(() => { const r = document.querySelector('.mc-attack').getBoundingClientRect(); return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) } })()`)
@@ -156,10 +165,20 @@ try {
   // ── ダッシュ（長押し）
   const sp = await evalJs(`(() => { const r = document.querySelector('.mc-sprint').getBoundingClientRect(); return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) } })()`)
   await touch('touchStart', [{ x: sp.x, y: sp.y, id: 7 }])
-  const sprinting = await evalJs(`window.__marugoto.input.isHeld('sprint')`)
-  await touch('touchEnd', [])
-  const released = await evalJs(`window.__marugoto.input.isHeld('sprint')`)
-  check('ダッシュは押している間だけ効く', sprinting === true && released === false, `押下=${sprinting} 離す=${released}`)
+  if (probe) {
+    const sprinting = await evalJs(`window.__marugoto.input.isHeld('sprint')`)
+    await touch('touchEnd', [])
+    const released = await evalJs(`window.__marugoto.input.isHeld('sprint')`)
+    check('ダッシュは押している間だけ効く', sprinting === true && released === false, `押下=${sprinting} 離す=${released}`)
+  } else {
+    // 公開ビルドでは、走りながら移動して速度が上がることで確認する
+    await touch('touchStart', [{ x: sp.x, y: sp.y, id: 7 }, { x: 160, y: 240, id: 8 }])
+    await touch('touchMove', [{ x: sp.x, y: sp.y, id: 7 }, { x: 160, y: 160, id: 8 }])
+    await waitFrames(5)
+    const running = await evalJs('!!window.__sim.player.running')
+    await touch('touchEnd', [])
+    check('ダッシュボタンで走る', running === true, `running=${running}`)
+  }
 
   const shot = await send('Page.captureScreenshot', { format: 'png' }, sessionId)
   fs.writeFileSync('screenshot-mobile.png', Buffer.from(shot.data, 'base64'))
