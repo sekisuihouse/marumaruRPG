@@ -292,6 +292,51 @@ try {
     check('デバッグ時にPで町小道具弾を発射できる', debugKeySeen && debugPropShot.enabled && debugPropShot.fired > 0 && debugPropShot.count > 0 && Number.isInteger(debugPropShot.asset), JSON.stringify({ debugKeySeen, ...debugPropShot }))
   }
 
+  if (URL_TARGET.includes('finalBoss=1')) {
+    const spawned = await evalJs(`(async () => {
+      const m = await import('/src/engine/finalBoss.js'); const s = window.__sim
+      for (const b of s.bosses) { b.spawned = true; b.alive = false; b.defeated = true }
+      s.bossProgress.defeatedBossCount = 4; s.bossProgress.order = ['student','stage','shrine','food']
+      s.player.items = { prototype_core:1, stage_pass:1, boundary_seal:1, chef_medal:1 }
+      m.updateFinalBoss(6.1); return { alive:s.finalBoss.alive, phase:s.finalBoss.phase }
+    })()`)
+    await sleep(12000)
+    const finalRender = await evalJs(`(() => {
+      const s = window.__sim; let mesh = null
+      window.__three.scene.traverse((o) => { if (o.isSkinnedMesh && o.visible && o.skeleton?.bones?.length === 41 && o.geometry?.attributes?.position?.count > 1000) mesh = o })
+      if (mesh && !mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox()
+      const e = mesh?.matrixWorld?.elements || []; const sy = Math.hypot(e[4] || 0, e[5] || 0, e[6] || 0)
+      const height = mesh ? (mesh.geometry.boundingBox.max.y - mesh.geometry.boundingBox.min.y) * sy : 0
+      return { model:!!mesh, bones:mesh?.skeleton?.bones?.length || 0, height, hud:!!document.querySelector('.final-boss-hud'), phase:s.finalBoss?.phase, profile:s.camera.profile }
+    })()`)
+    check('4ボス撃破後に最終ボスが出現する', spawned.alive && spawned.phase === 1, JSON.stringify(spawned))
+    check('最終ボスGLBが41本骨のスキンとして描画される', finalRender.model && finalRender.bones === 41, JSON.stringify(finalRender))
+    check('最終ボスが既存キャラより十分巨大に表示される', finalRender.height > 25 && finalRender.height < 50, `${finalRender.height.toFixed(1)}m`)
+    check('最終ボス専用HUDとカメラプロファイルが有効', finalRender.hud && finalRender.profile === 'finalGround', JSON.stringify(finalRender))
+    const damageVisual = await evalJs(`(async () => {
+      const s = window.__sim
+      Object.assign(s.finalBoss.parts.shinR, { state:'broken', broken:true, hp:0 })
+      Object.assign(s.finalBoss.parts.armL, { state:'wounded', hp:s.finalBoss.parts.armL.maxHp * 0.4 })
+      await new Promise((resolve) => setTimeout(resolve, 1200))
+      return { alive:s.finalBoss.alive, shin:s.finalBoss.parts.shinR.state, arm:s.finalBoss.parts.armL.state, broken:window.__three.scene.getObjectByName('final-break-shinR')?.visible, wounded:window.__three.scene.getObjectByName('final-wound-armL')?.visible }
+    })()`)
+    check('傷と欠損が本体上へ恒久表示される', damageVisual.broken && damageVisual.wounded, JSON.stringify(damageVisual))
+    await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true }, sessionId)
+    await sleep(250)
+    const mobile = await evalJs(`(() => {
+      const stick = document.querySelector('.virtual-joystick'); const box = stick?.getBoundingClientRect()
+      stick?.dispatchEvent(new PointerEvent('pointermove', { bubbles:true, pointerType:'touch', buttons:1, clientX:(box?.left||0)+(box?.width||0)*0.8, clientY:(box?.top||0)+(box?.height||0)*0.3 }))
+      const value = { ...window.__marugoto.keys, x: window.__sim ? null : null }
+      return { visible:getComputedStyle(stick).display !== 'none', width:innerWidth, moved:stick && box.width > 80 }
+    })()`)
+    check('スマホ縦画面で仮想ジョイスティックが表示される', mobile.visible && mobile.width === 390 && mobile.moved, JSON.stringify(mobile))
+    await send('Emulation.setDeviceMetricsOverride', { width: 844, height: 390, deviceScaleFactor: 2, mobile: true }, sessionId)
+    await sleep(150)
+    const landscapeStick = await evalJs(`getComputedStyle(document.querySelector('.virtual-joystick')).display !== 'none'`)
+    check('画面回転後も仮想ジョイスティックが残る', landscapeStick === true)
+    await send('Emulation.clearDeviceMetricsOverride', {}, sessionId)
+  }
+
   // 描画レイヤの検証: 装備のボーン追従・スケルトン統合・描画統計
   const render = await evalJs(`(() => {
     const t = window.__three

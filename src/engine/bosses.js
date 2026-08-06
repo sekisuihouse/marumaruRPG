@@ -228,7 +228,7 @@ export function updateBosses(dt) {
   // 戦闘中にプレイヤーが倒れたら、そこで仕切り直す。
   // updatePlayer が同じフレームで復活させることがあるので、死亡時刻でも判定する。
   const diedInFight = (sim.player.diedAt ?? -1) > (sim.arena?.since ?? 0)
-  if (isArenaLocked() && (sim.player.dead || diedInFight)) { abortBossFight('playerDown'); return }
+  if (isArenaLocked() && sim.arena?.bossId !== 'boss:final' && (sim.player.dead || diedInFight)) { abortBossFight('playerDown'); return }
   if (sim.mode !== 'play') return
   // BOSS FORGE は町の破壊による出現判定を行わない。ただし選択中のボスは必ず更新する。
   // ここを通さないと runAttack が回らず、攻撃を再生しても静止したまま見える。
@@ -545,7 +545,7 @@ export function defeatBoss(b) {
  */
 export function abortBossFight(reason = 'playerDown') {
   const b = (sim.bosses || []).find((x) => x.alive && !x.defeated)
-  if (!b) { if (isArenaLocked()) { unlockArena('abort'); resumeEnemies() } return false }
+  if (!b) { if (isArenaLocked() && sim.arena?.bossId !== 'boss:final') { unlockArena('abort'); resumeEnemies() } return false }
   clearBossObjects(b.id)
   b.alive = false
   b.spawned = false

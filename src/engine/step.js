@@ -18,6 +18,7 @@ import { saveGame } from './save.js'
 import { damageTarget, explode } from './targets.js'
 import { updateDestruct, isInsideStructure } from './destruct.js'
 import { updateBosses } from './bosses.js'
+import { damageFinalBossAt, finalBossMounted, recoverFinalBossFall, updateFinalBoss, updateMountedPlayer } from './finalBoss.js'
 import { updateDebris } from './debris.js'
 import { updateRagdolls } from './ragdoll.js'
 import { updateJuice, timeScale } from './juice.js'
@@ -90,6 +91,7 @@ export function stepSim(rawDt) {
     if (!isGuest()) {
       if (multiplayer.role === 'offline' || multiplayer.settings.enemies) updateEnemies(dt)
       if (multiplayer.role === 'offline' || multiplayer.settings.bosses) updateBosses(dt)
+      if (multiplayer.role === 'offline' || multiplayer.settings.bosses) updateFinalBoss(dt)
     }
     updateProjectiles(dt)
     updateEffects(dt)
@@ -131,7 +133,8 @@ function updateCamera(dt) {
   const preview = sim.bossForge && !sim.bossForge.combat
   // 通常プレイも上方向へ見上げられるよう、下限を0より下へ広げる。
   c.pitch = THREE.MathUtils.clamp(c.pitch, preview ? -0.45 : -0.35, preview ? 1.4 : 1.15)
-  c.dist = THREE.MathUtils.clamp(c.dist, preview ? 1.5 : 3.5, preview ? 80 : 16)
+  const profile = preview ? [1.5, 80] : c.profile === 'finalGround' ? [8, 30] : c.profile === 'finalMounted' ? [5, 18] : c.profile === 'finalCore' ? [4, 13] : c.profile === 'finalDeath' ? [7, 24] : [3.5, 16]
+  c.dist = THREE.MathUtils.clamp(c.dist, profile[0], profile[1])
 }
 
 // ───────────────────────────── プレイヤー
@@ -182,6 +185,7 @@ function updatePlayer(dt) {
   if (p.airborne) {
     const axis = cameraRelative(moveAxis())
     updateWeb(dt, axis)
+    recoverFinalBossFall()
     if (p.action) runPlayerAttack(dt)
     return
   }
@@ -202,6 +206,14 @@ function updatePlayer(dt) {
 
   // 会話
   if (wasPressed('interact')) tryInteract()
+
+  if (finalBossMounted()) {
+    const axis = cameraRelative(moveAxis())
+    p.running = wantSprint && p.stamina > 3 && !p.blocking
+    updateMountedPlayer(dt, axis)
+    if (p.action) runPlayerAttack(dt)
+    return
+  }
 
   // ── 移動
   let moveX = 0, moveZ = 0
@@ -601,6 +613,13 @@ function updateProjectiles(dt) {
         addEffect({ kind: 'impact', x: pr.x, y: pr.y, z: pr.z, color: pr.color, radius: 0.75, life: 0.25 })
         if (!pr.attack.pierce) done = true
         break
+      }
+      if (!done) {
+        const r = damageFinalBossAt({ x: pr.x, y: pr.y, z: pr.z }, pr.attacker, { ...pr.attack, range: pr.radius + 0.4 }, pr.mul)
+        if (r) {
+          addEffect({ kind: 'impact', x: pr.x, y: pr.y, z: pr.z, color: pr.color, radius: 0.75, life: 0.25 })
+          if (!pr.attack.pierce) done = true
+        }
       }
     }
     if (done || pr.life <= 0) sim.projectiles.splice(i, 1)

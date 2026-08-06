@@ -27,6 +27,7 @@ import { initJuice } from './engine/juice.js'
 import { initWeb } from './engine/webswing.js'
 import { initFireStream } from './engine/firestream.js'
 import { initBosses, armBossSystem, debugSetBossAi, debugSpawnBoss } from './engine/bosses.js'
+import { initFinalBoss } from './engine/finalBoss.js'
 import { initArena, lockArena, unlockArena, isArenaLocked } from './engine/arena.js'
 import { stopMusic, refreshMusicVolume, musicState } from './engine/music.js'
 import { initMultiplayerAuthority } from './net/hostAuthority.js'
@@ -120,6 +121,7 @@ function App() {
         initWeb()
         initFireStream()
         initBosses()
+        initFinalBoss()
         initArena()
         initMultiplayerAuthority()
         // マルチプレイ中は非表示タブでも進行を止めない（ホストが止まると全員が凍るため）
@@ -165,6 +167,7 @@ function App() {
       initWeb()
       initFireStream()
       initBosses()
+      initFinalBoss()
       initArena()
       stopMusic()
       sim.pendingBrokenSave = null   // 前のセーブの破壊状況を持ち越さない
@@ -186,7 +189,7 @@ function App() {
   const startForge = () => {
     // 本編セーブ・建物破壊進行を読まず、開発用の独立した一時状態を使う。
     if (document.pointerLockElement) document.exitPointerLock?.()
-    initEnemies(); initQuests(); initDebris(); initRagdolls(); initWeb(); initFireStream(); initBosses(); initArena(); resetTown(); resetPlayer(true)
+    initEnemies(); initQuests(); initDebris(); initRagdolls(); initWeb(); initFireStream(); initBosses(); initFinalBoss(); initArena(); resetTown(); resetPlayer(true)
     const first = 'student'
     sim.bossForge = {
       bossId: first, actionId: 'drone', annotations: [],
@@ -229,7 +232,7 @@ function App() {
     sim.camera.dist = 9; sim.camera.pitch = 0.28; sim.camera.yaw = Math.PI
     document.exitPointerLock?.()
     sim.bossForge = null
-    initBosses(); resetPlayer(true); resetTown(); publishHud(); setPhase('title')
+    initBosses(); initFinalBoss(); resetPlayer(true); resetTown(); publishHud(); setPhase('title')
   }
 
   if (phase === 'error') {

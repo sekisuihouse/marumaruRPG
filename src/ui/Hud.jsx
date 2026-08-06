@@ -6,13 +6,14 @@ import React, { useEffect, useState, useSyncExternalStore } from 'react'
 import { sim, subscribeHud, getHudSnapshot, publishHud } from '../engine/sim.js'
 import { PLAYER_ATTACKS, ELEMENTS, ENEMY_TYPES, ENEMY_BALANCE } from '../data/enemies.js'
 import { QUESTS, ITEMS } from '../data/quests.js'
-import { ACTION_META, bindingCodes, bindingConflicts, bindingLabel, bindingsSnapshot, clearKeys, resetBindings, setBinding, setInputContext, setVirtualAction } from '../engine/input.js'
+import { ACTION_META, bindingCodes, bindingConflicts, bindingLabel, bindingsSnapshot, clearKeys, resetBindings, setBinding, setInputContext, setVirtualAction, touch } from '../engine/input.js'
 import { findAnchor } from '../engine/webswing.js'
 import { tryAttack } from '../engine/step.js'
 import { dialogueView, chooseDialogue, closeDialogue, useItem } from '../engine/quests.js'
 import { saveGame, deleteSave } from '../engine/save.js'
 import { resetTown } from '../engine/destruct.js'
 import { resetBossProgress } from '../engine/bosses.js'
+import { resetFinalBoss } from '../engine/finalBoss.js'
 import { Minimap } from './Minimap.jsx'
 import { multiplayerSnapshot, subscribeMultiplayer } from '../net/multiplayerStore.js'
 import { netDiagnostics } from '../net/diagnostics.js'
@@ -37,6 +38,7 @@ export function Hud({ onRequestPointerLock }) {
     if (!confirm('町の破壊状態とボスの討伐状況を初期化します。出現中のボスも消えます。よろしいですか？')) return
     resetTown()
     resetBossProgress()
+    resetFinalBoss()
     saveGame(true)
     publishHud()
   }
@@ -97,6 +99,7 @@ export function Hud({ onRequestPointerLock }) {
           <Bar value={boss.hp} max={boss.maxHp} className="boss-hp" label={`${boss.label} HP`} />
         </section>
       ))}
+      {hud.finalBoss && <FinalBossHud boss={hud.finalBoss} />}
 
       {/* ステータス */}
       <div className="stats">
@@ -114,6 +117,7 @@ export function Hud({ onRequestPointerLock }) {
 
       <CombatHud hud={hud} />
       <ContextHint hud={hud} />
+      <VirtualJoystick />
 
       <Shockwave />
 
@@ -132,6 +136,41 @@ export function Hud({ onRequestPointerLock }) {
       <button className="help-fab" onClick={() => setShowHelp(true)} aria-label="操作説明を開く（F1キー）">？ 操作 F1</button>
     </section>
   )
+}
+
+function FinalBossHud({ boss }) {
+  const live = boss.parts.filter((p) => p.state !== 'broken' && (boss.phase >= 4 ? p.id === 'core' : p.id !== 'core')).slice(0, 5)
+  return <section className="boss-hud final-boss-hud" aria-label={`${boss.label} HP`}>
+    <b>{boss.label}　PHASE {boss.phase}</b>
+    <Bar value={boss.hp} max={boss.maxHp} className="boss-hp" label={`${boss.label} HP`} />
+    <small>{boss.objective}</small>
+    <div className="final-parts">{live.map((part) => <span key={part.id}>{part.label} {Math.ceil(part.hp / part.maxHp * 100)}%</span>)}</div>
+  </section>
+}
+
+function VirtualJoystick() {
+  const pad = React.useRef()
+  const [knob, setKnob] = useState({ x: 0, y: 0 })
+  const move = (event) => {
+    const box = pad.current?.getBoundingClientRect()
+    if (!box) return
+    const radius = box.width * 0.36
+    let x = event.clientX - (box.left + box.width / 2), y = event.clientY - (box.top + box.height / 2)
+    const len = Math.hypot(x, y)
+    if (len > radius) { x *= radius / len; y *= radius / len }
+    touch.move.x = x / radius; touch.move.y = -y / radius
+    setKnob({ x, y })
+  }
+  const down = (event) => { event.preventDefault(); pad.current?.setPointerCapture?.(event.pointerId); move(event) }
+  const up = () => { touch.move.x = 0; touch.move.y = 0; setKnob({ x: 0, y: 0 }) }
+  useEffect(() => {
+    const hidden = () => { if (document.hidden) up() }
+    document.addEventListener('visibilitychange', hidden)
+    return () => { document.removeEventListener('visibilitychange', hidden); up() }
+  }, [])
+  return <div ref={pad} className="virtual-joystick" aria-label="移動スティック" onPointerDown={down} onPointerMove={(e) => { if (e.buttons || e.pointerType === 'touch') move(e) }} onPointerUp={up} onPointerCancel={up}>
+    <i style={{ transform: `translate(${knob.x}px,${knob.y}px)` }} />
+  </div>
 }
 
 function HoldActionButton({ action, children, active = false, className = '' }) {

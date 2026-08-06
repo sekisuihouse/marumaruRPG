@@ -21,6 +21,7 @@ export function initWeb() {
     ax: 0, ay: 0, az: 0,
     rope: 0,
     partId: -1,
+    bossAnchorId: null,
     cooldownUntil: 0,
     lastDetach: 0,
     swings: 0,
@@ -87,6 +88,24 @@ export function findAnchor() {
   const dirs = aimSamples()
   let best = null
 
+  // 最終ボスの骨追従部位も接続点にする。構造物より先に評価し、動く身体へ糸を張れる。
+  const boss = sim.finalBoss
+  if (boss?.alive && boss.phase >= 2) {
+    for (const part of Object.values(boss.parts)) {
+      if (part.broken || part.role === 'shin') continue
+      for (const d of dirs) {
+        const vx = part.world.x - ox, vy = part.world.y - oy, vz = part.world.z - oz
+        const t = vx * d.x + vy * d.y + vz * d.z
+        if (t < W.minDistance || t > W.maxDistance) continue
+        const miss = Math.hypot(vx - d.x * t, vy - d.y * t, vz - d.z * t)
+        if (miss > part.radius * 1.6) continue
+        const height = part.world.y - p.pos.y, score = height - d.dev * 6 - t * 0.02 + 4
+        if (height >= W.minHeight && (!best || score > best.score)) best = { x: part.world.x, y: part.world.y, z: part.world.z, partId: -1, bossAnchorId: part.id, kind: 'finalBoss', height, score }
+      }
+    }
+    if (best && best.height >= W.preferHeight) return best
+  }
+
   if (registry.ready) {
     for (const d of dirs) {
       const hit = raycastStructure(ox, oy, oz, d.x, d.y, d.z, W.maxDistance)
@@ -141,6 +160,7 @@ export function tryWebAttach() {
   w.zipping = false            // ジップ中に撃ち直したら、そのまま次の糸へ繋ぐ
   w.ax = a.x; w.ay = a.y; w.az = a.z
   w.partId = a.partId
+  w.bossAnchorId = a.bossAnchorId || null
   w.rope = Math.max(W.minRope, Math.hypot(a.x - p.pos.x, a.y - (p.pos.y + 1.4), a.z - p.pos.z))
   w.swings++
   p.airborne = true
@@ -175,6 +195,7 @@ export function webRelease(zip = false) {
   } else {
     w.zipping = false
     w.partId = -1
+    w.bossAnchorId = null
     // リリース後は飛び続けず、勢いを抑えて素直に落下する。
     p.vel.x *= 0.5
     p.vel.z *= 0.5
@@ -189,6 +210,7 @@ function endZip(arrived) {
   if (!w.zipping) return
   w.zipping = false
   w.partId = -1
+  w.bossAnchorId = null
   if (arrived) {
     // 到着した勢いを残しつつ上へ跳ね上げ、屋根の上へ飛び出せるようにする
     p.vel.x *= W.zip.exitKeep * W.releaseBoost
@@ -223,6 +245,16 @@ export function updateWeb(dt, axis) {
       w.failReason = '接続先が崩れた'
       if (w.attached) webRelease(false)
       else endZip(false)
+    }
+  }
+  if ((w.attached || w.zipping) && w.bossAnchorId) {
+    const part = sim.finalBoss?.parts?.[w.bossAnchorId]
+    if (!part || part.broken || !sim.finalBoss?.alive) {
+      w.failHintUntil = sim.time + 0.85; w.failReason = '接続した部位が崩れた'
+      if (w.attached) webRelease(false); else endZip(false)
+    } else {
+      w.ax = part.world.x; w.ay = part.world.y; w.az = part.world.z
+      if (w.zipping && w.zipTarget) Object.assign(w.zipTarget, { x: w.ax, y: w.ay, z: w.az })
     }
   }
 

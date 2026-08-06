@@ -6,6 +6,7 @@ import { SAVE_KEY } from '../data/world.js'
 import { sim, say, publishHud } from './sim.js'
 import { serializeBroken, applyBroken, resetTown } from './destruct.js'
 import { serializeBosses, applyBossSave } from './bosses.js'
+import { serializeFinalBoss, applyFinalBossSave } from './finalBoss.js'
 
 const num = (v, d) => (typeof v === 'number' && Number.isFinite(v) ? v : d)
 
@@ -26,6 +27,7 @@ export function collectSave() {
     /** 壊した建物の小片。町を復元できるようにIDだけ持つ */
     town: serializeBroken(),
     bosses: serializeBosses(),
+    finalBoss: serializeFinalBoss(),
     dayTime: sim.dayTime,
     settings: sim.settings,
     stats: sim.stats,
@@ -95,6 +97,7 @@ export function applySave(data) {
   if (data.town) applyBroken(data.town)
   else resetTown()
   if (data.bosses) applyBossSave(data.bosses)
+  if (data.finalBoss) applyFinalBossSave(data.finalBoss)
   sim.dayTime = num(data.dayTime, sim.dayTime) % 1
   if (data.settings && typeof data.settings === 'object') {
     Object.assign(sim.settings, data.settings)

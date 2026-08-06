@@ -12,6 +12,7 @@ import { damageStructure } from './destruct.js'
 import { hitDebris } from './debris.js'
 import { impact } from './juice.js'
 import { damageBoss } from './bosses.js'
+import { damageFinalBossAt } from './finalBoss.js'
 
 /** 建物に与える物理ダメージ量。敵の防御は関係しないので単純化する。 */
 function structureDamage(attack, attacker, mul, structureMul) {
@@ -73,6 +74,8 @@ export function damageTarget(spec) {
       const r = damageBoss(b, spec.attacker, attack, { x: spec.x, y: spec.y, z: spec.z }, mul)
       if (r) out.enemies.push({ enemy: b, result: r })
     }
+    const r = damageFinalBossAt({ x: spec.x, y: spec.y, z: spec.z }, spec.attacker, { ...attack, range: radius }, mul)
+    if (r) out.enemies.push({ enemy: sim.finalBoss, result: r })
   }
 
   // ── ボス戦の反撃用オブジェクト（結界核・暴走ドローン・落下鍋）

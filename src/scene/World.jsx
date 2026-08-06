@@ -14,6 +14,7 @@ import { Debris } from './Debris.jsx'
 import { WebLine } from './WebLine.jsx'
 import { DebugOverlay } from './DebugOverlay.jsx'
 import { ArenaField } from './ArenaField.jsx'
+import { FinalBossEffects } from './FinalBossEffects.jsx'
 import { BossForgeCamera } from './BossForgeCamera.jsx'
 import { ThirdPersonCamera } from './ThirdPersonCamera.jsx'
 import { BossForgeDebug, BossForgePreviewStage, BossForgeBackdrop } from './BossForgeDebug.jsx'
@@ -133,6 +134,7 @@ export function World() {
         <Debris />
         <WebLine />
         <ArenaField />
+        <FinalBossEffects />
         <GroundEffects />
         <DamageNumbers />
         <DebugOverlay />

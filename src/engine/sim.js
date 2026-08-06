@@ -109,6 +109,7 @@ function makePlayer() {
     fireStreamNext: 0,
     fireStreamHold: false,
     staggerImmuneUntil: 0,
+    finalBossPlatform: null,
   }
 }
 
@@ -124,6 +125,7 @@ export const sim = {
   player: makePlayer(),
   enemies: [],
   bosses: [],
+  finalBoss: null,
   /** WebRTC参加者は可変Mapで保持し、ローカルプレイヤーとは別に補間描画する。 */
   remotePlayers: new Map(),
   net: { active: false, epoch: 0, sequence: 0, lastSnapshot: -1, correction: null, remoteAttack: null },
@@ -162,7 +164,7 @@ export const sim = {
   tutorialCompleteUntil: 0,
   quests: {},
   // 正面より少し上を見る初期角。以前の0.42(約24°下向き)より地平・高所を見つけやすい。
-  camera: { yaw: Math.PI, pitch: 0.28, dist: 9, target: new THREE.Vector3() },
+  camera: { yaw: Math.PI, pitch: 0.28, dist: 9, target: new THREE.Vector3(), profile: 'normal' },
   dialogue: null,           // {npcId, nodeId}
   stats: { damageDealt: 0, damageTaken: 0, blocked: 0 },
   settings: {
@@ -278,6 +280,7 @@ export function resetPlayer(full = true) {
   p.invuln = 1.2
   p.airborne = false
   p.vy = 0
+  p.finalBossPlatform = null
   p.heat = 0
   p.overheatUntil = 0
   p.staggerImmuneUntil = 0
@@ -404,7 +407,7 @@ function emptySnapshot() {
     messages: [], quests: [], mode: 'play', dialogue: null, dead: false,
     dayTime: 0, isNight: false, enemies: [], settings: sim.settings,
     blocking: false, kills: 0, deaths: 0, nearest: null, items: {}, levelUp: null, tutorialComplete: false,
-    heat: 0, overheat: false, swinging: false, canWeb: false, brokenParts: 0, debris: 0, bosses: [], bossProgress: { defeatedBossCount: 0, buildingRatios: {} },
+    heat: 0, overheat: false, swinging: false, canWeb: false, brokenParts: 0, debris: 0, bosses: [], finalBoss: null, bossProgress: { defeatedBossCount: 0, buildingRatios: {} },
   }
 }
 
@@ -440,6 +443,12 @@ export function buildSnapshot() {
     brokenParts: sim.destructStats?.broken ?? 0,
     debris: sim.debrisStats?.active ?? 0,
     bosses: (sim.bosses || []).filter((b) => b.alive && b.state !== 'dead').map((b) => ({ id: b.id, label: b.label, hp: Math.max(0, Math.round(b.hp)), maxHp: b.maxHp, phase: b.phase, color: b.def.color, vulnerable: sim.time < b.vulnerableUntil })),
+    finalBoss: sim.finalBoss?.alive ? {
+      id: sim.finalBoss.id, label: sim.finalBoss.label, hp: Math.max(0, Math.round(sim.finalBoss.hp)), maxHp: sim.finalBoss.maxHp,
+      phase: sim.finalBoss.phase, state: sim.finalBoss.state, color: sim.finalBoss.def.color,
+      objective: sim.finalBoss.phase <= 1 ? '左右どちらかのすねを破壊' : sim.finalBoss.phase === 2 ? '身体を登り、祭導管を破壊' : sim.finalBoss.phase === 3 ? '視界冠と残る祭導管を破壊' : sim.finalBoss.phase === 4 ? '胸の祭核を破壊' : '手のひらまで降りる',
+      parts: Object.values(sim.finalBoss.parts).map((part) => ({ id: part.id, label: part.label, hp: Math.max(0, part.hp), maxHp: part.maxHp, state: part.state, color: part.color })),
+    } : null,
     bossProgress: { defeatedBossCount: sim.bossProgress?.defeatedBossCount || 0, buildingRatios: { ...(sim.bossProgress?.buildingRatios || {}) } },
     enemies: sim.enemies.filter((e) => e.alive).map((e) => ({
       id: e.id, label: e.label, hp: Math.max(0, Math.round(e.hp)), maxHp: e.maxHp,
