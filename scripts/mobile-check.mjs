@@ -19,6 +19,21 @@ if (!fs.existsSync(CHROME)) {
   console.log('Chrome が見つからないためスキップします:', CHROME)
   process.exit(0)
 }
+
+// 開発サーバーが起動していないまま進むと、原因の分かりにくい TypeError になる。
+// ここで先に確かめて、何をすればよいかを出す。
+try {
+  const res = await fetch(URL_TARGET, { redirect: 'follow' })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+} catch (err) {
+  console.error(`\n${URL_TARGET} を開けませんでした（${err.message}）。`)
+  console.error('別ターミナルで開発サーバーを起動してから、もう一度実行してください:\n')
+  console.error('    npm run dev')
+  console.error(`    npm run test:mobile -- ${URL_TARGET}\n`)
+  console.error('公開版を確かめるときは URL を渡してください:')
+  console.error('    npm run test:mobile -- https://sekisuihouse.github.io/marumaruRPG/\n')
+  process.exit(1)
+}
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'marugoto-mob-'))
 const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`,
   '--no-first-run', '--no-default-browser-check', '--disable-extensions', '--window-size=844,390',
@@ -80,7 +95,9 @@ try {
 
   await send('Page.navigate', { url: `${URL_TARGET}?autostart=1` }, sessionId)
   await sleep(9000)
-  for (let i = 0; i < 40; i++) { if (await evalJs('Boolean(window.__sim?.ready ?? window.__sim)')) break; await sleep(500) }
+  let booted = false
+  for (let i = 0; i < 40; i++) { booted = await evalJs('Boolean(window.__sim)'); if (booted) break; await sleep(500) }
+  if (!booted) throw new Error(`${URL_TARGET} でゲームが起動しませんでした（window.__sim が無い）`)
   await waitFrames(3)
 
   const ui = await evalJs(`(() => ({
