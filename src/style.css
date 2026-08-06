@@ -73,6 +73,17 @@ kbd{display:inline-block;min-width:1.5em;padding:1px 5px;margin:0 2px;border:1px
   border:3px solid #fff;border-radius:24px;background:linear-gradient(135deg,#224f3df2,#2e8064f2);box-shadow:0 12px 46px #00150dcc;
   text-align:center;font-size:clamp(25px,4vw,48px);font-weight:900;line-height:1.18;animation:levelpop .32s ease-out}.tutorial-complete-notice strong{color:#ffe14c;font-size:clamp(34px,5.2vw,66px)}
 @keyframes levelpop{from{opacity:0;transform:translate(-50%,-16px) scale(.82)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+/* フェーズ目標。約2秒で自然に消えるよう、表示中にフェードアウトまで含めて動かす */
+.objective-banner{position:absolute;left:50%;top:31%;transform:translateX(-50%);width:min(760px,94vw);padding:16px 28px;
+  text-align:center;background:linear-gradient(135deg,#101d2ceb,#1d3348eb);border:3px solid #ffffffdd;border-radius:20px;
+  box-shadow:0 12px 46px #00080fcc;color:#fff;pointer-events:none;animation:objectivepop 2.2s ease-out forwards}
+.objective-banner small{display:block;font-size:clamp(14px,2vw,22px);font-weight:900;letter-spacing:.16em}
+.objective-banner strong{display:block;margin-top:4px;font-size:clamp(22px,3.6vw,44px);font-weight:900;line-height:1.15;text-shadow:0 3px 10px #000a}
+@keyframes objectivepop{
+  0%{opacity:0;transform:translate(-50%,-14px) scale(.9)}
+  9%{opacity:1;transform:translate(-50%,0) scale(1)}
+  80%{opacity:1;transform:translate(-50%,0) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-8px) scale(.98)}}
 
 /* ───────── クエストトラッカー ───────── */
 .quest-tracker{position:absolute;right:22px;bottom:96px;width:250px;display:flex;flex-direction:column;gap:2px;

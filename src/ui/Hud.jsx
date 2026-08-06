@@ -121,6 +121,7 @@ export function Hud({ onRequestPointerLock }) {
 
       <Shockwave />
 
+      {hud.objectiveBanner && <ObjectiveBanner banner={hud.objectiveBanner} />}
       {hud.levelUp && <LevelUpNotice levelUp={hud.levelUp} />}
       {hud.tutorialComplete && <section className="tutorial-complete-notice" role="status" aria-live="assertive">レベルアップすると<br /><strong>攻撃が増えるよ！</strong></section>}
 
@@ -138,13 +139,23 @@ export function Hud({ onRequestPointerLock }) {
   )
 }
 
+/** フェーズが切り替わった瞬間に、やることを画面中央へ数秒出す。 */
+function ObjectiveBanner({ banner }) {
+  return <section className="objective-banner" role="status" aria-live="assertive" key={banner.id}>
+    <small style={{ color: banner.color }}>{banner.label}</small>
+    <strong>{banner.text}</strong>
+  </section>
+}
+
 function FinalBossHud({ boss }) {
   const live = boss.parts.filter((p) => p.state !== 'broken' && (boss.phase >= 4 ? p.id === 'core' : p.id !== 'core')).slice(0, 5)
   return <section className="boss-hud final-boss-hud" aria-label={`${boss.label} HP`}>
     <b>{boss.label}　PHASE {boss.phase}</b>
     <Bar value={boss.hp} max={boss.maxHp} className="boss-hp" label={`${boss.label} HP`} />
     <small>{boss.objective}</small>
-    <div className="final-parts">{live.map((part) => <span key={part.id}>{part.label} {Math.ceil(part.hp / part.maxHp * 100)}%</span>)}</div>
+    {boss.phase >= 5
+      ? <div className="final-parts"><span>身体 残り {boss.bodyIntact}/{boss.bodyTotal}</span></div>
+      : <div className="final-parts">{live.map((part) => <span key={part.id}>{part.label} {Math.ceil(part.hp / part.maxHp * 100)}%</span>)}</div>}
   </section>
 }
 

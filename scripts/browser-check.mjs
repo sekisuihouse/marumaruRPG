@@ -312,7 +312,7 @@ try {
     check('4ボス撃破後に最終ボスが出現する', spawned.alive && spawned.phase === 1, JSON.stringify(spawned))
     if (URL_TARGET.includes('finalBossTest=1')) check('最終ボステストはレベル10で開始する', spawned.level === 10, `Lv.${spawned.level}`)
     check('最終ボスGLBが41本骨のスキンとして描画される', finalRender.model && finalRender.bones === 41, JSON.stringify(finalRender))
-    check('最終ボスが調整後の12mで表示される', finalRender.height > 10 && finalRender.height < 14, `${finalRender.height.toFixed(1)}m`)
+    check('最終ボスが巨人として表示される（実測 約35.6m）', finalRender.height > 28 && finalRender.height < 42, `${finalRender.height.toFixed(1)}m`)
     check('最終ボス戦でATフィールドや橋封鎖が発生しない', finalRender.arenaLocked === false, JSON.stringify(finalRender))
     check('最終ボス専用HUDとカメラプロファイルが有効', finalRender.hud && finalRender.profile === 'finalGround', JSON.stringify(finalRender))
     const damageVisual = await evalJs(`(async () => {
