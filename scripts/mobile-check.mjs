@@ -246,20 +246,60 @@ try {
   const landed = await evalJs('({ airborne: !!window.__sim.player.airborne, y: window.__sim.player.pos.y })')
   check('跳んだあと着地して操作へ戻る', landed.airborne === false, JSON.stringify(landed))
 
-  // ── 歩くとカメラが主人公の後ろへ戻る
-  await goHome()
-  await evalJs('(() => { window.__sim.camera.yaw += 2.2; window.__sim.camera.lookedAt = -99; return true })()')
-  const camBefore = await evalJs('({ yaw: window.__sim.camera.yaw, pyaw: window.__sim.player.yaw })')
+  // ── 歩くと視点が定位置（主人公の後ろ上）へ戻る
+  // 移動はカメラ基準なので、歩けばプレイヤー自身がカメラの正面を向く。
+  // つまり「向きのずれ」では何も測れない。実際に効くのは見上げ角の復帰なのでそこを見る。
+  const calm = () => evalJs(`(() => {
+    const s = window.__sim
+    for (const e of s.enemies) { e.aware = false; e.lastSeen = -99 }
+    s.camera.combatUntil = -99
+    return true
+  })()`)
+  const lookUp = () => evalJs(`(() => {
+    const c = window.__sim.camera
+    c.pitch = -1
+    c.lookedAt = -99
+    return c.pitch
+  })()`)
+
+  await goHome(); await calm(); await lookUp()
   await touch('touchStart', [{ x: 160, y: 240, id: 21 }])
   await touch('touchMove', [{ x: 160, y: 170, id: 21 }])
   await waitFrames(10)
-  const camAfter = await evalJs('({ yaw: window.__sim.camera.yaw, pyaw: window.__sim.player.yaw })')
+  const calmPitch = await evalJs('window.__sim.camera.pitch')
   await touch('touchEnd', [])
-  const gap = (a, b) => Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)))
-  const wasOff = gap(camBefore.yaw, camBefore.pyaw + Math.PI)
-  const nowOff = gap(camAfter.yaw, camAfter.pyaw + Math.PI)
-  check('歩くとカメラが主人公の後ろへ戻る', nowOff < wasOff - 0.2,
-    `ずれ ${wasOff.toFixed(2)} → ${nowOff.toFixed(2)} rad`)
+  check('歩くと視点が主人公の後ろ上へ戻る', calmPitch > -0.2,
+    `見上げ角 -1.00 → ${calmPitch.toFixed(2)}（定位置 0.34）`)
+
+  // ── 戦闘中は原神と同じく、置いた視点がそのまま残る
+  await goHome()
+  await evalJs(`(() => {
+    const s = window.__sim, p = s.player
+    const e = s.enemies.find((x) => x.alive && x.state !== 'dead')
+    e.pos.set(p.pos.x + 4, p.pos.y, p.pos.z + 4)
+    // 見えている状態にしないと、AIが次の更新で警戒を解いてしまう
+    e.yaw = Math.atan2(p.pos.x - e.pos.x, p.pos.z - e.pos.z)
+    e.aware = true; e.lastSeen = s.time
+    s.camera.combatUntil = -99
+    return true
+  })()`)
+  await lookUp()
+  await touch('touchStart', [{ x: 160, y: 240, id: 22 }])
+  await touch('touchMove', [{ x: 160, y: 170, id: 22 }])
+  await waitFrames(10)
+  const fight = await evalJs('({ pitch: window.__sim.camera.pitch, fighting: window.__sim.time < window.__sim.camera.combatUntil })')
+  await touch('touchEnd', [])
+  check('戦闘中は視点を勝手に戻さない', fight.fighting === true && fight.pitch < -0.7,
+    `戦闘中=${fight.fighting} / 見上げ角 -1.00 → ${fight.pitch.toFixed(2)}`)
+
+  // 戦闘が終われば、また戻るようになる
+  await calm(); await goHome(); await lookUp()
+  await touch('touchStart', [{ x: 160, y: 240, id: 23 }])
+  await touch('touchMove', [{ x: 160, y: 170, id: 23 }])
+  await waitFrames(10)
+  const calmAgain = await evalJs('window.__sim.camera.pitch')
+  await touch('touchEnd', [])
+  check('戦闘が終われば また戻るようになる', calmAgain > -0.2, `見上げ角 -1.00 → ${calmAgain.toFixed(2)}`)
 
   // ── スロット切替（原神のキャラ切替列）
   const slot = await evalJs(`(() => { const r = document.querySelectorAll('.mc-slot')[1].getBoundingClientRect(); return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) } })()`)
