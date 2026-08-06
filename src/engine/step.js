@@ -85,7 +85,8 @@ export function stepSim(rawDt) {
     return
   }
 
-  if (!sim.paused) {
+  // スマホが縦向きのあいだは進行させない（回転させている間にやられないように）
+  if (!sim.paused && !sim.orientationBlocked) {
     updatePlayer(dt)
     // オフラインとホストだけがAIを決定する。ホスト設定で無効にした群は更新しない。
     if (!isGuest()) {

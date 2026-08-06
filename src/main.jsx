@@ -19,7 +19,7 @@ import { sim, initEnemies, initQuests, resetPlayer, setPlayerDebugLevel, publish
 import { initNpcs } from './engine/step.js'
 import { stepSim } from './engine/step.js'
 import { ACTION_META, attachInput, bindingLabel, setBindings, setDebugInputEnabled } from './engine/input.js'
-import { isHeld, keys, touch } from './engine/input.js'
+import { isHeld, isTouchDevice, keys, touch } from './engine/input.js'
 import { readSave, applySave, deleteSave, saveGame } from './engine/save.js'
 import { initDebris } from './engine/debris.js'
 import { initRagdolls } from './engine/ragdoll.js'
@@ -43,6 +43,7 @@ import { World } from './scene/World.jsx'
 import { MOTION_GAIN } from './gfx/BossModel.jsx'
 import { Hud } from './ui/Hud.jsx'
 import { MultiplayerMenu } from './ui/MultiplayerMenu.jsx'
+import { OrientationGate, lockLandscape } from './ui/OrientationGate.jsx'
 import { BossForge } from './ui/BossForge.jsx'
 
 function Loader() {
@@ -155,6 +156,8 @@ function App() {
   }, [phase])
 
   const start = (useSave, roomSettings = null, finalBossTest = false) => {
+    // 「はじめる」のタップは数少ないユーザー操作の機会。ここで横向きへ固定しておく。
+    if (isTouchDevice()) lockLandscape()
     if (useSave && saveRef.current) {
       applySave(saveRef.current)
       setBindings(sim.settings.bindings || {})
@@ -286,6 +289,8 @@ public/assets/characters/glb/*.glb を生成してください。</pre>
       {phase === 'title' && <Title hasSave={!!saveRef.current} onContinue={() => start(true)} onNew={() => start(false)} onMultiplayer={() => setPhase('multiplayer')} />}
       {phase === 'multiplayer' && <MultiplayerMenu onBack={() => setPhase('title')} onStart={(settings) => start(false, settings)} />}
       <Loader />
+      {/* スマホは横画面必須。縦のあいだは覆いを出して進行も止める */}
+      <OrientationGate />
     </main>
   )
 }

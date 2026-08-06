@@ -100,6 +100,27 @@ try {
   if (!booted) throw new Error(`${URL_TARGET} でゲームが起動しませんでした（window.__sim が無い）`)
   await waitFrames(3)
 
+  // ── 縦画面では遊ばせない
+  const setViewport = (w, h) => send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 2, mobile: true }, sessionId)
+  await setViewport(390, 844)
+  await sleep(1500)
+  const portrait = await evalJs(`({ gate: !!document.querySelector('.orientation-gate'), blocked: !!window.__sim.orientationBlocked })`)
+  const held = await evalJs('({x: window.__sim.player.pos.x, z: window.__sim.player.pos.z})')
+  await touch('touchStart', [{ x: 100, y: 600, id: 90 }])
+  await touch('touchMove', [{ x: 100, y: 520, id: 90 }])
+  await sleep(1200)
+  const heldAfter = await evalJs('({x: window.__sim.player.pos.x, z: window.__sim.player.pos.z})')
+  await touch('touchEnd', [])
+  const shotPortrait = await send('Page.captureScreenshot', { format: 'png' }, sessionId)
+  fs.writeFileSync('screenshot-mobile-portrait.png', Buffer.from(shotPortrait.data, 'base64'))
+  check('縦画面では横にするよう促して覆う', portrait.gate === true, JSON.stringify(portrait))
+  check('縦画面のあいだは進行が止まる', portrait.blocked === true
+    && Math.hypot(heldAfter.x - held.x, heldAfter.z - held.z) < 0.05, JSON.stringify(portrait))
+  await setViewport(844, 390)
+  await sleep(1500)
+  const landscape = await evalJs(`({ gate: !!document.querySelector('.orientation-gate'), blocked: !!window.__sim.orientationBlocked })`)
+  check('横にすると覆いが消えて再開する', landscape.gate === false && landscape.blocked === false, JSON.stringify(landscape))
+
   const ui = await evalJs(`(() => ({
     touchUi: !!document.querySelector('.hud.touch-ui'),
     controls: !!document.querySelector('.mobile-controls'),
