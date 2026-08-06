@@ -128,6 +128,26 @@ function publishThrottled(dt) {
 const CAMERA_RECENTER = 2.2
 /** 最後に視点を動かしてから、この秒数は自動で戻さない。 */
 const CAMERA_LOOK_GRACE = 0.35
+/** 敵がこの距離にいて気づいていれば戦闘中とみなす(m) */
+const COMBAT_RANGE = 20
+/** 戦闘が途切れてから、この秒数は戦闘中のままにする（ちらつき防止） */
+const COMBAT_HOLD = 2.5
+
+/**
+ * 戦闘中か。原神と同じく、戦っている間はカメラを勝手に戻さない。
+ * 相手の周りを回り込んでも、置いた視点がそのまま残るようにする。
+ */
+function playerInCombat() {
+  const p = sim.player
+  if (p.action) return true
+  if (sim.finalBoss?.alive) return true
+  for (const b of sim.bosses || []) if (b.alive && b.state !== 'dead') return true
+  for (const e of sim.enemies) {
+    if (!e.alive || e.state === 'dead' || !e.aware) continue
+    if (e.pos.distanceToSquared(p.pos) <= COMBAT_RANGE * COMBAT_RANGE) return true
+  }
+  return false
+}
 
 function updateCamera(dt) {
   const c = sim.camera
@@ -140,14 +160,23 @@ function updateCamera(dt) {
   // 見上げ側(負)はほぼ真上まで開ける。巨大な最終ボスを首だけで見上げられるようにする。
   // 実際にカメラが地面へ潜らないよう、急角度では ThirdPersonCamera が距離を詰める。
   c.pitch = THREE.MathUtils.clamp(c.pitch, preview ? -1.45 : -1.42, preview ? 1.4 : 1.15)
-  const profile = preview ? [1.5, 80] : c.profile === 'finalGround' ? [2.5, 6] : c.profile === 'finalMounted' ? [1, 3.5] : c.profile === 'finalCore' ? [1, 3] : c.profile === 'finalDeath' ? [2, 5] : [3.5, 16]
+  // 最終ボスは実測 約35.6m。近すぎると全身も足元も見えないので、専用に引ける幅を持たせる。
+  const profile = preview ? [1.5, 80]
+    : c.profile === 'finalGround' ? [8, 34]
+      : c.profile === 'finalMounted' ? [5, 18]
+        : c.profile === 'finalCore' ? [4, 14]
+          : c.profile === 'finalDeath' ? [7, 26]
+            : [3.5, 16]
   c.dist = THREE.MathUtils.clamp(c.dist, profile[0], profile[1])
 
   // 基本は主人公の後ろ上から見る三人称。見回しは一時的に効き、
   // 歩き出すと自動でこの定位置へ戻る。指・マウスを動かしている間は割り込まない。
+  // 戦闘中だけは戻さない（原神と同じ。回り込んでも視点が置いたまま残る）。
   const p = sim.player
   const looking = sim.time - (c.lookedAt ?? -99) < CAMERA_LOOK_GRACE
-  if (!preview && !p.dead && !looking && p.moveSpeed > 0.4) {
+  if (playerInCombat()) c.combatUntil = sim.time + COMBAT_HOLD
+  const fighting = sim.time < (c.combatUntil ?? -99)
+  if (!preview && !p.dead && !looking && !fighting && p.moveSpeed > 0.4) {
     const want = p.yaw + Math.PI            // カメラは主人公の背後に回る
     const diff = Math.atan2(Math.sin(want - c.yaw), Math.cos(want - c.yaw))
     const k = Math.min(1, dt * CAMERA_RECENTER)
