@@ -28,7 +28,8 @@
     "build:final-boss": "/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python scripts/build-final-boss.py",
     "test:p2p": "node scripts/p2p-browser-test.mjs",
     "test:p2p:tabs": "node scripts/p2p-browser-test.mjs http://localhost:5173/ --tabs",
-    "test:p2p:race": "node scripts/p2p-browser-test.mjs http://localhost:5173/ --tabs --slow-sdp"
+    "test:p2p:race": "node scripts/p2p-browser-test.mjs http://localhost:5173/ --tabs --slow-sdp",
+    "test:mobile": "node scripts/mobile-check.mjs"
   },
   "dependencies": {
     "@react-three/drei": "latest",

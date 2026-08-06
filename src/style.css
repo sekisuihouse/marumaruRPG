@@ -268,7 +268,80 @@ kbd{display:inline-block;min-width:1.5em;padding:1px 5px;margin:0 2px;border:1px
 .stats>b{color:#f6e6b0;font-size:14px}.stats small{font-size:11px;line-height:1.45}.bar{height:11px;margin:5px 0;border:1px solid #d5b56d;border-radius:1px;background:#07101a}.bar i{box-shadow:inset 0 1px #ffffff66}
 .boss-hud{top:19px;width:min(500px,56vw);padding:7px 16px;background:linear-gradient(180deg,#0b2035ee,#061421f0);border:1px solid #d7b564;border-radius:1px;clip-path:polygon(0 8px,8px 0,calc(100% - 8px) 0,100% 8px,100% calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,0 calc(100% - 8px));color:#f2d98c;box-shadow:0 6px 20px #0009}
 .final-boss-hud{width:min(650px,72vw);background:linear-gradient(180deg,#29120ff2,#071521f2)}.final-boss-hud small{display:block;color:#fff3c7}.final-parts{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin-top:4px}.final-parts span{padding:2px 5px;border:1px solid #d7b56480;background:#071521;font-size:9px;color:#fff}
-.virtual-joystick{display:none;position:absolute;left:18px;bottom:172px;width:112px;height:112px;border:2px solid #e9d29a99;border-radius:50%;background:#07152199;pointer-events:auto;touch-action:none;z-index:8}.virtual-joystick:before{content:'';position:absolute;inset:34%;border:1px solid #e9d29a66;border-radius:50%}.virtual-joystick i{position:absolute;left:36px;top:36px;width:36px;height:36px;border:2px solid #fff1bd;border-radius:50%;background:#b58a39cc;box-shadow:0 0 12px #eec76788}
+/* ───────── スマホ操作（原神と同じ操作系） ─────────
+   左＝フローティングスティック / 右＝視点ドラッグ / 右下＝ボタン円弧 / 右端＝スロット列 */
+.mobile-controls{position:absolute;inset:0;pointer-events:none;z-index:9;
+  --mc-unit:1;--mc-attack:104px;--mc-mid:74px;--mc-small:58px}
+/* 指を受ける全画面レイヤー。ボタンはこの上に載るので取り合いにならない */
+.mc-field{position:absolute;inset:0;pointer-events:auto;touch-action:none;-webkit-user-select:none;user-select:none}
+.mc-stick{position:absolute;width:128px;height:128px;margin:-64px 0 0 -64px;border:2px solid #e9d29a88;border-radius:50%;
+  background:radial-gradient(circle,#0a1a2599,#0a1a2533);pointer-events:none}
+.mc-stick:before{content:'';position:absolute;inset:33%;border:1px solid #e9d29a55;border-radius:50%}
+.mc-stick i{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border:2px solid #fff1bd;border-radius:50%;
+  background:#b58a39cc;box-shadow:0 0 14px #eec76788}
+
+.mobile-controls .mc-btn{position:absolute;display:grid;place-content:center;gap:1px;border-radius:50%;pointer-events:auto;touch-action:none;
+  border:2px solid #f2e0b199;background:radial-gradient(circle at 50% 30%,#20415ceb,#0a1a26ef);color:#fff6dd;
+  font:900 13px/1.1 inherit;text-align:center;box-shadow:0 3px 12px #0009,inset 0 0 14px #ffe9b31f;-webkit-tap-highlight-color:transparent}
+.mobile-controls .mc-btn small{display:block;font-size:9px;font-weight:700;opacity:.75}
+.mobile-controls .mc-btn .mc-cd{position:absolute;inset:0;display:grid;place-content:center;border-radius:50%;background:#04101899;
+  font-size:15px;font-style:normal;color:#ffe6a8}
+.mobile-controls .mc-btn.on{border-color:#ffe14c;background:radial-gradient(circle at 50% 30%,#4d7d5cf2,#123024f2);box-shadow:0 0 18px #8ff0b877}
+.mobile-controls .mc-btn.off{opacity:.42}
+.mobile-controls .mc-btn:active{transform:scale(.93)}
+
+/* 原神の右下配置：ジャンプが最も右下、通常攻撃が最大、その左上にスキル、さらに左に爆発 */
+/* 右端のスロット列を避けるため、円弧全体はその内側(right:80px〜)に置く */
+.mc-attack{right:80px;bottom:104px;width:var(--mc-attack);height:var(--mc-attack);font-size:16px;
+  border-color:#ffe9b8;background:radial-gradient(circle at 50% 28%,#2c5f80f2,#0b1f2ff2)}
+.mc-jump{right:14px;bottom:18px;width:var(--mc-small);height:var(--mc-small)}
+.mc-skill{right:190px;bottom:168px;width:var(--mc-mid);height:var(--mc-mid)}
+.mc-burst{right:274px;bottom:104px;width:var(--mc-mid);height:var(--mc-mid)}
+.mc-sprint{right:196px;bottom:30px;width:var(--mc-small);height:var(--mc-small);font-size:11px}
+.mc-guard{right:272px;bottom:22px;width:50px;height:50px}
+.mc-heal{right:340px;bottom:52px;width:50px;height:50px}
+
+/* 原神のキャラ切替列と同じ、右端の縦並び */
+.mc-slots{position:absolute;right:8px;top:56px;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.mc-slots .mc-slot{position:relative;width:50px;height:50px;border-radius:50%;pointer-events:auto;touch-action:none;
+  border:2px solid #d9c79066;background:#0a1a26e8;color:#f4e6c4;font:800 9px/1.15 inherit;display:grid;place-content:center;gap:1px;
+  box-shadow:0 2px 8px #0008;-webkit-tap-highlight-color:transparent}
+.mc-slots .mc-slot b{font-size:13px;color:#f0d28b}
+.mc-slots .mc-slot.on{border-color:#ffe14c;background:#3d5a2ae8;box-shadow:0 0 14px #ffe14c66}
+.mc-slots .mc-slot.off{opacity:.4}
+.mc-slots .mc-slot em{position:absolute;inset:0;display:grid;place-content:center;border-radius:50%;background:#04101899;font-style:normal;font-size:13px}
+
+.mc-interact{position:absolute;right:calc(26px + var(--mc-attack) + 18px);bottom:230px;padding:9px 14px;border-radius:26px;
+  border:2px solid #ffe9b8;background:#123c4ef0;color:#fff6dd;font:900 13px/1.2 inherit;pointer-events:auto;touch-action:none;
+  box-shadow:0 3px 12px #0009}
+.mc-interact small{display:block;font-size:10px;font-weight:700;opacity:.8}
+
+/* 縦持ちや小さい端末では円弧を内側へ寄せる */
+@media (max-width:560px),(max-height:460px){
+  .mobile-controls{--mc-attack:86px;--mc-mid:62px;--mc-small:50px}
+  .mc-attack{right:74px;bottom:76px}
+  .mc-jump{right:12px;bottom:14px}
+  .mc-skill{right:168px;bottom:132px}
+  .mc-burst{right:240px;bottom:84px}
+  .mc-sprint{right:172px;bottom:20px}
+  .mc-guard{right:240px;bottom:16px;width:44px;height:44px}
+  .mc-heal{right:300px;bottom:36px;width:44px;height:44px}
+  .mc-slots{top:60px;gap:6px}
+  .mc-slots .mc-slot{width:46px;height:46px}
+  .mc-interact{bottom:186px;right:110px;padding:7px 11px;font-size:11px}
+}
+/* タッチ操作時はPC用の下段バーとヒントを出さない（原神には無い要素） */
+.hud.touch-ui .combat-hud,.hud.touch-ui .context-hint,.hud.touch-ui .quest-tracker,.hud.touch-ui .brand,.hud.touch-ui .minimap-hint{display:none}
+/* ミニマップは右上（原神と同じ）。右端のスロット列とぶつからない位置まで寄せる */
+.hud.touch-ui .minimap{left:auto;right:66px;bottom:auto;top:6px;transform:scale(.52);transform-origin:top right}
+.hud.touch-ui .stats{top:10px;left:10px;width:min(44vw,250px);padding:7px 10px;font-size:12px}
+.hud.touch-ui .stats>b{font-size:13px}
+.hud.touch-ui .stats small{margin-top:4px;font-size:10px;line-height:1.4}
+.hud.touch-ui .bar{height:11px;margin:4px 0;border-width:1px}
+/* 操作説明・開発用リセットは左上へ。指の通り道（右下の円弧と左下のスティック）を空ける */
+.hud.touch-ui .help-fab{left:10px;right:auto;top:136px;bottom:auto;padding:6px 10px;font-size:11px}
+.hud.touch-ui .reset-fab{left:96px;right:auto;top:136px;bottom:auto;padding:6px 10px;font-size:11px}
+.hud.touch-ui .messages{bottom:auto;top:180px}
 .quest-tracker{right:28px;top:25px;bottom:auto;width:250px;padding:9px 12px;background:#071929e8;border:1px solid #c8a25b;border-radius:2px;clip-path:polygon(0 8px,8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%);box-shadow:0 5px 18px #0009}.quest-tracker b{color:#ebc774}.quest-tracker small{display:none}
 .minimap{left:28px;bottom:28px;padding:5px;border:1px solid #c8a25b;border-radius:50%;background:#061421d9;box-shadow:0 5px 20px #0009}.minimap-hint{color:#ddc282}
 .combat-hud{bottom:20px;gap:5px;width:min(720px,94vw)}
@@ -276,8 +349,8 @@ kbd{display:inline-block;min-width:1.5em;padding:1px 5px;margin:0 2px;border:1px
 .ability-use{order:2;background:#071522ed;border:1px solid #c7a359;border-radius:1px;color:#f2dfaa;padding:6px 16px;clip-path:polygon(0 6px,6px 0,calc(100% - 6px) 0,100% 6px,100% calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,0 calc(100% - 6px))}.quick-actions{order:3;position:static;transform:none;gap:4px;width:auto}.quick-actions button{min-height:27px;padding:4px 8px;background:#091a29e8;font-size:10px;clip-path:none}.quick-actions button.on{background:#315f70;border-color:#f0d28b}.quick-actions kbd{color:#f0d28b}
 .context-hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:5px;color:#fff;font-weight:900;text-align:center}.context-hint i{font-style:normal;font-size:28px;line-height:1;text-shadow:0 0 9px #000}.context-hint span{padding:5px 11px;background:#061522df;border:1px solid #d7b564;border-radius:2px;color:#f6e6b0;white-space:nowrap}.context-hint.ready i{color:#fff2c1;text-shadow:0 0 10px #eec767}.context-hint.attached i{color:#d8fbff;animation:webpulse .65s infinite alternate}.context-hint.unavailable i{color:#9ba4aa}.context-hint.unavailable span{border-color:#8e979d;color:#d1d5d7}
 .help-fab{right:26px;bottom:24px;border:1px solid #c8a25b;border-radius:2px;background:#071929e8;color:#ecd18a;box-shadow:0 4px 14px #0008}.reset-fab{right:26px;bottom:65px}.binding-warning{margin:8px 0;padding:7px 9px;border:1px solid #e5b260;background:#573a14;color:#fff1bd;border-radius:5px}
-@media(max-width:760px){.brand{left:14px;top:17px;font-size:19px}.stats{left:14px;top:59px;width:230px;padding:8px 10px}.stats small{font-size:9px}.quest-tracker{display:none}.minimap{display:block;left:auto;right:12px;bottom:170px}.combat-hud{bottom:8px}.ability-slots{gap:4px}.ability-slots button{min-height:60px;padding:5px 3px}.ability-slots button b{font-size:10px}.ability-slots button span{font-size:8px}.quick-actions button{min-height:25px;padding:3px 5px;font-size:9px}.context-hint{top:45%}.context-hint span{font-size:10px}.help-fab{right:12px;bottom:12px}.virtual-joystick{display:block}.final-boss-hud{top:8px;width:76vw;font-size:10px}.final-parts{display:none}}
-@media(max-width:900px),(pointer:coarse){.virtual-joystick{display:block}.minimap{left:auto;right:12px}}
+@media(max-width:760px){.brand{left:14px;top:17px;font-size:19px}.stats{left:14px;top:59px;width:230px;padding:8px 10px}.stats small{font-size:9px}.quest-tracker{display:none}.minimap{display:block;left:auto;right:12px;bottom:170px}.combat-hud{bottom:8px}.ability-slots{gap:4px}.ability-slots button{min-height:60px;padding:5px 3px}.ability-slots button b{font-size:10px}.ability-slots button span{font-size:8px}.quick-actions button{min-height:25px;padding:3px 5px;font-size:9px}.context-hint{top:45%}.context-hint span{font-size:10px}.help-fab{right:12px;bottom:12px}.final-boss-hud{top:8px;width:76vw;font-size:10px}.final-parts{display:none}}
+@media(max-width:900px),(pointer:coarse){.minimap{left:auto;right:12px}}
 
 /* ── BOSS FORGE（開発環境のみ） ───────────────────────────── */
 .boss-forge{position:fixed;inset:0;z-index:30;pointer-events:none;color:#dcecff;font:12px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;background:linear-gradient(90deg,#07111ddd 0 23%,transparent 31% 69%,#07111ddd 77% 100%)}.boss-forge button,.boss-forge input,.boss-forge select,.boss-forge textarea{pointer-events:auto;font:inherit}.forge-title{position:absolute;top:0;left:0;right:0;height:38px;display:flex;align-items:center;gap:12px;padding:6px 12px;border-bottom:1px solid #4d85aa;background:#07121cec;pointer-events:auto}.forge-title b{font-size:17px;letter-spacing:.14em;color:#78d9ff}.forge-title span{opacity:.72}.forge-title button{margin-left:auto}.forge-panel{position:absolute;top:48px;bottom:176px;width:min(285px,23vw);overflow:auto;padding:10px;background:#091826ed;border:1px solid #315b78;pointer-events:auto}.forge-left{left:10px}.forge-right{right:10px}.forge-panel h3{margin:2px 0 8px;color:#ffcf6a}.forge-panel button,.forge-bottom button,.forge-title button{margin:2px;padding:5px 7px;border:1px solid #477895;border-radius:3px;background:#112a3e;color:#e8f4ff;cursor:pointer}.forge-panel button.active,.forge-bottom button.active{border-color:#ffd26f;background:#5b431e;color:#fff4ce}.forge-panel label,.forge-panel b,.forge-panel small{display:block;margin:7px 0}.forge-panel input,.forge-panel select,.forge-panel textarea{width:100%;background:#06111c;color:#e8f4ff;border:1px solid #355c78;border-radius:3px;padding:4px}.forge-panel input[type=checkbox]{width:auto}.forge-panel textarea{min-height:58px}.forge-panel hr{border:0;border-top:1px solid #315b78;margin:10px 0}.forge-bottom{position:absolute;left:calc(min(285px,23vw) + 22px);right:calc(min(285px,23vw) + 22px);bottom:8px;min-height:160px;padding:8px;background:#07131eea;border:1px solid #315b78;pointer-events:auto}.forge-actions,.forge-controls,.forge-annotations{display:flex;flex-wrap:wrap;gap:3px;align-items:center}.forge-actions b,.forge-annotations b{color:#78d9ff;margin-right:5px}.forge-timeline{display:flex;gap:9px;margin:7px 0;padding:6px;background:#0b2233}.forge-timeline span{color:#b9d1e2}.forge-timeline b{color:#ffcf6a}.forge-prompt{display:block;width:100%;height:140px;margin-top:8px;background:#02090f;color:#dcecff;border:1px solid #477895;padding:7px;pointer-events:auto}.forge-marker{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#f4bd4d;color:#201000;border:2px solid #fff;font-weight:900}.boss-forge.combat .forge-panel{opacity:.72}.boss-forge.combat .forge-right{display:none}@media(max-width:900px){.forge-panel{width:220px}.forge-bottom{left:230px;right:10px}.forge-title span{display:none}}
