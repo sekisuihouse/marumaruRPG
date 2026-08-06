@@ -261,7 +261,7 @@ try {
     check('Jキーでクエスト画面を開ける', state.questOpen === true)
     check('ミニマップが描画されている', state.minimap === true)
     check('村人が配置されている', state.npcs === 4, `${state.npcs}人`)
-    check('敵が出現している', state.enemiesAlive > 0, `${state.enemiesAlive}体`)
+    if (!URL_TARGET.includes('finalBossTest=1')) check('敵が出現している', state.enemiesAlive > 0, `${state.enemiesAlive}体`)
     // ヘッドレスは SwiftShader(ソフトウェア描画)なので fps は出ない。進行だけ見る
     check('フレームが進んでいる', state.frames > 20, `${state.frames} フレーム / 内部時間 ${state.time}s`)
     check('町がマージされている', state.townDraws > 0 && state.townDraws < 40, `${state.townDraws} ドローコール`)
@@ -292,13 +292,13 @@ try {
     check('デバッグ時にPで町小道具弾を発射できる', debugKeySeen && debugPropShot.enabled && debugPropShot.fired > 0 && debugPropShot.count > 0 && Number.isInteger(debugPropShot.asset), JSON.stringify({ debugKeySeen, ...debugPropShot }))
   }
 
-  if (URL_TARGET.includes('finalBoss=1')) {
+  if (URL_TARGET.includes('finalBoss=1') || URL_TARGET.includes('finalBossTest=1')) {
     const spawned = await evalJs(`(async () => {
       const m = await import('/src/engine/finalBoss.js'); const s = window.__sim
       for (const b of s.bosses) { b.spawned = true; b.alive = false; b.defeated = true }
       s.bossProgress.defeatedBossCount = 4; s.bossProgress.order = ['student','stage','shrine','food']
       s.player.items = { prototype_core:1, stage_pass:1, boundary_seal:1, chef_medal:1 }
-      m.updateFinalBoss(6.1); return { alive:s.finalBoss.alive, phase:s.finalBoss.phase }
+      m.updateFinalBoss(6.1); return { alive:s.finalBoss.alive, phase:s.finalBoss.phase, level:s.player.level }
     })()`)
     await sleep(12000)
     const finalRender = await evalJs(`(() => {
@@ -307,11 +307,13 @@ try {
       if (mesh && !mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox()
       const e = mesh?.matrixWorld?.elements || []; const sy = Math.hypot(e[4] || 0, e[5] || 0, e[6] || 0)
       const height = mesh ? (mesh.geometry.boundingBox.max.y - mesh.geometry.boundingBox.min.y) * sy : 0
-      return { model:!!mesh, bones:mesh?.skeleton?.bones?.length || 0, height, hud:!!document.querySelector('.final-boss-hud'), phase:s.finalBoss?.phase, profile:s.camera.profile }
+      return { model:!!mesh, bones:mesh?.skeleton?.bones?.length || 0, height, hud:!!document.querySelector('.final-boss-hud'), phase:s.finalBoss?.phase, profile:s.camera.profile, arenaLocked:!!s.arena?.active }
     })()`)
     check('4ボス撃破後に最終ボスが出現する', spawned.alive && spawned.phase === 1, JSON.stringify(spawned))
+    if (URL_TARGET.includes('finalBossTest=1')) check('最終ボステストはレベル10で開始する', spawned.level === 10, `Lv.${spawned.level}`)
     check('最終ボスGLBが41本骨のスキンとして描画される', finalRender.model && finalRender.bones === 41, JSON.stringify(finalRender))
-    check('最終ボスが既存キャラより十分巨大に表示される', finalRender.height > 25 && finalRender.height < 50, `${finalRender.height.toFixed(1)}m`)
+    check('最終ボスが調整後の12mで表示される', finalRender.height > 10 && finalRender.height < 14, `${finalRender.height.toFixed(1)}m`)
+    check('最終ボス戦でATフィールドや橋封鎖が発生しない', finalRender.arenaLocked === false, JSON.stringify(finalRender))
     check('最終ボス専用HUDとカメラプロファイルが有効', finalRender.hud && finalRender.profile === 'finalGround', JSON.stringify(finalRender))
     const damageVisual = await evalJs(`(async () => {
       const s = window.__sim

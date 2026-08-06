@@ -3,7 +3,8 @@ import { FINAL_ATTACKS, FINAL_BOSS, FINAL_PART_DEFS, FINAL_PLATFORM_DEFS } from 
 import { sim, addEffect, floater, gainXp, say } from './sim.js'
 import { damagePlayer } from './damage.js'
 import { groundY, move, nearestWalkable } from './nav.js'
-import { isArenaLocked, lockArena, resumeEnemies, unlockArena } from './arena.js'
+import { isArenaLocked, resumeEnemies, unlockArena } from './arena.js'
+import { playMusic, stopMusic } from './music.js'
 
 const tmp = new THREE.Vector3()
 const tmp2 = new THREE.Vector3()
@@ -50,9 +51,9 @@ const setState = (boss, state, phase = boss.phase) => { boss.state = state; boss
 
 function syncFallbackParts(boss) {
   const byRole = {
-    shinL: [-2.1, 6.5, 0], shinR: [2.1, 6.5, 0], armL: [-7.2, 18, 0], armR: [7.2, 18, 0],
-    conduitStudent: [-2.2, 23, -1.1], conduitStage: [-3.7, 25, 0], conduitShrine: [3.7, 25, 0], conduitFood: [2.2, 23, -1.1],
-    crown: [0, 33, 0], core: [0, 26, -1.5],
+    shinL: [-0.7, 2.2, 0], shinR: [0.7, 2.2, 0], armL: [-2.4, 6, 0], armR: [2.4, 6, 0],
+    conduitStudent: [-0.75, 7.7, -0.4], conduitStage: [-1.25, 8.35, 0], conduitShrine: [1.25, 8.35, 0], conduitFood: [0.75, 7.7, -0.4],
+    crown: [0, 11, 0], core: [0, 8.7, -0.5],
   }
   const s = Math.sin(boss.yaw), c = Math.cos(boss.yaw)
   for (const part of Object.values(boss.parts)) {
@@ -89,9 +90,9 @@ function spawn() {
   boss.anim = 'swagger'
   setState(boss, 'assembling', 0)
   syncFallbackParts(boss)
-  lockArena(boss)
+  playMusic('bossChase')
   sim.camera.profile = 'finalGround'
-  addEffect({ kind: 'burst', x: boss.pos.x, y: boss.pos.y + 2, z: boss.pos.z, radius: 12, color: boss.def.color, life: 2.5 })
+  addEffect({ kind: 'burst', x: boss.pos.x, y: boss.pos.y + 2, z: boss.pos.z, radius: 4, color: boss.def.color, life: 2.5 })
   say('四つの祭の力が集まり、祭典終端巨人・ティウが立ち上がる！', 'boss')
   return true
 }
@@ -234,9 +235,9 @@ function tryMountNearby(boss) {
   if (!best) {
     for (const [shinId, side, platformId] of [['shinL', -1, 'forearmL'], ['shinR', 1, 'forearmR']]) {
       if (!boss.parts[shinId].broken) continue
-      tmp.set(boss.pos.x + side * 5, boss.pos.y + 1.2, boss.pos.z)
+      tmp.set(boss.pos.x + side * 1.8, boss.pos.y + 0.7, boss.pos.z)
       const d = p.pos.distanceTo(tmp)
-      if (d < 4 && (!best || d < best.d)) best = { platform: boss.platforms[platformId], d }
+      if (d < 3.2 && (!best || d < best.d)) best = { platform: boss.platforms[platformId], d }
     }
   }
   if (best) mountPlayer(best.platform.id)
@@ -319,8 +320,8 @@ function breakPart(boss, part) {
   addEffect({ kind: 'burst', x: part.world.x, y: part.world.y, z: part.world.z, radius: part.radius * 1.6, color: part.color || '#ffcf70', life: 1.2 })
   say(`${part.label}を破壊！`, 'boss')
   if (part.role === 'conduit') {
-    boss.hazards.push({ id: `backlash:${part.id}`, x: part.world.x, y: part.world.y, z: part.world.z, radius: 4, damage: 36, life: 1.2, hit: false, color: part.color })
-    addEffect({ kind: 'telegraph', x: part.world.x, y: part.world.y, z: part.world.z, radius: 4, color: part.color, life: 1.2 })
+    boss.hazards.push({ id: `backlash:${part.id}`, x: part.world.x, y: part.world.y, z: part.world.z, radius: 1.6, damage: 36, life: 1.2, hit: false, color: part.color })
+    addEffect({ kind: 'telegraph', x: part.world.x, y: part.world.y, z: part.world.z, radius: 1.6, color: part.color, life: 1.2 })
     // The matching trophy turns the backlash into a readable safe response window.
     if (sim.player.items[part.reward]) { boss.nextAttackAt = Math.max(boss.nextAttackAt, sim.time + 2.8); say(`${part.label}の力を、獲得した証が押し返した！`, 'boss') }
   }
@@ -336,6 +337,7 @@ function beginDeath(boss) {
 function finishFinalBoss(boss) {
   boss.alive = false; boss.defeated = true; boss.state = 'defeated'; boss.phase = 5; boss.hp = 0
   sim.player.finalBossPlatform = null; sim.camera.profile = 'normal'
+  stopMusic()
   if (isArenaLocked()) { unlockArena('clear'); resumeEnemies() }
   if (!boss.rewarded) { boss.rewarded = true; gainXp(1200); sim.player.gold += 800 }
   say('祭典終端巨人・ティウを撃破。四つの祭の光が町へ帰った。', 'boss')
@@ -390,5 +392,6 @@ export function applyFinalBossSave(data) {
 
 export function resetFinalBoss() {
   if (isArenaLocked() && sim.arena?.bossId === 'boss:final') { unlockArena('abort'); resumeEnemies(0) }
+  if (sim.finalBoss?.alive) stopMusic()
   sim.player.finalBossPlatform = null; sim.camera.profile = 'normal'; sim.finalBoss = makeFinalBoss()
 }

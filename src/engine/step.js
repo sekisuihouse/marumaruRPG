@@ -133,7 +133,7 @@ function updateCamera(dt) {
   const preview = sim.bossForge && !sim.bossForge.combat
   // 通常プレイも上方向へ見上げられるよう、下限を0より下へ広げる。
   c.pitch = THREE.MathUtils.clamp(c.pitch, preview ? -0.45 : -0.35, preview ? 1.4 : 1.15)
-  const profile = preview ? [1.5, 80] : c.profile === 'finalGround' ? [8, 30] : c.profile === 'finalMounted' ? [5, 18] : c.profile === 'finalCore' ? [4, 13] : c.profile === 'finalDeath' ? [7, 24] : [3.5, 16]
+  const profile = preview ? [1.5, 80] : c.profile === 'finalGround' ? [5, 18] : c.profile === 'finalMounted' ? [3.5, 12] : c.profile === 'finalCore' ? [3, 10] : c.profile === 'finalDeath' ? [5, 16] : [3.5, 16]
   c.dist = THREE.MathUtils.clamp(c.dist, profile[0], profile[1])
 }
 

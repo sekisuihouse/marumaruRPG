@@ -14,7 +14,7 @@ import { useProgress } from '@react-three/drei'
 import * as THREE from 'three'
 import './style.css'
 
-import { loadNav, groundY as navGroundY, isWalkable as navIsWalkable } from './engine/nav.js'
+import { loadNav, groundY as navGroundY, isWalkable as navIsWalkable, nearestWalkable as navNearestWalkable } from './engine/nav.js'
 import { sim, initEnemies, initQuests, resetPlayer, setPlayerDebugLevel, publishHud, say } from './engine/sim.js'
 import { initNpcs } from './engine/step.js'
 import { stepSim } from './engine/step.js'
@@ -27,7 +27,7 @@ import { initJuice } from './engine/juice.js'
 import { initWeb } from './engine/webswing.js'
 import { initFireStream } from './engine/firestream.js'
 import { initBosses, armBossSystem, debugSetBossAi, debugSpawnBoss } from './engine/bosses.js'
-import { initFinalBoss } from './engine/finalBoss.js'
+import { initFinalBoss, updateFinalBoss } from './engine/finalBoss.js'
 import { initArena, lockArena, unlockArena, isArenaLocked } from './engine/arena.js'
 import { stopMusic, refreshMusicVolume, musicState } from './engine/music.js'
 import { initMultiplayerAuthority } from './net/hostAuthority.js'
@@ -98,7 +98,8 @@ function App() {
       if (r && typeof r.catch === 'function') r.catch(() => {})
     } catch { /* ロックできない環境 */ }
   }
-  const autoStart = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('autostart')
+  const finalBossTestRequested = import.meta.env.DEV && typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('finalBossTest') === '1'
+  const autoStart = typeof window !== 'undefined' && (new URLSearchParams(window.location.search).has('autostart') || finalBossTestRequested)
   const bossForgeRequested = import.meta.env.DEV && typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('bossForge') === '1'
   const debugModeRequested = import.meta.env.DEV && typeof window !== 'undefined' && (
     import.meta.env.MODE === 'debug' || new URLSearchParams(window.location.search).get('debug') === '1'
@@ -135,7 +136,7 @@ function App() {
         publishHud()
         saveRef.current = readSave()
         if (bossForgeRequested) startForge()
-        else if (autoStart) start(false)
+        else if (autoStart) start(false, null, finalBossTestRequested)
         else setPhase('title')
       } catch (e) {
         console.error(e)
@@ -153,13 +154,13 @@ function App() {
     return detach
   }, [phase])
 
-  const start = (useSave, roomSettings = null) => {
+  const start = (useSave, roomSettings = null, finalBossTest = false) => {
     if (useSave && saveRef.current) {
       applySave(saveRef.current)
       setBindings(sim.settings.bindings || {})
       say('セーブデータから再開しました。', 'save')
     } else {
-      deleteSave()
+      if (!finalBossTest) deleteSave()
       initEnemies()
       initQuests()
       initDebris()
@@ -174,13 +175,27 @@ function App() {
       resetTown()                    // 見た目・破片・通行判定をまとめて元に戻す
       resetPlayer(true)
       if (roomSettings?.initialLevel > 1) setPlayerDebugLevel(roomSettings.initialLevel)
-      say('未来の町へようこそ。WASDで歩き、Eで話す。F1で操作説明。', 'info')
-      saveGame(true)
+      say(finalBossTest ? '最終ボステスト：レベル10・4ボス討伐済みで開始します。' : '未来の町へようこそ。WASDで歩き、Eで話す。F1で操作説明。', finalBossTest ? 'boss' : 'info')
+      if (!finalBossTest) saveGame(true)
     }
     if (debugStartLevel > 0) setPlayerDebugLevel(debugStartLevel)
     if (sim.debugMode) console.info('[DEBUG] P: 町の小道具をランダム射出')
     sim.mode = 'play'
     armBossSystem()
+    if (finalBossTest) {
+      setPlayerDebugLevel(10)
+      sim.bossProgress.defeatedBossCount = sim.bosses.length
+      sim.bossProgress.order = sim.bosses.map((boss) => boss.def.id)
+      for (const boss of sim.bosses) {
+        boss.spawned = true; boss.alive = false; boss.defeated = true; boss.state = 'dead'
+        const item = boss.def.reward?.item
+        if (item) { sim.player.items[item] = 1; sim.bossProgress.rewards[item] = true }
+      }
+      const testStart = navNearestWalkable(12, 0)
+      sim.player.pos.set(testStart.x, navGroundY(testStart.x, testStart.z), testStart.z)
+      sim.autosaveAt = Infinity
+      updateFinalBoss(0)
+    }
     publishHud()
     setPhase('play')
     requestPointerLock()
